@@ -1,0 +1,575 @@
+<script>
+function emisionPLA20($scope,  $rootScope, DreamFactory, CONFIG, sessionService) {
+    $scope.getRequisitosActividadEconomica = function(lista){
+        //console.log("listasdoss",lista);
+        //$scope.datos.f01_requisitos_actividad_economica=lista;
+        //console.log("chequeos",$scope.datos.f01_requisitos_actividad_economica);
+        $rootScope.datosRequisitosActividadEconomica= lista;
+    }
+
+}
+</script>
+
+<div class="animated fadeInRight">
+    <form class="form-horizontal">
+        <div class="wrap" ng-controller="emisionPLA20" ng-init="getRequisitosActividadEconomica(datos.f01_requisitos_actividad_economica)">
+            <div class="ibox-title_2">
+                <h5>EMISION DE LICENCIA DE FUNCIONAMIENTO</h5>
+            </div>
+
+        <div class="form-group"><label class="col-sm-2 control-label">PMC:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_num_pmc}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+      <div class="form-group"><label class="col-sm-2 control-label">Tipo de Persona:</label>
+                    <div class="col-sm-10"  ng-switch on="datos.f01_tipo_per">
+                        <div class="animate-switch" ng-switch-when="N">
+                            <input type="text" disabled="" value="NATURAL" id="datos.f01_tipo_per" name="datos.f01_tipo_per" placeholder="{{datos.f01_tipo_per}}" class="form-control">
+                        </div>
+                        <div class="animate-switch" ng-switch-when="J">
+                            <input type="text" disabled="" value="JURIDICO" id="datos.f01_tipo_per" name="datos.f01_tipo_per" placeholder="{{datos.f01_tipo_per}}" class="form-control">
+                        </div>
+                        
+                    </div>                
+                </div>
+        <div class="hr-line-dashed"></div>
+    <div class="ibox-title_2">
+            <h5>DATOS DEL CONTRIBUYENTE</h5>
+        </div>
+        <div class="form-group"><label class="col-sm-2 control-label">NIT:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_nit_prop}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">TIPO DE DOCUMENTO:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_tip_doc_prop}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">NUMERO DE DOCUMENTO:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_num_dos_prop}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">EXPEDIDO:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_expedido_prop}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">PRIMER NOMBRE:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_pri_nom_prop}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">SEGUNDO NOMBRE:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_seg_nom_prop}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">TERCER NOMBRE:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_ter_nom_prop}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">APELLIDO PATERNO:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_ape_pat_prop}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">APELLIDO MATERNO:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_ape_mat_prop}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">APELLIDO DE CASADA:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_ape_cas_prop}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">TELEFONO:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_telef_prop}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">CELULAR:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_cel_prop}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">CORREO ELECTRONICO:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_email_prop}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+    <div class="ibox-title_2">
+            <h5>IDENTIFICACION DE LA EMPRESA</h5>
+        </div>
+        <div class="form-group"><label class="col-sm-2 control-label">NIT:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_num_doc_per_jur}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">RAZON SOCIAL:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_raz_soc_per_jur}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+    <div class="ibox-title_2">
+            <h5>DATOS DEL REPRESENTANTE LEGAL</h5>
+        </div>
+        <div class="form-group"><label class="col-sm-2 control-label">TIPO DE DOCUMENTO:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_tip_doc_rep}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">NUMERO DE DOCUMENTO:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_num_doc_rep}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+
+                <div class="form-group"><label class="col-sm-2 control-label">Expedido:</label>
+                    <div class="col-sm-10">
+                        <select id="f01_expedido_prop" name="f01_expedido_prop"  ng-model="datos.f01_expedido_prop"  class="form-control" placeholder="-- Seleccione --" ng-disabled="true" required>
+                            <option value="LPZ"> LA PAZ  </option>
+                            <option value="ORU"> ORURO  </option>
+                            <option value="PTS"> POTOSI  </option>
+                            <option value="CBB"> COCHABAMBA  </option>
+                            <option value="TJA"> TARIJA  </option>
+                            <option value="CHQ"> CHUQUISACA  </option>
+                            <option value="SCZ"> SANTA CRUZ  </option>
+                            <option value="PND"> PANDO  </option>
+                            <option value="BNI"> BENI  </option>
+                            <option value="EXT"> EXTRANJERO  </option>
+                        </select>
+                    </div>
+                </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">PRIMER NOMBRE:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_pri_nom_rep}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">SEGUNDO NOMBRE:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_seg_nom_rep}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">TERCER NOMBRE:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_ter_nom_rep}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">APELLIDO PATERNO:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_ape_pat_rep}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">APELLIDO MATERNO:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_ape_mat_rep}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">APELLIDO CASADA:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_ape_cas_rep}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">TELEFONO OFICINA:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_telef_rep}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">CELULAR:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_cel_rep}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">CORREO ELECTRONICO:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_email_rep}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+    <div class="ibox-title_2">
+            <h5>DATOS TECNICOS DE LA ACTIVIDAD ECONOMICA</h5>
+        </div>
+        <div class="form-group"><label class="col-sm-2 control-label">NIT:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_nit}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">DENOMINACION:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_raz_soc}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">SUPERFICIE M2:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_sup}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">CAPACIDAD APROX:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_cap_aprox}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">HORARIO INICIO DE ATENCION:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_de_hor}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">HORARIO FIN DE ATENCION:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_a_hor}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">FECHA DE INICIO DE LA ACTIVIDAD:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_fecha_ini_act}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">EL ESTABLECIMIENTO ES::<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_estab_es}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">PRODUCTOS ELABORADOS:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_productosElaborados}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">ACTIVIDADES SECUNDARIAS:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_actividadesSecundarias}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+    <div class="ibox-title_2">
+            <h5>UBICACION DE LA ACTIVIDAD ECONOMICA</h5>
+        </div>
+        <div class="form-group"><label class="col-sm-2 control-label">MACRODISTRITO:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_macro_act_descrip}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">DISTRITO:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_dist_act_descrip}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">ZONA:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_zona_act_descrip}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">TIPO DE VIA: <small class="m-l-sm" style="color: red">*</small></label>
+            <div class="col-sm-10">
+                <select id="f01_tip_via_act" name="f01_tip_via_act" ng-model="datos.f01_tip_via_act" class="form-control" required>
+                    <option value="APROBADO">APROBADO</option>
+                    <option value="OBSERVADO">OBSERVADO</option>
+                </select>
+                <span style="color:red" ng-show="formulario.f01_tip_via_act.$invalid">
+                    <span ng-show="formulario.f01_tip_via_act.$error.required">Es requerido.
+                    </span>
+                </span>
+            </div>
+        </div> 
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">NOMBRE DE VIA:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_num_act}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">FACTOR: <small class="m-l-sm" style="color: red">*</small></label>
+            <div class="col-sm-10">
+                <select id="f01_factor" name="f01_factor" ng-model="datos.f01_factor" class="form-control" required>
+                    <option value="APROBADO">APROBADO</option>
+                    <option value="OBSERVADO">OBSERVADO</option>
+                </select>
+                <span style="color:red" ng-show="formulario.f01_factor.$invalid">
+                    <span ng-show="formulario.f01_factor.$error.required">Es requerido.
+                    </span>
+                </span>
+            </div>
+        </div> 
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">NUMERO:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_num_act1}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">EDIFICIO:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_edificio_act}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">BLOQUE:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_bloque_act}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">PISO:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_piso_act}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">DPTO/OF/LOC::<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_dpto_of_loc}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">TELEFONO:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_tel_act1}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">CASILLA:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_casilla}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">CUENTA ENERGIA ELECTRICA:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_cod_luz}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+    <div class="ibox-title_2">
+            <h5>.</h5>
+        </div>
+        <div class="form-group"><label class="col-sm-2 control-label">TIPO DE ACTIVIDAD: <small class="m-l-sm" style="color: red">*</small></label>
+            <div class="col-sm-10">
+                <select id="f01_tip_act" name="f01_tip_act" ng-model="datos.f01_tip_act" class="form-control" required>
+                    <option value="APROBADO">APROBADO</option>
+                    <option value="OBSERVADO">OBSERVADO</option>
+                </select>
+                <span style="color:red" ng-show="formulario.f01_tip_act.$invalid">
+                    <span ng-show="formulario.f01_tip_act.$error.required">Es requerido.
+                    </span>
+                </span>
+            </div>
+        </div> 
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">TIPO DE LICENCIA:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_tipo_lic_descrip}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">TIPO DE CATEGORIA:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_categoria_agrupada_descripcion}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">ACTIVIDAD DESARROLLADA:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f01_categoria_descrip}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+    <div class="ibox-title_2">
+            <h5>REQUISITOS GENERALES</h5>
+        </div>
+        <div class="form-group"><label class="col-sm-2 control-label">.:</label>
+            <div class="col-sm-10">
+                <table class="table table-striped "><tbody>
+                    <tr ng-repeat="role in datosRequisitosCheckBox">
+                        <td><div class="ngSelectionCell">
+                            <input tabindex="-1" class="ngSelectionCheckbox" type="checkbox" ng-checked="role.estado" ng-model="role.estado" ng-disabled='true'/></div></td>
+                        <td>{{role.resvalor}}</td>                                
+                    </tr></tbody>
+                </table>
+            </div>
+        </div> 
+        <div class="hr-line-dashed"></div> 
+    <div class="ibox-title_2">
+            <h5>VERIFICACION DE ANTECEDENTES</h5>
+        </div>
+        <div class="form-group"><label class="col-sm-2 control-label">LA SOLICITUD:: <small class="m-l-sm" style="color: red">*</small></label>
+            <div class="col-sm-10">
+                <select id="f02_la_sol_proced" name="f02_la_sol_proced" ng-model="datos.f02_la_sol_proced" class="form-control" required>
+                    <option value="APROBADO">APROBADO</option>
+                    <option value="OBSERVADO">OBSERVADO</option>
+                </select>
+                <span style="color:red" ng-show="formulario.f02_la_sol_proced.$invalid">
+                    <span ng-show="formulario.f02_la_sol_proced.$error.required">Es requerido.
+                    </span>
+                </span>
+            </div>
+        </div> 
+        <div class="hr-line-dashed"></div>
+    <div class="ibox-title_2">
+            <h5>INFORME DE ANTECEDENTES</h5>
+        </div>
+        <div class="form-group"><label class="col-sm-2 control-label">.:</label>
+            <div class="col-sm-10">
+                <textarea id="f02_info" name="f02_info" ng-model="datos.f02_info" class="form-control" required></textarea>
+                <span style="color:red" ng-show="formulario.f02_info.$invalid">
+                    <span ng-show="formulario.f02_info.$error.required">Es requerido.
+                    </span>
+                </span>
+            </div>
+        </div>
+        <div class="hr-line-dashed"></div>
+    <div class="ibox-title_2">
+            <h5>ASIGNACION DE INSPECTOR Y PROGRAMACION DE INSPECCIÓN</h5>
+        </div>
+        <div class="form-group"><label class="col-sm-2 control-label">NOMBRE DEL INPECTOR INTEGRAL:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f02_nom_ins}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">FECHA DE INSPECCION:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f02_fech_insp}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+    <div class="ibox-title_2">
+            <h5>FOLIADO Y DESCRIPCION - ASIGNACION</h5>
+        </div>
+        <div class="form-group"><label class="col-sm-2 control-label">NUMERO DE HOJAS ADJUNTAS AL TRAMITE:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f03_hojas_recibidas}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">DESCRIPCION:</label>
+            <div class="col-sm-10">
+                <textarea id="f03_observaciones_i" name="f03_observaciones_i" ng-model="datos.f03_observaciones_i" class="form-control" required></textarea>
+                <span style="color:red" ng-show="formulario.f03_observaciones_i.$invalid">
+                    <span ng-show="formulario.f03_observaciones_i.$error.required">Es requerido.
+                    </span>
+                </span>
+            </div>
+        </div>
+        <div class="hr-line-dashed"></div>
+    <div class="ibox-title_2">
+            <h5>CONDICIONES GENERALES</h5>
+        </div>
+        <div class="form-group"><label class="col-sm-2 control-label">.:</label>
+            <div class="col-sm-10">
+                <table class="table table-striped "><tbody>
+                    <tr ng-repeat="role in datosRequisitosCheckBox">
+                        <td><div class="ngSelectionCell">
+                            <input tabindex="-1" class="ngSelectionCheckbox" type="checkbox" ng-checked="role.estado" ng-model="role.estado" ng-disabled='true'/></div></td>
+                        <td>{{role.resvalor}}</td>                                
+                    </tr></tbody>
+                </table>
+            </div>
+        </div> 
+        <div class="hr-line-dashed"></div> 
+        <div class="form-group"><label class="col-sm-2 control-label">PRODUCTOS ELABORADOS/COMERCIALIZADOS:</label>
+            <div class="col-sm-10">
+                <textarea id="f04_prod_elab_comer" name="f04_prod_elab_comer" ng-model="datos.f04_prod_elab_comer" class="form-control" required></textarea>
+                <span style="color:red" ng-show="formulario.f04_prod_elab_comer.$invalid">
+                    <span ng-show="formulario.f04_prod_elab_comer.$error.required">Es requerido.
+                    </span>
+                </span>
+            </div>
+        </div>
+        <div class="hr-line-dashed"></div>
+    <div class="ibox-title_2">
+            <h5>.</h5>
+        </div>
+            <div class="form-group"><label class="col-sm-2 control-label">SE REALIZO REINSPECCION?:</label>
+                <div class="col-sm-10">
+                    <input type="checkbox" ng-model="datos.f04_verif_insp" ng-true-value="'SI'" ng-false-value="'NO'" /> SI
+                </div>
+            </div>
+            <div class="hr-line-dashed"></div>
+    <div class="ibox-title_2">
+            <h5>DATOS REINSPECCION</h5>
+        </div>
+        <div class="form-group"><label class="col-sm-2 control-label">FECHA:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f04_fecha_reinsp}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">OBSERVACIONES:</label>
+            <div class="col-sm-10">
+                <textarea id="f04_obs_reinsp" name="f04_obs_reinsp" ng-model="datos.f04_obs_reinsp" class="form-control" required></textarea>
+                <span style="color:red" ng-show="formulario.f04_obs_reinsp.$invalid">
+                    <span ng-show="formulario.f04_obs_reinsp.$error.required">Es requerido.
+                    </span>
+                </span>
+            </div>
+        </div>
+        <div class="hr-line-dashed"></div>
+    <div class="ibox-title_2">
+            <h5>INSPECCION Y ELABORACION DE RECOMENDACION INSPECTOR INTEGRAL</h5>
+        </div>
+        <div class="form-group"><label class="col-sm-2 control-label">RESULTADO DE LA INSPECCION: <small class="m-l-sm" style="color: red">*</small></label>
+            <div class="col-sm-10">
+                <select id="f03_resultado_inspeccion" name="f03_resultado_inspeccion" ng-model="datos.f03_resultado_inspeccion" class="form-control" required>
+                    <option value="APROBADO">APROBADO</option>
+                    <option value="OBSERVADO">OBSERVADO</option>
+                </select>
+                <span style="color:red" ng-show="formulario.f03_resultado_inspeccion.$invalid">
+                    <span ng-show="formulario.f03_resultado_inspeccion.$error.required">Es requerido.
+                    </span>
+                </span>
+            </div>
+        </div> 
+        <div class="hr-line-dashed"></div>
+    <div class="ibox-title_2">
+            <h5>ELABORACION DE INFORME DE RECOMENDACION</h5>
+        </div>
+        <div class="form-group"><label class="col-sm-2 control-label">.:</label>
+            <div class="col-sm-10">
+                <textarea id="f03_inf_aprobado" name="f03_inf_aprobado" ng-model="datos.f03_inf_aprobado" class="form-control" required></textarea>
+                <span style="color:red" ng-show="formulario.f03_inf_aprobado.$invalid">
+                    <span ng-show="formulario.f03_inf_aprobado.$error.required">Es requerido.
+                    </span>
+                </span>
+            </div>
+        </div>
+        <div class="hr-line-dashed"></div>
+    <div class="ibox-title_2">
+            <h5>ELABORACION DE INFORME DE RECOMENDACION</h5>
+        </div>
+        <div class="form-group"><label class="col-sm-2 control-label">.:</label>
+            <div class="col-sm-10">
+                <textarea id="f03_inf_rechazo" name="f03_inf_rechazo" ng-model="datos.f03_inf_rechazo" class="form-control" required></textarea>
+                <span style="color:red" ng-show="formulario.f03_inf_rechazo.$invalid">
+                    <span ng-show="formulario.f03_inf_rechazo.$error.required">Es requerido.
+                    </span>
+                </span>
+            </div>
+        </div>
+        <div class="hr-line-dashed"></div>
+    <div class="ibox-title_2">
+            <h5>ELABORACION DE INFORME DE RECOMENDACION</h5>
+        </div>
+        <div class="form-group"><label class="col-sm-2 control-label">.:</label>
+            <div class="col-sm-10">
+                <textarea id="f04_obs_insp" name="f04_obs_insp" ng-model="datos.f04_obs_insp" class="form-control" required></textarea>
+                <span style="color:red" ng-show="formulario.f04_obs_insp.$invalid">
+                    <span ng-show="formulario.f04_obs_insp.$error.required">Es requerido.
+                    </span>
+                </span>
+            </div>
+        </div>
+        <div class="hr-line-dashed"></div>
+    <div class="ibox-title_2">
+            <h5>.</h5>
+        </div>
+            <div class="form-group"><label class="col-sm-2 control-label">EL INMUEBLE DONDE FUNCIONA LA ACTIVIDAD ES CATALOGADO COMO PATRIMONIAL:</label>
+                <div class="col-sm-10">
+                    <input type="checkbox" ng-model="datos.f04_verif_bien_pat" ng-true-value="'SI'" ng-false-value="'NO'" /> SI
+                </div>
+            </div>
+            <div class="hr-line-dashed"></div>
+    <div class="ibox-title_2">
+            <h5>DATOS INSPECCION UPTM</h5>
+        </div>
+        <div class="form-group"><label class="col-sm-2 control-label">NOMBRE INSPECTOR: <small class="m-l-sm" style="color: red">*</small></label>
+            <div class="col-sm-10">
+                <select id="f07_dat_insp_patr" name="f07_dat_insp_patr" ng-model="datos.f07_dat_insp_patr" class="form-control" required>
+                    <option value="APROBADO">APROBADO</option>
+                    <option value="OBSERVADO">OBSERVADO</option>
+                </select>
+                <span style="color:red" ng-show="formulario.f07_dat_insp_patr.$invalid">
+                    <span ng-show="formulario.f07_dat_insp_patr.$error.required">Es requerido.
+                    </span>
+                </span>
+            </div>
+        </div> 
+        <div class="hr-line-dashed"></div>
+    <div class="ibox-title_2">
+            <h5>FOLIADO Y DESCRIPCION - INSPECCION</h5>
+        </div>
+        <div class="form-group"><label class="col-sm-2 control-label">NUMERO DE HOJAS ADJUNTADAS AL TRAMITE:<small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.f04_hojas_recibidas}}" class="form-control"></div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">DESCRIPCION:</label>
+            <div class="col-sm-10">
+                <textarea id="f04_observaciones_i" name="f04_observaciones_i" ng-model="datos.f04_observaciones_i" class="form-control" required></textarea>
+                <span style="color:red" ng-show="formulario.f04_observaciones_i.$invalid">
+                    <span ng-show="formulario.f04_observaciones_i.$error.required">Es requerido.
+                    </span>
+                </span>
+            </div>
+        </div>
+        <div class="hr-line-dashed"></div>
+    <div class="ibox-title_2">
+            <h5>VALIDACION INFORME DE RECOMENDACION</h5>
+        </div>
+        <div class="form-group"><label class="col-sm-2 control-label">RESULTADO REVISION: <small class="m-l-sm" style="color: red">*</small></label>
+            <div class="col-sm-10">
+                <select id="f45_firma" name="f45_firma" ng-model="datos.f45_firma" class="form-control" required>
+                    <option value="APROBADO">APROBADO</option>
+                    <option value="OBSERVADO">OBSERVADO</option>
+                </select>
+                <span style="color:red" ng-show="formulario.f45_firma.$invalid">
+                    <span ng-show="formulario.f45_firma.$error.required">Es requerido.
+                    </span>
+                </span>
+            </div>
+        </div> 
+        <div class="hr-line-dashed"></div>
+        <div class="form-group"><label class="col-sm-2 control-label">OBSERVACIONES:</label>
+            <div class="col-sm-10">
+                <textarea id="f45_observaciones" name="f45_observaciones" ng-model="datos.f45_observaciones" class="form-control" required></textarea>
+                <span style="color:red" ng-show="formulario.f45_observaciones.$invalid">
+                    <span ng-show="formulario.f45_observaciones.$error.required">Es requerido.
+                    </span>
+                </span>
+            </div>
+        </div>
+        <div class="hr-line-dashed"></div>
+
+                    <!-- botones -->
+            <a class="btn btn-primary" ng-disabled="false" ng-click="volver()">
+                <i class="glyphicon fa fa-times"></i>
+                 Cancelar
+            </a>
+            <a class="btn btn-primary" ng-click="cargarDatos(datos);guardarData(datos);" ng-disabled="false">
+                <i class="glyphicon fa fa-save"></i>
+                 Guardar / Continuar
+            </a>
+            <!-- botones -->
+
+        </div>
+    </form>
+</div>

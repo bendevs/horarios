@@ -1,0 +1,133 @@
+<script type="text/javascript">
+            // When the document is ready
+    function conMayusculas(field) {
+        field.value = field.value.toUpperCase()
+    };
+      //*** Este Codigo permite Validar que sea un campo Numerico
+    function soloNumerico(variable){
+        Numer=parseInt(variable);
+        if (isNaN(Numer)){
+            return "";
+        }
+        return Numer;
+    }
+    function valNumero(Control){
+        Control.value=soloNumerico(Control.value);
+    }
+    //*** Fin del Codigo para Validar que sea un campo Numerico       
+</script>
+
+<div  class="col-md-12" ng-controller="busquedaDinamicaController" data-ng-init="inicioBusqueda()">
+    
+    <div class="col-lg-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>Busquedas</h5>
+                <div ibox-tools>
+                </div>                
+            </div>
+            <div class="ibox-content">                
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>Busquedas</h5>
+                <div ibox-tools>
+                </div>
+                <div class="botones_inspinia_lmc">
+                    <a class="btn btn-primary" ng-click="limpiar()" data-toggle="modal" data-target="#registroBusqueda">
+                    <i class="glyphicon glyphicon-plus-sign"></i> Nuevo Busqueda</a>
+                </div>
+            </div>
+            <div class="ibox-content">                
+                <table ng-table="tablaBusquedas" show-filter="true" class="table table-striped ">
+                    <tr ng-repeat="Busqueda in $data" >
+                        <td align="center" data-title="'OPCIONES'">
+                            <a tooltip = "Modificar Busqueda" class="btn btn-info btn-circle"data-toggle="modal" data-target="#registroBusqueda" ng-click="modificarBusquedaCargar(Busqueda)"><i class="fa fa-pencil"></i></a>
+                            <a tooltip = "Eliminar Busqueda" class="btn btn-info btn-circle"data-toggle="modal" data-target="#registroBusqueda" ng-click="eliminarBusquedaCargar(Busqueda)"><i class="fa fa-trash-o"></i></a>
+                        </td>
+                        <td data-title="'C&Oacute;DIGO'" sortable="'rid'" filter="{'rid':'text'}">{{Busqueda.rid}}</td>
+                        <td data-title="'Busqueda'" sortable="'rnombre'" filter="{'rnombre':'text'}">{{Busqueda.rnombre}}</td>
+                        <td data-title="'T&Iacute;TULO'" sortable="'rtitulo'" filter="{'rtitulo':'text'}">{{Busqueda.rtitulo}}</td>
+                        <td data-title="'T&Iacute;TULO COLUMNAS'" sortable="'rtitcolumnas'" filter="{'rtitcolumnas':'text'}">{{Busqueda.rtitcolumnas}}</td>                        
+                        <td data-title="'FILTRADO'" sortable="'rfiltrado'" filter="{'rfiltrado':'text'}">{{Busqueda.rfiltrado}}</td>
+                        <td data-title="'CONSULTA SQL'" sortable="'rconsultasql'" filter="{'rconsultasql':'text'}">{{Busqueda.rconsultasql}}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>    
+    <div class="modal fade" id="registroBusqueda" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Cerrar</span></button>
+                    <h4 class="modal-title" id="myModalLabel">{{titulo}}</h4>
+                </div>
+                <div class="modal-body" >
+                    <form name="formularioBusquedas" novalidate>                        
+                        <div class="form-group">
+                            <label for="url" >Busqueda:</label>
+                            <div class="controls">
+                                <input  ng-model="datosBusqueda.rnombre" name="rnombre" id="rnombre" class="form-control" type="text" placeholder="ingrese Busqueda" ng-disabled="only" ng-required="true" onkeyUp="return conMayusculas(this)">
+                                <span style="color:red" ng-show="formularioBusquedas.rnombre.$invalid">
+                                    <span ng-show="formularioBusquedas.rnombre.$error.required">Busqueda es requerido.
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="url" >TITULO:</label>
+                            <div class="controls">
+                                <input  ng-model="datosBusqueda.rtitulo" name="rcodigo" id="rcodigo" class="form-control" type="text" placeholder="ingrese titulo" ng-disabled="only" ng-required="true" onkeyUp="return conMayusculas(this)">
+                                <span style="color:red" ng-show="formularioBusquedas.rtitulo.$invalid">
+                                    <span ng-show="formularioBusquedas.rtitulo.$error.required">Titulo es requerido.
+                                    </span>
+                                </span>
+                            </div>
+                        </div>                        
+                        <div class="form-group">
+                            <label for="url" >T&Iacute;TULO COLUMNAS:</label>
+                            <div class="controls">
+                                 <input  ng-model="datosBusqueda.rtitcolumnas" name="rtitcolumnas" id="rtitcolumnas" class="form-control" type="text" placeholder="ingrese subtitulo" ng-disabled="only">   
+                                <span style="color:red" ng-show="formularioBusquedas.rtitcolumnas.$invalid">
+                                    <span ng-show="formularioBusquedas.rtitcolumnas.$error.required">Campo es requerido.
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="url" >FILTRADO POR:</label>
+                            <div class="controls">
+                                <input  ng-model="datosBusqueda.rfiltrado" name="rfiltrado" id="rfiltrado" class="form-control" type="text" placeholder="ingrese subtitulo" ng-disabled="only">
+                                <span style="color:red" ng-show="formularioBusquedas.rfiltrado.$invalid">
+                                    <span ng-show="formularioBusquedas.rfiltrado.$error.required">Campo es requerido.
+                                    </span>
+                                </span>
+                            </div>
+                        </div>                        
+                        <div class="form-group">
+                            <label for="url" >CONSULTA SQL:</label>
+                            <div class="controls">
+                                <textarea ng-model="datosBusqueda.rconsultasql" id="rconsultasql" name="rconsultasql" class="form-control" style="resize:none; height:8em;" ng-disabled="only">
+                                </textarea> 
+                                <span style="color:red" ng-show="formularioBusquedas.rconsultasql.$invalid">
+                                    <span ng-show="formularioBusquedas.rconsultasql.$error.required">Campo es requerido.
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                  <button id= "btnCerrar" name ="btnCerrar" type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                  <button ng-click="validar(datosBusqueda)" type="button" class="btn btn-primary" ng-show="boton=='new'" ng-hide="boton=='upd' || boton=='del'" ng-disabled="formularioBusquedas.$invalid">Guardar</button>
+                  <button ng-click="modificarBusqueda(datosBusqueda)" data-dismiss="modal" type="button" class="btn btn-primary" ng-show="boton=='upd'" ng-hide="boton=='new' || boton=='del'" ng-disabled="formularioBusquedas.$invalid">Modificar</button>
+                  <button ng-click="eliminarBusqueda(datosBusqueda)" data-dismiss="modal" type="button" class="btn btn-primary" ng-show="boton=='del'" ng-hide="boton=='new' || boton=='upd'" >Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,123 @@
+<div class="col-md-12" ng-controller="serviciosCims">
+  <form  name="reportForm" id="reportForm" class="form-horizontal" role="form">
+    <div class="col-md-12 col-sm-12 col-xs-12"   >
+      <div class="form-group">
+        <label for="category">REPORTES GRAFICOS:</label>
+        <div class="controls">
+          <select ng-model="datosCarga.area" id="area" name="area" class="form-control"  ng-required="true" ng-change = "limpiar()">
+            <option style="display:none" value="">-- Elegir--</option>
+            <option value = 1 >REPORTE POR GRUPO ETAREO DE NIÑOS REGISTRADOS</option>
+            <option value = 2 >REPORTE POR INSCRITOS</option>
+            <option value = 3 >REPORTE POR CENTROS INFANTILES</option>
+            <option value = 4 >REPORTE POR EDAD Y GENERO DE NIÑ@s</option>
+          </select>                        
+        </div>
+      </div>
+    </div>
+    <br>
+    <div>
+      <a class="btn btn-primary" ng-click="categoria(datosCarga.area)" >
+        <i class="glyphicon fa fa-eye"></i>
+        Generar Grafica
+      </a>
+      <a class="btn btn-primary" ng-click="cargarDatos()" >
+        <i class="glyphicon fa fa-print"></i>
+        Imprimir
+      </a>
+    </div>
+  </form>
+  <div ng-show = "graficaP">
+    <div class="row"  id="grafica" >
+      <table  width="100%">
+        <td>
+          <br>
+          <center><h3>{{titulorep}}</h3></center>
+        </td>
+      </table>
+      <br>
+    </div>
+    <div class="col-md-12" ng-show="datosCarga.area==1 || datosCarga.area==2 || datosCarga.area==3" >
+      <div class="row panel panel-default" >
+        <div class="table-responsive" >
+          <table class="table table-hover">
+            <tbody  id="Tramite">
+              <tr>
+                <td><div><b>#</b></div></td>
+                <td><div><b>GRUPOS</b></div></td>
+                <td><div><b>CANTIDAD</b></div></td>
+              </tr>
+              <tr ng-repeat="dato in datatramite">
+                <td><div class="col-sm-1">{{$index+1}}</div></td>
+                <td><div>{{dato.nombre}}</div></td>
+                <td><div class="col-sm-2">{{dato.suma}}</div></td>
+              </tr>
+              <td>
+                <div class="col-sm-3">
+                  <b>Total</b>
+                </div>
+              </td>
+              <td>
+                <div class="col-sm-7"><b>=</b>
+                </div>
+              </td>
+              <td>
+                <div class="col-sm-3"><b>{{cantidad}}</b>
+                </div>
+              </td>
+            </tbody>
+          </table>
+          <br>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-12" ng-show="datosCarga.area==4">
+      <div class="row panel panel-default" >
+        <div class="table-responsive" >
+          <table class="table table-hover">
+            <tbody  id="Tramite">
+              <tr>
+                <td><div><b>#</b></div></td>
+                <td><div><b>GRUPOS</b></div></td>
+                <td><div><b>MASCULINO</b></div></td>
+                <td><div><b>FEMENINO</b></div></td>
+                <td><div><b>CANTIDAD</b></div></td>
+              </tr>
+              <tr ng-repeat="dato in datatramite">
+                <td><div class="col-sm-1">{{$index+1}}</div></td>
+                <td><div>{{dato.nombre}}</div></td>
+                <td><div class="col-sm-5">{{dato.masculino}}</div></td>
+                <td><div class="col-sm-5">{{dato.femenino}}</div></td>
+                <td><div class="col-sm-2">{{dato.suma}}</div></td>
+              </tr>
+              <td>
+                <div class="col-sm-3">
+                  <b>Total</b>
+                </div>
+              </td>
+              <td>
+                <div class="col-sm-7"><b>=</b>
+                </div>
+              </td>
+              <td>
+              <div class="col-sm-3"><b>{{cantidadm}}</b>
+                </div>
+              </td>
+              <td>
+              <div class="col-sm-3"><b>{{cantidadf}}</b>
+                </div>
+              </td>
+              <td>
+                <div class="col-sm-3"><b>{{cantidad}}</b>
+                </div>
+              </td>
+            </tbody>
+          </table>
+          <br>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-12" id="graficass">
+      <div id="containerdato" style="width: 1200px; height:600px; margin: 0 auto"></div>
+    </div>
+  </div>
+</div>

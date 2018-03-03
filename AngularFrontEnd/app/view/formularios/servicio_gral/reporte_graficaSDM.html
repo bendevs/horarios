@@ -1,0 +1,98 @@
+<div class="col-md-12" ng-controller="grafica_sdm">
+    <form  name="reportForm" id="reportForm" class="form-horizontal" role="form"
+        novalidate data-ng-init="inicioActuaciones()" >
+        <div>
+               <div class="col-md-12 col-sm-12 col-xs-12"   >
+                <div class="form-group">
+                    <label for="category">REPORTES GRAFICOS:</label>
+                    <div class="controls">
+
+                     
+                    </div>
+                </div>
+            </div>
+              <br>
+              <div class="col-md-3">
+                  <div class="form-group">
+                      <label class="col-sm-3 control-label no-padding-right" for="url">FECHA INGRESO:</label>
+                      <div class="controls">
+                          <p class="input-group">
+                          <input name="FECHA1" id="registro1[]" type="text" class="form-control" datepicker-popup="" ng-model="registro.FECHA1" is-open="startDateOpened1" ng-required="true" close-text="Close" ng-disabled="desabilitado"/>
+                          <span class="input-group-btn">
+                              <button type="button" class="btn btn-default" ng-click="startDateOpen1($event)"><i class="glyphicon glyphicon-calendar"></i>
+                              </button>
+                          </span>
+                      </p>
+                      </div>
+                  </div>
+              </div> 
+              <div class="col-md-3">
+                <div class="form-group">
+                   <label class="col-sm-3 control-label no-padding-right" for="url">FECHA SALIDA:</label>
+                      <div class="controls">    
+                          <p class="input-group"><input name="FECHA2" id="registro2[]" type="text" class="form-control" datepicker-popup="" ng-model="registro.FECHA2" is-open="startDateOpened" ng-required="true" close-text="Close" ng-disabled="desabilitado"/>
+                          <span class="input-group-btn">
+                              <button type="button" class="btn btn-default" ng-click="startDateOpen($event)"><i class="glyphicon glyphicon-calendar"></i>
+                              </button>
+                          </span></p>
+                      </div>
+                  </div>
+              </div> 
+               <br>
+              <div class="col-md-10">
+                   <a class="btn btn-primary" ng-click="categoria(datosCarga.area,'USG_SDMV',registro) " >
+                      <i class="glyphicon fa fa-eye"></i>
+                       Generar Grafica
+                  </a>
+                  <a class="btn btn-primary" ng-click="cargarDatos()" >
+                      <i class="glyphicon fa fa-print"></i>
+                      Imprimir
+
+                  </a>
+              </div>
+
+          <div>
+    </form>
+
+    <div ng-show = "graficaP">
+      <div class="row"  id="grafica" >
+          <table  width="100%">
+            <td>
+            </br>
+              <center><h3>SERVICIO DE MANTENIMIENTO VEHICULAR - GRAFICA </h3></center>
+            </td>
+          </table>
+          <br/>
+      </div>
+
+        <div class="col-md-12" >
+        <div class="row panel panel-default" >
+          <div class="table-responsive" >
+              <table class="table table-hover">
+                <tbody  id="Tramite">
+                  <tr>
+                      <td><div class="col-sm-1"><b>#</b></div></td>
+                      <td><div class="col-sm-5"><b>NOMBRE</b></div></td>
+                      <td><div class="col-sm-2"><b>CANTIDAD</b></div></td>
+                  </tr>
+                  <tr ng-repeat="dato in datatramite">
+                      <td><div class="col-sm-1">{{$index+1}}</div></td>
+                      <td><div class="col-sm-5">{{dato.nombres}}</div></td>
+                      <td><div class="col-sm-2">{{dato.countpart}}</div></td>
+                  </tr>
+                  <td>
+                          <div class="col-sm-3"><b>Total</b></div></td>
+                          <td><div class="col-sm-7"><b>=</b></div></td>
+
+                          <td><div class="col-sm-3"><b>{{cantidad}}</b></div></td>
+                  </tbody>
+              </table>
+              </br>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-12" id="graficass">
+            <div id="containerdato" style="width: 1200px; height:600px; margin: 0 auto"></div>
+        </div>
+
+  </div>

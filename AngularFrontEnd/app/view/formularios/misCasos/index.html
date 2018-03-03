@@ -1,0 +1,774 @@
+<!-- begin script panel depurador #2F4050 -->
+<script type="text/javascript">
+   // SKIN Select
+    $('.spin-icon').click(function (){
+        $(".theme-config-box_2").toggleClass("show");
+    });
+</script>
+<script type="text/javascript">
+   // SKIN Select
+    $('.spin-icon_3').click(function (){
+        $(".theme-config-box_3").toggleClass("show");
+    });
+</script>
+<!-- end script panel depurador -->
+<!-- begin script panel -->
+<script type="text/javascript">
+    $(function() {
+    $( "#accordion" ).accordion();
+  });
+
+
+//funciones para busqueda del ciudadano
+
+
+// When the document is ready
+	function upperCase() {
+           var x=document.getElementById("asunto").value
+           document.getElementById("asunto").value=x.toUpperCase()
+        }
+    //*** Este Codigo permite Validar que sea un campo Numerico
+    function soloNumerico(variable){
+            Numer=parseInt(variable);
+        if (isNaN(Numer)){
+                return "";
+        }
+        return Numer;
+    }
+
+    function valNumero(Control){
+        Control.value=soloNumerico(Control.value);
+    }
+
+    function soloNumericoCelular(sValor){
+        Numer=parseInt(sValor);
+        if (isNaN(Numer)){
+            return "";
+        }else{
+            var digits = ("" + Numer).split("");
+            if(digits.length > 0 && (digits[0] == 7 || digits[0] == 6)){
+                return Numer;
+            }else{
+                return "";
+            }
+        }
+    }
+
+    function valNumeroCelular(Control){
+        Control.value = soloNumericoCelular(Control.value);
+    }
+    //*** Fin del Codigo para Validar que sea un campo Numerico
+    function deshabilita(form)
+    {
+        if (form.INT_RL_NUM_DOCUMENTO.value != "" )
+        {   var valorNit = form.INT_RL_NUM_DOCUMENTO.value;
+            if (valorNit.length >=4 )
+                {
+                    form.BTN_RC_CONSULTA.disabled = false;
+
+                }
+            else
+                {form.BTN_RC_CONSULTA.disabled = true;}
+        }
+        else
+        {form.BTN_RC_CONSULTA.disabled = true; }
+    }
+    function deshabilitaNit(form)
+    {
+        if (form.RC_NIT.value != "" )
+        {
+            var valorNit = form.RC_NIT.value;
+            if (valorNit.length >=5 || valorNit == 0)
+            {
+                if(valorNit == 0){
+                    form.BTN_RC_CONSULTA.disabled = true;
+                }else{
+                    form.BTN_RC_CONSULTA.disabled = false;
+                }
+            }
+            else
+            {
+                form.BTN_RC_CONSULTA.disabled = true;
+            }
+        }
+        else
+        {
+            form.BTN_RC_CONSULTA.disabled = true;
+        }
+    }
+
+function cambioPaginasiguiente(){
+    document.getElementById("idanterior").disabled=false;
+}
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        $('#multiDocsButon').click(function(){
+            $("#multiDocsFile").click();
+        });
+    });
+</script>
+<script type="text/javascript">
+    function ShowSelected()
+    {
+/* Para obtener el texto */
+    var combo = document.getElementById("tipoTramite");
+    var selected = combo.options[combo.selectedIndex].text;
+    nombreTramite.innerHTML = selected;
+    }
+</script>
+
+<!-- end script panel -->
+<style>
+    .color2 {
+        padding: 10px;
+        cursor: pointer;
+    }
+</style>
+
+<div id="frmCasoController" ng-controller="misCasosController" data-ng-init="inicioCasos();">
+    <!--<h3 ng-if="!seleccionado">{{tituloP}}</h3>-->
+    <div class="row" ng-show="panelCasos" style="z-index: 9999">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title" style="padding: 25px 10px 60px 10px !important;">
+                <div class="col-lg-12 form-inline" role="form" >
+                    <div class="col-lg-2">
+                        <h5>Lista de tramites </h5>
+                    </div>
+                            <div class="col-lg-4" ng-show="nodoAsignado">
+                                <label>   Nodo: </label>
+                                <select ng-model="nodoCombo" name="NodoId" id="NodoId" class="form-control" ng-change="filtroTramites(nodoCombo)">
+                                    <option ng-repeat="nodo in nodos" value="{{nodo}}">{{nodo.nodonombre}}</option>
+                                </select>
+                                </div>
+                                <div class="col-lg-4">
+                                <label>  Buscador: </label>
+                                <input  id="campobsc" type="text" name="campobsc" ng-model="campobsc">
+                                <button id="buscatramite" class="btn btn-primary"  ng-click="btnbuscador(campobsc)">Buscar</button>
+                            </div>
+                         <div class="col-lg-2" align="right">
+                            <a class="btn btn-primary" data-toggle="modal" ng-click="limpiar()" data-target="#registro"><i class="glyphicon glyphicon-plus"></i>&nbsp;Crear Tr&aacute;mite</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <table ng-table="tablaBandeja" show-filter="true" class="table table-striped">
+                        <tr class="column" ng-repeat="caso in $data">
+                            <td data-title="'#'">{{$index+1}}</td>
+                            <td data-title="'Atender'" style="width:120px">
+                                <div class="fixed-action-btn">
+                                    <ul class="horizontal">
+                                        <li>
+                                            <a ng-show = "caso.usuactualid != usuarioid" tooltip = "Ver" ng-click="atenderCaso(caso,'ver')" class="btn-floating"><i class="fa fa-eye"></i></a>
+                                        </li>
+                                        <li>
+                                            <a ng-show = "caso.usuactualid == usuarioid" tooltip = "Atender" ng-click="atenderCaso(caso)" class="btn-floating"><i class="fa fa-folder-open"></i></a>
+                                        </li>
+                                        <li>
+                                            <a ng-show= "caso.casoestpaso == 'PENDIENTE'" tooltip = "Recibir Trámite" ng-click="recibirTramite(caso,'recibir')" class="btn-floating"><i class="fa fa-download"></i></a>
+                                        </li>
+                                        <li>
+                                            <a ng-show= "caso.usuactualid == usuarioid" tooltip = "Dejar Trámite" ng-click="recibirTramite(caso,'dejar')" class="btn-floating"><i class="fa fa-pencil-square"></i></a>
+                                        </li>
+                                        <li>
+                                            <a ng-show= "caso.usuactualid == 0 && caso.casoestpaso != 'PENDIENTE'" tooltip = "Tomar y Atender Trámite" ng-click="recibirTramite(caso,'tomarAtender'); atenderCaso(caso)" class="btn-floating"><i class="fa fa-folder-o"></i></a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                            <!-- <td data-title="'# Trámite&nbsp;'" sortable="'casonro'" filter="{'casonro':'text'}">{{caso.casonro}}</td> -->
+                            <td data-title="'Código Trámite&nbsp;'" sortable="'casonombre'" filter="{'casonombre':'text'}"><thing ng-style="caso.usuactualid != usuarioid && {color:'#000000','font-weight': 'bold' } || caso.usuactualid==0 && {color:'#000000','font-weight': 'bold' }">{{caso.casonombre}}</thing></td>
+                            <td data-title="'Proceso&nbsp; -&nbsp; Actividad'" sortable="'procnombre'" filter="{'procnombre':'text'}">{{caso.procnombre}}&nbsp; <br> {{caso.actnombre}}</td>
+                            <td data-title="'Fecha Inicio&nbsp;'" sortable="'fechaini'" filter="{'fechaini':'text'}">{{caso.fechaini}}</td>
+                            <td data-title="'Fecha L&iacute;mite&nbsp;'" ng-style="caso.tiempo=='HOY' && {'background-color':'#FAF798'} || caso.tiempo=='FUTURO' && {'background-color':'#D2FF94'} || caso.tiempo=='PASADO' && {'background-color':'#FF8383'}" sortable="'fechalimite'" filter="{'fechalimite':'text'}">{{caso.fechalimite}}
+                            </td>
+                        </tr>
+
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12">
+              <button id="idanterior" name="idanterior" class="btn btn-primary" ng-click="lstanterior_casos();" disabled="true" ><b><</b></button>
+               <label>&nbsp;{{pagina}} de {{totalcasos}}&nbsp;</label>
+              <button id="idsiguiente" class="btn btn-primary" ng-click="lstsiguiente_casos();" onclick="cambioPaginasiguiente();"><b>></b></button>
+        </div>
+    </div>
+    <!-- //////////////////////////////////////////////////// -->
+    <div class="row" ng-show="panelFormularios">
+        <div class="col-md-12">
+            <div class="ibox-title" style="width:90% ; margin: auto; height: 65px;  top: 0px; left: 18%;right: 18%; background-color: #CDFBF2 !important;">
+                <h5>
+                    <div ng-show="seleccionado" style="font-size: 12px !important; position: relative;top: -7px">
+                        <p style="line-height: 0.7">TR&Aacute;MITE: <b style="font-weight: normal; color: #676a6c">{{casoActual.casonombre}}</b></p>
+                        <p style="line-height: 0.7">PROCESO: <b style="font-weight: normal; color: #676a6c">{{casoActual.procnombre}}</b></p>
+                        <p style="line-height: 0.7">ACTIVIDAD: <b style="font-weight: normal; color: #676a6c">{{casoActual.actnombre}}</b></p>
+                    </div>
+                </h5>
+                <div class="botones_inspinia_lmc" style="top: -8px !important">
+                    <a ng-click="volver();" class="btn btn-info btn-circle" data-toggle="tooltip" tooltip = "Volver">
+                        <i class="fa fa-home"></i>
+                    </a>
+                    <a ng-click="volverFormulario();" class="btn btn-info btn-circle" data-toggle="tooltip" tooltip = "Volver" ng-show="contador-2>=0">
+                        <i class="fa fa-reply"></i>
+                    </a>
+                    <a ng-click="llamarHistorico();" class="btn btn-info btn-circle" data-toggle="modal" data-target="#formhistorico" tooltip = "Ver historico">
+                        <i class="fa fa-history"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="ibox-content" style=" width:90% ; margin: auto; top: 0px; left: 18%; box-shadow: 0 2px 2px 0 rgba(0,0,0,.14),0 3px 1px -2px rgba(0,0,0,.2),0 1px 5px 0 rgba(0,0,0,.12);">
+                <div ng-include src="template"></div>
+            </div>
+        </div>
+        <!-- ///////////////////////////////////////////// -->
+        <div ng-show="mostrardepuracion">
+           <!-- begin panel depurador ux-->
+            <div class="theme-config">
+                <div class="theme-config-box_2">
+                    <div class="spin-icon">
+                        <i class="fa fa-cogs fa-spin"></i>
+                    </div>
+                    <div class="skin-setttings_2">
+                        <div class="title" style="text-align: left;">Depurador</div>
+                        <div class="setings-depurador" style="background: #f3f3f4 !important;">
+
+                                <div class="ibox float-e-margins">
+                                    <div class="ibox-title" style="border-color:#DEDEDE">
+                                       <h5>Formularios</h5>
+                                       <div ibox-tools></div>
+                                       <div class="botones_inspinia_lmc"></div>
+                                    </div>
+                                    <div class="ibox-content">
+                                        <table class="table table-striped">
+                                            <thead>
+                                                 <th>#&nbsp;</th>
+                                                 <th>Órden&nbsp;</th>
+                                                 <th>Descripci&oacute;n&nbsp;</th>
+                                            </thead>
+                                            <tbody>
+                                                 <tr class="column" ng-repeat="formulario in obtFormularios" ng-click="cargarFormulario(formulario,$index)" ng-style="formulario.formid==formularioSeleccionado && {'background-color':'#E1FFF9'}">
+                                                    <td>{{$index+1}}</td>
+                                                    <td>{{formulario.formorden}}</td>
+                                                    <td>{{formulario.formdescripcion}}</td>
+
+                                                 </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+
+                                <div class="ibox float-e-margins">
+                                    <div class="ibox-title" style="border-color: #DEDEDE">
+                                        <h5>Campos Formulario  </h5>
+                                        <div ibox-tools></div>
+                                        <div class="botones_inspinia_lmc">
+                                        </div>
+                                    </div>
+                                    <div class="ibox-content">
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <th>Campo&nbsp;</th>
+                                                <th>Valor&nbsp;</th>
+                                            </thead>
+                                            <tbody>
+                                                <tr class="column" ng-repeat="(key, value) in trmFormulario">
+
+                                                   <td>{{key}}</td>
+                                                   <td>{{value}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+          <!-- end panel depurador ux-->
+        </div>
+
+        <div class="theme-config_3">
+            <div class="theme-config-box_3">
+                <div class="spin-icon_3" ng-click="llamarHistorico();">
+                    <i class="fa fa-history fa-spin"></i>
+                </div>
+                <div class="skin-setttings_3">
+                    <div class="title" style="text-align: left;">Historico</div>
+                    <div class="setings-depurador" style="background: #f3f3f4 !important;">
+                        <form name="formularioHistorico"  readOnly="true" novalidate>
+                            <div class="ibox float-e-margins">
+                                <div class="ibox-content">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped ">
+                                            <thead>
+                                                <th>#&nbsp;</th>
+                                                <th>Caso&nbsp;</th>
+                                                <th>Actividad&nbsp;</th>
+                                                <th>Nodo&nbsp;</th>
+                                                <th>Usuario&nbsp;</th>
+                                                <th>Fecha Inicio&nbsp;</th>
+                                                <th>Fecha Limite&nbsp;</th>
+                                            </thead>
+                                            <tbody>
+                                                <tr class="column" ng-repeat="historico in obtHistorico">
+                                                    <td>{{$index+1}}</td>
+                                                    <td>{{historico.cadoid}}</td>
+                                                    <td>{{historico.actividad}}</td>
+                                                    <td>{{historico.nodonombre}}</td>
+                                                    <td>{{historico.usuario}}</td>
+                                                    <td>{{historico.fechaini}}</td>
+                                                    <td>{{historico.fechalim}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ibox float-e-margins">
+                                <div class="ibox-title">
+                                    <h5>{{procTitulo}}</h5>
+                                    <h5>{{casoTitulo}}</h5>
+                                </div>
+                                <div id="sample">
+                                  <div style="display: none; vertical-align: top; padding: 10px;" id="SVGArea"></div>
+                                  <div style="width:100%; white-space:nowrap;">
+                                    <span style="display: none; vertical-align: top; padding: 5px; width:100px">
+                                      <div id="myPaletteDiv" style="border: solid 1px gray; height: 500px;"></div>
+                                    </span>
+                                    <span style="display: inline-block; vertical-align: top; padding: 5px; width:80%">
+                                      <div id="myDiagramDiv" style="border: solid 1px gray; height: 300px;"></div>
+                                      <textarea ng-model="ImagenProceso" id="mySavedModel" style="width:100%;height:200px;display:none;">
+                                        {{ImagenProceso}}
+                                      </textarea>
+                                    </span>
+                                  </div>
+                                  <div id="myInspector">
+
+                                  </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12" ng-show="panelReglaNegocioActividadMapa">
+                                <div class="col-lg-12">
+                                    <div class="ibox float-e-margins">
+                                        <div class="ibox-title">
+                                            <h5>{{tituloRNMapa}}</h5>
+                                        </div>
+                                        <div class="ibox-content">
+                                            <table class="table table-striped ">
+                                                <thead>
+                                                    <th>#&nbsp;</th>
+                                                    <th>Orden&nbsp;</th>
+                                                    <th>Actividad Siguiente&nbsp;</th>
+                                                    <th>Regla&nbsp;</th>
+                                                </thead>
+                                                <tbody>
+                                                   <tr class="column" ng-repeat="rnActividadMapa in obtNRactividadMapa" ng-style="rnActividad.rna_id==formularioSeleccionado && {'background-color':'#A2D5AE','font-color':'#A2D5AE'}">
+                                                        <td>{{$index+1}}</td>
+                                                        <td>{{rnActividadMapa.rna_orden}}</td>
+                                                        <td>{{rnActividadMapa.rna_actnombre}}</td>
+                                                        <td>{{rnActividadMapa.rna_regla}}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- modal crear tramite -->
+  <div class="modal fade" id="registro" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog" ng-show="procventana">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Cerrar</span></button>
+                    <h4 class="modal-title" id="myModalLabel">{{titulo}}</h4>
+                </div>
+                <div class="modal-body" >
+        <div id="procesos" >
+                    <form name="formularioCasos"  readOnly="true" >
+                        <div class="row">
+                            <table ng-table="tablaProcesos" show-filter="true" class="table table-striped">
+                                <!--<thead>
+                                    <th>#&nbsp;</th>
+                                    <th>Proceso&nbsp;</th>
+                                    <th>Actividad Inicial&nbsp;</th>
+                                </thead>-->
+
+                                    <tr class="color2"  class="column" ng-repeat="proceso in obtProceso" ng-click="seleccionarProceso(proceso)" ng-style="proceso.procid==procesoSeleccionado && {'background-color':'#E1FFF9','font-color':'#A2D5AE'}">
+
+					<td data-title="'#'" ng-mouseover="style={'background-color':'#E1FFF9','cursor':'pointer'}" ng-mouseleave="style={}" ng-style="style">{{$index+1}}</td>
+                                        <td data-title="'Proceso'" ng-mouseover="style={'background-color':'#E1FFF9','cursor':'pointer'}" ng-mouseleave="style={}" ng-style="style">{{proceso.procnombre}}</td>
+                                        <td data-title="'Actividad Inicial'" ng-mouseover="style={'background-color':'#E1FFF9','cursor':'pointer'}" ng-mouseleave="style={}" ng-style="style">{{proceso.actnombre}}</td>
+
+                                    </tr>
+
+                            </table>
+                        </div>
+                    </form>
+        </div>
+
+        <!--modal registro 2-->
+<div id="proceso2" ng-show="sig" >
+              <form name="formularioCasos2"  readOnly="true" novalidate >
+              <div class="row">
+                       <!-- <table>
+                             <h5>VENTANILLA Calle Colon</h5>
+                             <h5>OPERADOR administrador</h5>
+                             <h5>SERVICIO Registro en el Padrón Municipal de Contribuyentes</h5>
+                             <h5>PROCESO EMISION DE LICENCIA DE FUNCIONAMIENTO</h5>
+                        </table>-->
+                        <div class="form-group" align="right" >
+                            <label class="col-sm-3"  for="url" >Procedencia: <font color="#FF0000" size="5px"> </font></label>
+                            <div class="col-sm-9" align="left">
+                                <select id="tipoHojaRuta" name="tipoHojaRuta" ng-model="tipo_hr" class="form-control" required>
+                                    <option value="INTERNO">INTERNO</option>
+                                    <option value="EXTERNO">EXTERNO</option>
+                                    <!--<option value="CSJEXTERNO">CONSEJO EXTERNA</option>
+                                    <option value="CSJINTERNO">CONSEJO INTERNA</option>-->
+                                </select>
+                                <!--<span style="color:red" ng-show="formularioCasos2.tipoHojaRuta.$invalid">
+                                    <span ng-show="formularioCasos2.tipoHojaRuta.$error.required">Es requerido.
+                                    </span>
+                                </span--><br>
+                            </div>
+                        </div>
+
+                        <div class="form-group" align="right" >
+                            <label class="col-sm-3 control-label" align="right" for="url">Asunto: <font color="#FF0000" size="5px"></font></label>
+                            <div class="col-sm-9" >
+                                <textarea ng-model="datos.asunto" id="asunto"  name="asunto" class="form-control" width="30%" height="30" placeholder="ingrese el asunto" maxlength="120"  onkeyUp="return conMayusculas(this);" ng-disabled="desabilitadoRc" required>{{datos.asunto}}</textarea>
+                                <span style="color:red" ng-show="formularioCasos2.asunto.$invalid">
+                                    <span ng-show="formularioCasos2.asunto.$error.required">Es requerido.
+                                    </span>
+                                </span><br>
+                            </div>
+                        </div>
+
+
+                    <div ng-if="tipo_hr=='EXTERNO'|| tipo_hr=='CSJEXTERNO'">
+                             <label>DATOS DEL SOLICITANTE </label>
+                            <br>
+
+                                <div class="form-group" align="right">
+                                    <label class="col-sm-3 control-label no-padding-right" for="url" >Solicitante: <font color="#FF0000" size="5px"> * </font></label>
+                                    <div class="col-sm-9" align="left">
+                                        <select id="solicitante" name="solicitante" ng-model="datos.solicitante" class="form-control" ng-change="cmbTipoPersona(datos.solicitante)" ng-disabled="desabilitadoRc">
+                                            <option value="natural">Natural</option>
+                                            <option value="juridico">Jur&iacute;dica</option>
+                                        </select>
+                                        <font style="color:red" ng-show="datos.solicitante == null">Es requerido.
+                                        </font><br>
+                                    </div>
+                                </div>
+
+                    <!-- RC-NATURAL -->
+                    <div ng-if="datos.solicitante=='natural'" align="right">
+                            <div class="form-group" >
+                                <label class="col-sm-3 control-label no-padding-right" for="url" >Nº de C&eacute;dula de Identidad: <font color="#FF0000" size="5px"> </font></label>
+                                <div class="col-sm-9" align="left">
+                                    <div class="input-group">
+                                        <input ng-change="cambiarColorBtn();" ng-minlength="4" ng-model="datos.INT_RL_NUM_DOCUMENTO" id="INT_RL_NUM_DOCUMENTO" name="INT_RL_NUM_DOCUMENTO" class="form-control" type="text" placeholder="ingrese la cedula de identidad" onkeyUp="conMayusculas(this);" ng-disabled="" required>
+                                        <span class="input-group-btn">
+                                            <button ng-show="btnMostrarRcConsulta" id="BTN_RC_CONSULTA" name="BTN_RC_CONSULTA" class="btn btn-{{btnClass}}" class="btn btn-default" type="button" ng-click="recuperarDatosRc('NATURAL',datos.INT_RL_NUM_DOCUMENTO);">Consultar</button>
+                                            <button ng-show="btnMostrarRcActualizar" id="BTN_RC_ACTUALIZAR" name="BTN_RC_ACTUALIZAR" class="btn btn-{{btnClass}}" class="btn btn-default" type="button" ng-click="modificarRegistroCiudadano(datos);">Actualizar Datos</button>
+                                        </span>
+                                    </div>
+                                    <span style="color:red" ng-show="formNexo.INT_RL_NUM_DOCUMENTO.$invalid">
+                                        <span ng-show="formNexo.INT_RL_NUM_DOCUMENTO.$error.required">Es requerido.
+                                        </span>
+                                    </span><br>
+                                </div>
+
+                        </div>
+
+                        <div class="col-sm-12" ng-if="spanOcultarMostrarExito" align="right">
+                            <div class="form-group" >
+                                <label class="col-sm-3 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"></font></label>
+                                <div class="col-sm-9" align="left">
+                                    <div class="alert alert-success fade in">
+                                        <a href="" class="close" data-dismiss="alert">&times;</a>
+                                        <strong></strong> Favor revisar la informacion y completar si faltara.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-12" align="right" ng-show="spanOcultarMostrarFracaso">
+                            <div class="form-group" >
+                                <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"></font></label>
+                                <div class="col-sm-8" align="left">
+                                    <div class="alert alert-danger fade in">
+                                        <a href="" class="close" data-dismiss="alert">&times;</a>
+                                        <strong></strong> Favor registrar los datos de la solicitud.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- REGISTRO CIUDADANO -->
+                        <div class="col-sm-12" align="right">
+                            <div class="form-group" align="right">
+                                <label class="col-sm-3 control-label no-padding-right" for="url" >Expedido: <font color="#FF0000" size="5px"> </font></label>
+                                <div class="col-sm-9" align="left">
+                                    <select ng-change="mostrarBtnActualizar();" ng-class="{'red': camposRcEncontrados}" ng-disabled="desabilitadoRc || desabilitadoFormulario" id="region" name="region" ng-model="datos.region" class="form-control" required>
+                                        <option value="">--Seleccione--</option>
+                                            <option value="LPZ">LA PAZ</option>
+                                            <option value="CBB">COCHABAMBA</option>
+                                            <option value="SCZ">SANTA CRUZ</option>
+                                            <option value="CHQ">CHUQUISACA</option>
+                                            <option value="TJA">TARIJA</option>
+                                            <option value="PTS">POTOSI</option>
+                                            <option value="ORU">ORURO</option>
+                                            <option value="BNI">BENI</option>
+                                            <option value="PND">PANDO</option>
+                                    </select>
+                                    <br>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- REGISTRO CIUDADANO -->
+                        <div ng-if="consultaCiuCampos"  class="col-sm-12" align="right">
+                            <div class="form-group" >
+                                <label class="col-sm-3 control-label no-padding-right" for="url" >Nombres: <font color="#FF0000" size="5px"> </font></label>
+                                <div class="col-sm-9" align="right">
+                			<input ng-change="mostrarBtnActualizar();" ng-model="datos.RC_NOMBRE" id="RC_NOMBRE" name="RC_NOMBRE" class="form-control" type="text" placeholder="ingrese tu nombre completo" ng-disabled="" onkeyUp="return conMayusculas(this);" required>
+                                    <span style="color:red" ng-show="formularioCasos2.RC_NOMBRE.$invalid">
+                                        <span ng-show="formularioCasos2.RC_NOMBRE.$error.required">Es requerido.
+                                        </span>
+                                    </span><br>
+                                </div>
+                            </div>
+                        </div>
+                        <div ng-if="consultaCiuCampos" class="col-sm-12" align="right">
+                            <div class="form-group" >
+                                <label class="col-sm-3 control-label no-padding-right" for="url" >Paterno: <font color="#FF0000" size="5px"> </font></label>
+                                <div class="col-sm-9" align="left">
+                                    <input ng-change="mostrarBtnActualizar();"  ng-model="datos.RC_PATERNO" id="RC_PATERNO" name="RC_PATERNO" class="form-control" type="text" placeholder="ingrese paterno" ng-disabled="desabilitadoRc" onkeyUp="return conMayusculas(this);" onblur="return conMayusculas(this);" >
+                                    <br>
+                                </div>
+                            </div>
+                        </div>
+                        <div ng-if="consultaCiuCampos" class="col-sm-12" align="right">
+                            <div class="form-group" >
+                                <label class="col-sm-3 control-label no-padding-right" for="url" >Materno: <font color="#FF0000" size="5px"> </font></label>
+                                <div class="col-sm-9" align="left">
+                                    <input ng-change="mostrarBtnActualizar();" ng-model="datos.RC_MATERNO" id="RC_MATERNO" name="RC_MATERNO" class="form-control" type="text" placeholder="ingrese Materno" ng-disabled="desabilitadoRc" onkeyUp="return conMayusculas(this);" required onblur="return conMayusculas(this);" >
+                                    <span style="color:red" ng-show="formularioCasos2.RC_MATERNO.$invalid">
+                                        <span ng-show="formularioCasos2.RC_MATERNO.$error.required">Es requerido.
+                                        </span>
+                                    </span><br>
+                                </div>
+                            </div>
+                        </div>
+                        <div ng-if="consultaCiuCampos2" class="col-sm-12" align="right">
+                            <div class="form-group" >
+                                <label class="col-sm-3 control-label no-padding-right" for="url" >Nombre Completo: <font color="#FF0000" size="5px"> </font></label>
+                                <div class="col-sm-9" align="left">
+                                    <input ng-change="mostrarBtnActualizar();" ng-disabled="desabilitadoRc || desabilitadoFormulario" ng-model="datos.INT_SOLICITANTE" id="INT_SOLICITANTE" name="INT_SOLICITANTE" class="form-control" type="text" placeholder="ingrese tu nombre completo" onkeyUp="return conMayusculas(this);" required onblur="return conMayusculas(this);" >
+                                    <span style="color:red" ng-show="formularioCasos2.INT_SOLICITANTE.$invalid">
+                                        <span ng-show="formularioCasos2.INT_SOLICITANTE.$error.required">Es requerido.
+                                        </span>
+                                    </span><br>
+                                </div>
+                            </div>
+                        </div><!-- RC -->
+                        <div class="col-sm-12" align="right">
+                            <div class="form-group" >
+                                <label class="col-sm-3 control-label no-padding-right" for="url" >Direcci&oacute;n: <font color="#FF0000" size="5px">  </font></label>
+                                <div class="col-sm-9" align="left">
+                                    <input ng-change="mostrarBtnActualizar();" ng-model="datos.direccion" id="direccion" name="direccion" class="form-control" type="text" placeholder="ingrese direccion" ng-disabled="desabilitadoRc || desabilitadoFormulario" onkeyUp="return conMayusculas(this);" >
+                                    <!--<span style="color:red" ng-show="formularioCasos2.direccion.$invalid">
+                                        <span ng-show="formularioCasos2.direccion.$error.required">Es requerido.
+                                        </span>-->
+                                    </span><br>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-12" align="right">
+                            <div class="form-group" >
+                                <label class="col-sm-3 control-label no-padding-right" for="url" >Direcci&oacute;n de Email:</label>
+                                <div class="col-sm-9"  align="left">
+                                    <input ng-change="mostrarBtnActualizar();" ng-model="datos.INT_CORREO" id="INT_CORREO" name="INT_CORREO" class="form-control" type="email" placeholder="ingrese direccion email" ng-disabled="desabilitadoRc || desabilitadoFormulario">
+                                  <span style="color:red" class="error" ng-show="formularioCasos2.INT_CORREO.$error.required">
+                                    Es requerido!</span>
+                                  <span style="color:red" class="error" ng-show="formularioCasos2.INT_CORREO.$error.email">
+                                    Email invalido!</span>
+                                    <br>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-12" align="right">
+                            <div class="form-group" >
+                                <label class="col-sm-3 control-label no-padding-right" for="url" >Nº de Celular:</label>
+                                <div class="col-sm-9" align="left">
+                                    <input ng-change="mostrarBtnActualizar();" ng-model="datos.INT_TEL_CELULAR" id="INT_TEL_CELULAR" name="INT_TEL_CELULAR" class="form-control" type="text" placeholder="ingrese Nº de celular" ng-disabled="desabilitadoRc" onkeyUp="valNumeroCelular(this);"><br>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-12" align="right">
+                            <div class="form-group" >
+                                <label class="col-sm-3 control-label no-padding-right" for="url" >Tel&eacute;fono Fijo Nº:</label>
+                                <div class="col-sm-9" align="left">
+                                    <input ng-change="mostrarBtnActualizar();" ng-model="datos.telefonoFijo" id="telefonoFijo" name="telefonoFijo" class="form-control" type="text" placeholder="ingrese Nº de telefono" ng-disabled="desabilitadoRc" onkeyUp="return valNumero(this);"><br>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                         <!--FIN PERSONA NATURAL-->
+
+                                      <!-- RC-JURIDICO -->
+                    <div ng-if="datos.solicitante=='juridico'">
+                        <div class="col-sm-12" align="right">
+                            <div class="form-group" >
+                                <label class="col-sm-3 control-label no-padding-right" for="url" >Nit: <font color="#FF0000" size="5px"> * </font></label>
+                                <div class="col-sm-9" align="left">
+                                    <div class="input-group">
+                                        <input ng-change="cambiarColorBtn();" ng-minlength="1" onkeyup="deshabilitaNit(this.form);valNumero(this);" ng-model="datos.RC_NIT" id="RC_NIT" name="RC_NIT" class="form-control" type="text" placeholder="ingrese Nit" ng-disabled="" onkeyUp="return conMayusculas(this);" required>
+                                       <span class="input-group-btn">
+                                           <button id="BTN_RC_CONSULTA" name="BTN_RC_CONSULTA" class="btn btn-{{btnClass}}" class="btn btn-default" type="button" ng-click="recuperarDatosRc('JURIDICO',datos.RC_NIT);" >Consultar</button>
+                                           <button ng-show="btnMostrarRcActualizar" id="BTN_RC_ACTUALIZAR" name="BTN_RC_ACTUALIZAR" class="btn btn-{{btnClass}}" class="btn btn-default" type="button" ng-click="modificarRegistroCiudadano(datos);">Actualizar Datos</button>
+                                       </span>
+                                    </div>
+                                    <span style="color:red" ng-show="formularioCasos2.RC_NIT.$invalid">
+                                        <span ng-show="formularioCasos2.RC_NIT.$error.required">Es requerido.
+                                        </span>
+                                    </span><br>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-12" align="right" ng-show="spanOcultarMostrarExito">
+                            <div class="form-group" >
+                                <label class="col-sm-3 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"></font></label>
+                                <div class="col-sm-9" align="left">
+                                    <div class="alert alert-success fade in">
+                                        <a href="" class="close" data-dismiss="alert">&times;</a>
+                                        <strong></strong> Favor revisar la informacion y completar si faltara.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-12" align="right" ng-show="spanOcultarMostrarFracaso">
+                            <div class="form-group" >
+                                <label class="col-sm-3 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"></font></label>
+                                <div class="col-sm-9" align="left">
+                                    <div class="alert alert-danger fade in">
+                                        <a href="" class="close" data-dismiss="alert">&times;</a>
+                                        <strong></strong> Favor registrar los datos de la solicitud.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-12" align="right">
+                            <div class="form-group" >
+                                <label class="col-sm-3 control-label no-padding-right" for="url" >Nombre o Raz&oacute;n Social: <font color="#FF0000" size="5px"> * </font></label>
+                                <div class="col-sm-9" align="left">
+                                    <input ng-change="mostrarBtnActualizar();"  ng-model="datos.nombreRazonSocial" id="nombreRazonSocial" name="nombreRazonSocial" class="form-control" type="text" placeholder="ingrese tu nombre o Razon Social" ng-disabled="" onkeyUp="return conMayusculas(this);" required onblur="return conMayusculas(this);" >
+                                    <span style="color:red" ng-show="formNexo.nombreRazonSocial.$invalid">
+                                        <span ng-show="formularioCasos2.nombreRazonSocial.$error.required">Es requerido.
+                                        </span>
+                                    </span><br>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-12" align="right">
+                            <div class="form-group" >
+                                <label class="col-sm-3 control-label no-padding-right" for="url" >Direcci&oacute;n de Email: </label>
+                                <div class="col-sm-9" align="left">
+                                    <input ng-change="mostrarBtnActualizar();" ng-model="datos.RC_CORREO" id="RC_CORREO" name="RC_CORREO" class="form-control" type="email" placeholder="ingrese correo" ng-disabled="desabilitadoRc || desabilitadoFormularioJuridico">
+                                    <span style="color:red" class="error" ng-show="formNexo.RC_CORREO.$error.required">
+                                    Es requerido!</span>
+                                    <span style="color:red" class="error" ng-show="formNexo.RC_CORREO.$error.email">
+                                    Email invalido!</span>
+                                    <br>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-12" align="right">
+                            <div class="form-group" >
+                                <label class="col-sm-3 control-label no-padding-right" for="url" >Direcci&oacute;n: <font color="#FF0000" size="5px"> * </font></label>
+                                <div class="col-sm-9" align="left">
+                                    <input ng-change="mostrarBtnActualizar();"  ng-model="datos.direccionJuridico" id="direccionE" name="direccionE" class="form-control" type="text" placeholder="ingrese direccion " ng-disabled="desabilitadoRc || desabilitadoFormularioJuridico" required>
+                                    <span style="color:red" ng-show="formNexo.direccionE.$invalid">
+                                        <span ng-show="formularioCasos2.direccionE.$error.required">Es requerido.
+                                        </span>
+                                    </span><br>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-12" align="right">
+                            <div class="form-group" >
+                                <label class="col-sm-3 control-label no-padding-right" for="url" >Tel&eacute;fono Fijo Nº:</label>
+                                <div class="col-sm-9" align="left">
+                                    <input ng-change="mostrarBtnActualizar();" ng-model="datos.telefonoFijoJuridico" id="telefonoFijo" name="telefonoFijo" class="form-control" type="text" placeholder="ingrese Nº de telefono" ng-disabled="desabilitadoRc" onkeyUp="return valNumero(this);"><br>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    </div>
+
+                        <div ng-if="tipo_hr=='INTERNO'|| tipo_hr=='CSJINTERNO'">
+
+                       <!-- <div class="col-sm-12" align="justify">
+                            <div class="form-group" >
+                                <label class="col-sm-4 control-label no-padding-right" for="url" >Unidad Organizacional Destino: <font color="#FF0000" size="5px"> * </font></label>
+                                <div class="col-sm-8" align="left">
+                                        <select id="unidad" class="form-control" ng-model="unidad" ng-disabled="desabilitadoRc" name="tipodoc">
+                                        <option value="">--SELECCIONAR--</option>
+                                            <option value="dir1">1. DIRECCION DE ADMINISTRACION GENERAL</option>
+                                            <option value="dir2">2. DIRECCION DE CULTURA CIUDADANA</option>
+                                            <option value="dir3">3. DIRECCION DE DESARROLLO ORGANIZACIONAL Y TECNOLOGIAS DE LA INFORMACION</option>
+                                            <option value="dir4">4. DIRECCION DE FISCALIZACION DE OBRAS Y SERVICIOS</option>
+                                            <option value="dir5">5. DIRECCION DE GESTION DE RECURSOS HUMANOS</option>
+                                            <option value="adm">6. ADMINISTRACION DE SERVICIOS DE SALUD</option>
+                                            <option value="cemn">7. CEMENTERIO GENERAL</option>
+                                            <option value="siremu">8. SIREMU</option>
+                                            <option value="subcotahuma">9. SUBALCALDIA COTAHUMA</option>
+                                            <option value="submaxpar">10. SUALCALDIA MAXILIMIALO PAREDES</option>
+                                            <option value="subper">11. SUALCALDIA PERIFERICA</option>
+                                            <option value="subsan">12. SUALCALDIA SAN ANTONIO</option>
+                                            <option value="subsur">13. SUALCALDIA SUR</option>
+                                            <option value="submalls">14. SUALCALDIA MALLASA</option>
+                                            <option value="subcentro">15. SUALCALDIA CENTRO</option>
+                                            <option value="subhmt">16. SUALCALDIA HAMPATURI</option>
+                                            <option value="subzongo">17. SUALCALDIA ZONGO</option>
+                                            <option value="tb">18. TERMINAL DE BUSES</option>
+                                            <option value="zm">19. ZOOLOGICO MUNICIPAL</option>
+                                            <option value="smc">20. SECRETARIA MUNICIPAL DE CULTURAS</option>
+                                            <option value="im">21. INTENDENCIA MUNICIPAL</option>
+                                            <option value="lm">22. LABORATORIO MUNICIPAL</option>
+                                            <option value="atm">23. AUTORIDAD TRIBUTARIA MUNICIPAL </option>
+                                            <option value="upaz">24. UNIDAD DE PROTECCION ANIMAL ZOONOSIS</option>
+                                            <option value="smpe">25. SECRETARIA MUNICIPAL DE PROMOCION ECONOMICA</option>
+                                            <option value="ucaes">26. UNIDAD DE CONTROL AMBIENTAL A LAS ACTIVIDADES ECONOMICAS Y SOCIALES</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>-->
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button ng-click="emisioncerrar();" type="button" class="btn btn-default">{{botoncerrar}}</button>
+                    <!--<button ng-click="adicionarCaso(datosCaso)" data-dismiss="modal" type="button" class="btn btn-primary" ng-show="boton=='new'" ng-hide="boton=='upd' || boton=='del'">Crear</button>{{botontit}}-->
+            <button  ng-click="emisionprueba(datos); " type="button" class="btn btn-primary" data-toggle="modal" ng-disabled="procesoid==''">Crear</button>
+                    <button ng-click="modificarCaso(datosCaso)" data-dismiss="modal" type="button" class="btn btn-primary" ng-show="boton=='upd'" ng-hide="boton=='new' || boton=='del'" ng-disabled="formularioProcesos.$invalid">Modificar</button>
+                    <button ng-click="eliminarCaso(datosCaso)" data-dismiss="modal" type="button" class="btn btn-primary" ng-show="boton=='del'" ng-hide="boton=='new' || boton=='upd'" >Eliminar</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

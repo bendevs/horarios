@@ -1,0 +1,99 @@
+<script type="text/javascript">
+</script>
+<div class="container" ng-controller="regMedicoController" >
+<legend>Formulario de Registro de Salud</legend>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group" >
+                <label for="category">Grupo Sanguineo</label>
+                <div class="controls">
+                    <select id="grpSanguineo" class="form-control" ng-model="a" ng-disabled="desabilitado" name="grpSanguineo">
+                        <option value="ORH+">ORH+</option>
+                        <option value="A+">A+</option>
+                        <option value="B+">B+</option>
+                        <option value="ORH-">ORH-</option>
+                        <option value="A-">A-</option>
+                        <option value="B-">B-</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="form-group" >
+                <label for="category">Cobertura Medica</label>
+                <div class="controls">
+                    <select id="cbtMedica" class="form-control" ng-model="aa" ng-disabled="desabilitado" name="cbtMedica">
+                        <option value="SUMI">SUMI</option>
+                        <option value="SPAM">SPAM</option>
+                        <option value="PARTICULAR">PARTICULAR</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="form-group" >
+                <label for="url" >Fecha de Alta:</label>
+                <div class="controls">
+                    <p class="input-group"><input name="prsfecnmt" id="prsfecnmt" type="text" class="form-control" datepicker-popup="" ng-model="datosPersona.prsfecnmt" is-open="startDateOpened" ng-required="true" close-text="Close" ng-disabled="desabilitado"/>
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-default" ng-click="startDateOpen($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+                    </span></p>
+                    <!--span style="color:red" ng-show="formularioPersonas.prsfecnmt.$invalid">
+                        <span ng-show="formularioPersonas.prsfecnmt.$error.required">Fecha de Nacimiento es requerido.
+                        </span>
+                    </span-->
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="form-group" >
+                <label for="url" >Antecedentes Personales:</label>
+                <div class="controls">
+                    <table class="table table-striped">
+                        <thead>
+                            <th>&nbsp;&nbsp;&nbsp;</th>
+                            <th>Antecedentes&nbsp;</th>
+                            <th>Detalle&nbsp;</th>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="antecedente in antecedentes">
+                                <td><div class="ngSelectionCell">
+                                    <input tabindex="-1" class="ngSelectionCheckbox" type="checkbox" ng-checked="row.selected" ng-model="checkboxes.items[antecedente.id]" /></div></td>
+                                <td>{{antecedente.ant}}</td>
+                                <td>{{antecedente.det}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="form-group" >
+                <label for="url" >Antecedentes Familiares:</label>
+                <div class="controls">
+                    <table class="table table-striped ">
+                        <thead>
+                            <th>&nbsp;&nbsp;&nbsp;</th>
+                            <th>Antecedentes&nbsp;</th>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="antecedenteF in antecedentesFamiliares">
+                                <td><div class="ngSelectionCell">
+                                    <input tabindex="-1" class="ngSelectionCheckbox" type="checkbox" ng-checked="row.selected" ng-model="checkboxesi.items[antecedenteF.id]" /></div></td>
+                                <td>{{antecedenteF.ante}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="form-group" >
+                <label for="url" >observaciones:</label>
+                <div class="controls">
+                    <textarea ng-model="datosPersona.prsCorreo" id="prsCorreo" name="prsCorreo" class="form-control" placeholder="ingrese e-mail" ng-disabled="desabilitado" width="30%" height="30"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

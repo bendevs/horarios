@@ -1,0 +1,408 @@
+<script>
+    $('.clockpicker').clockpicker();
+
+function cocheController($scope,  $rootScope, DreamFactory, CONFIG, sessionService) {
+    var fecha= new Date();
+    $scope.fechactual=fecha.getFullYear() + "-" + fecha.getMonth() + "-" + fecha.getDate() + " " + fecha.getHours() + ":" + fecha.getMinutes() + ":" + fecha.getSeconds();
+    var misDatos = {
+        "procedure_name":"usuarioslst",
+        "body":{
+        }
+    };
+    DreamFactory.api[CONFIG.SERVICE].callStoredProcWithParams(misDatos).success(function (results){
+        if(results.length > 0){
+            $scope.usuarios = results[0];
+        }else{                        
+        }
+    }).error(function(results){
+    });
+    
+    $scope.coche = {
+        marca: "Audi",
+        modelo: "A3",
+        nombreCompleto: function() {
+            var x;
+            x = $scope.coche;
+            return x.marca + " " + x.modelo;
+        }
+    };
+
+    datoObjectFinalPub = [];
+    
+    $scope.tituloForm1 = "TRÁMITE: EMISIÓN DE LICENCIA / AUTORIZACIÓN PARA EL FUNCIONAMIENTO DE SERVICIO DE INTERNET";
+    $scope.titulo2Form1 = "VERIFICACIÓN DE REQUISITOS Y ORDEN DE DEMOLICIÓN - PERSONA NATURAL";
+
+    $scope.getListaRequisitos = function(lista){
+        $rootScope.datosRequisitosCheckBox = lista;
+
+        if ($scope.datos.publicidad_grilla == [] || $scope.datos.publicidad_grilla == undefined || $scope.datos.publicidad_grilla == null) {
+            $scope.verPublicidad = false;
+        }
+        else{
+            $scope.verPublicidad = true;
+            var respuestPub = $scope.datos.publicidad_grilla;
+            for(j=1; j<respuestPub.length;j++){
+                datoObjectPub = new Object(); 
+                datoObjectPub.nroElem = respuestPub[j].nroElem; 
+                datoObjectPub.INT_TIPO_LETRE = respuestPub[j].INT_TIPO_LETRE; 
+                datoObjectPub.INT_CARA = respuestPub[j].INT_CARA;
+                datoObjectPub.FECHAINICIO = respuestPub[j].FECHAINICIO;
+                datoObjectPub.INT_DESC = respuestPub[j].INT_DESC;
+                datoObjectPub.INT_ALTO = respuestPub[j].INT_ALTO;
+                datoObjectPub.INT_ANCHO = respuestPub[j].INT_ANCHO;
+                datoObjectFinalPub[j-1] = datoObjectPub;    
+            }
+            $scope.datosPublicidad = datoObjectFinalPub;
+        };
+    }
+
+    $scope.getListaCondicionesTecnicas = function(lista){
+        $rootScope.datosRequisitosCondiciones = lista;       
+    }
+}
+</script>
+
+<div class="animated fadeInRight">
+    <form class="form-horizontal" name="formulario" novalidate> 
+        <div class="wrap" ng-controller="cocheController" ng-init="getListaRequisitos(datos.AE_REQ);getListaCondicionesTecnicas(datos.INT_CON_TEC)">
+            <div class="ibox-title_2">
+                <h5>Datos Generales de la Actividad</h5>
+            </div>
+            <div class="form-group"><label class="col-sm-2 control-label">Fecha de Solicitud:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_FEC_SOLICITUD}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div> 
+
+            <div class="form-group"><label class="col-sm-2 control-label">Tipo de Contribuyente:<small class="m-l-sm" style="color: red">*</small></label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_TIPO_CONTRIBUYENTE}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div> 
+
+            <div class="form-group"><label class="col-sm-2 control-label" style="red">Actividad: <small class="m-l-sm" style="color: red">*</small></label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_ACTIVIDAD_DESCRIPCION}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="ibox-title_2">
+                <h5>Documento Personal del Solicitante</h5>
+            </div>
+
+            <div class="form-group"><label class="col-sm-2 control-label">Tipo de Documento:<small class="m-l-sm" style="color: red"></small></label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_TIPO_DOC_IDENTIDAD}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="form-group"><label class="col-sm-2 control-label">Numero de Documento:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_NUM_DOC}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="form-group"><label class="col-sm-2 control-label">Expedido en:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_EXP}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="form-group"><label class="col-sm-2 control-label">Correo Electrónico:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_CORREO}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div> 
+
+            <div class="form-group"><label class="col-sm-2 control-label">Número de Teléfono Celular:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_TEL_CELULAR}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="ibox-title_2">
+                <h5>Datos de la Actividad</h5>
+            </div>
+            <div class="form-group"><label class="col-sm-2 control-label">Razon Social / Denominación:<small class="m-l-sm" style="color: red"></small></label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_DENOMINACION}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+           <!--  <div class="form-group"><label class="col-sm-2 control-label">Fecha de Inicio de la Actividad:<small class="m-l-sm" style="color: red"></small></label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_INICIO_AE}}" class="form-control"></div>
+            </div> -->
+            <div class="hr-line-dashed"></div>
+
+            <div class="form-group"><label class="col-sm-2 control-label">Superficie en mt2:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_AC_SUPERFICIE}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="form-group"><label class="col-sm-2 control-label">Capacidad (Aprox.):</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_AC_CAPACIDAD}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div> 
+
+            <div class="form-group"><label class="col-sm-2 control-label">Horario de Inicio:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_AC_HR_INICIO}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div> 
+
+            <div class="form-group"><label class="col-sm-2 control-label">Horario de Finalización:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_AC_HR_FINAL}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="form-group"><label class="col-sm-2 control-label">Establecimiento:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_AC_ESTADO}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+
+            <div class="ibox-title_2">
+                <h5>Ubicación de la Actividad</h5>
+            </div>
+        
+            <div class="form-group"><label class="col-sm-2 control-label">Macrodistrito:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_AC_MACRO}}" class="form-control"></div>
+            </div> 
+            <div class="hr-line-dashed"></div>       
+
+            <div class="form-group"><label class="col-sm-2 control-label">Zona:<small class="m-l-sm" style="color: red"></small></label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_AC_ZONA}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="form-group"><label class="col-sm-2 control-label">Tipo de Vía:<small class="m-l-sm" style="color: red"></small></label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_AC_TIP_VIA}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="form-group"><label class="col-sm-2 control-label">Nombre de Vía:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_AC_NOMBRE_VIA}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="form-group"><label class="col-sm-2 control-label">Número:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_AC_NUMERO}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div> 
+
+            <div class="form-group"><label class="col-sm-2 control-label">Edificio:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_AC_EDIFICIO}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div> 
+
+            <div class="form-group"><label class="col-sm-2 control-label">Bloque:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_AC_BLOQUE}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="form-group"><label class="col-sm-2 control-label">Piso:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_AC_PISO}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div> 
+
+            <div class="form-group"><label class="col-sm-2 control-label">Departamento Nro.:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_AC_NUME}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div> 
+
+            <div class="form-group"><label class="col-sm-2 control-label">Teléfono:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_AC_TEL}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="form-group"><label class="col-sm-2 control-label">Número de Teléfono Celular:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_AC_CEL}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="form-group"><label class="col-sm-2 control-label">Correo Electrónico:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_AC_COR}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+            
+
+
+
+
+
+
+
+            <div class="ibox-title_2">
+                <h5>Información de Requisitos para Obtener Licencia / Autorización</h5>
+            </div>
+
+            <div class="form-group"><label class="col-sm-2 control-label">Requisitos:</label>
+                <div class="col-sm-10">
+                    <table class="table table-striped "><tbody>
+                        <tr ng-repeat="role in datosRequisitosCheckBox">
+                            <td><div class="ngSelectionCell">
+                                <input tabindex="-1" class="ngSelectionCheckbox" type="checkbox" ng-checked="role.estado" ng-model="role.estado" ng-disabled="true"/></div></td>
+                            <td>{{role.resvalor}}</td>
+                        </tr></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="ibox-title_2">
+                <h5>CONCLUSIÓN: <small class="m-l-sm">Informe Requisitos Documentarios y Orden de Demolición</small></h5>
+            </div>
+        
+            <div class="form-group"><label class="col-sm-2 control-label">Resultado:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_APROBADO}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div> 
+
+            <div class="ibox-title_2">
+                <h5>Programación de Inspección</h5>
+            </div>
+
+            <div class="form-group"><label class="col-sm-2 control-label">Datos de la Inspección Programada:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_SELECCIONA_INSPECTOR}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="ibox-title_2">
+                <h5>Resultado de la Inspección</h5>
+            </div>
+
+            <div class="form-group"><label class="col-sm-2 control-label">Fecha de Inspección:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_FEC_INSPECCION}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="form-group"><label class="col-sm-2 control-label">Hora de Inspección:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_HORA_INSPECCION}}" class="form-control"></div>                
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="form-group"><label class="col-sm-2 control-label">Condiciones Técnicas Registradas:</label>
+                <div class="col-sm-10">
+                    <table class="table table-striped ">                        
+                        <tbody>
+                            <tr ng-repeat="role1 in datosRequisitosCondiciones">
+                                <td><div class="ngSelectionCell">
+                                    <input tabindex="-1" class="ngSelectionCheckbox" type="checkbox" ng-checked="role1.estado" ng-model="role1.estado" disabled/></div></td>
+                                <td>{{role1.resvalor}}</td>                                
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="hr-line-dashed"></div>
+
+            <div class="form-group"><label class="col-sm-2 control-label">Glosa:</label>
+                <div class="col-sm-10"><textarea id="INT_GLOSA" name="INT_GLOSA" ng-model="datos.INT_GLOSA" placeholder="{{datos.INT_GLOSA}}" rows="4" disabled="" class="form-control" onkeyUp="return conMayusculas(this);"></textarea></div>
+            </div>
+            
+            
+            <div class="hr-line-dashed"></div>
+
+            <div class="form-group"><label class="col-sm-2 control-label">Observación:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_OBSERVACIONES_PRIMERA_FECHA}}" class="form-control"></div>                
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="form-group"><label class="col-sm-2 control-label">Requiere re inspección:</label>
+                <div class="col-sm-10">
+                    <select id="INT_REINSPECCION" name="INT_REINSPECCION" class="form-control"  ng-model="datos.INT_REINSPECCION" ng-change="getAccesoInspeccion(datos.INT_REINSPECCION);" ng-disabled="true" >
+                        <option value="NO">NO</option>                         
+                        <option value="SI">SI</option>
+                    </select>
+                </div>
+            </div>
+            <div class="hr-line-dashed"></div>
+            <div class="ibox-title_2">
+                <h5>Recomendación del Inspector</h5>
+            </div>
+            <div class="form-group"><label class="col-sm-2 control-label">El inspector recomienda:</label>
+                <div class="col-sm-10">
+                    <select id="INT_REC_INS" name="INT_REC_INS" class="form-control"  ng-model="datos.INT_REC_INS" ng-disabled="true">
+                        <option value="PROCEDE">PROCEDE</option>
+                        <option value="OBSERVADO">OBSERVADO</option>
+                        <option value="EN PROCESO">EN PROCESO</option>
+                    </select>
+                </div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="ibox-title_2">
+                <h5>Validación Informe con Recomendaciones - Jefe UI</h5>
+            </div>
+
+            <div class="form-group"><label class="col-sm-2 control-label">Informe:</label>
+                <div class="col-sm-10">
+                    <select id="INT_T_REC_UI" name="INT_T_REC_UI" class="form-control"  ng-model="datos.INT_T_REC_UI" required>             
+                        <option value="APROBADO">APROBADO</option>
+                        <option value="RECHAZADO">RECHAZADO</option>
+                    </select>
+                    <span style="color:red" ng-show="formulario.INT_T_REC_UI.$invalid">
+                        <span ng-show="formulario.INT_T_REC_UI.$error.required">Es requerido.
+                        </span>
+                    </span>                    
+                </div>
+            </div>
+            <div class="hr-line-dashed"></div>
+            <div ng-if = "datos.INT_T_REC_UI=='RECHAZADO'">
+                <div class="form-group"><label class="col-sm-2 control-label">Observaciones:</label>
+                    <div class="col-sm-10">
+                        <textarea id="INT_DESCRIP_UI" name="INT_DESCRIP_UI" ng-model="datos.INT_DESCRIP_UI" class="form-control" placeholder="" required onkeyUp="return conMayusculas(this);"></textarea>
+                        <span style="color:red" ng-show="formulario.INT_DESCRIP_UI.$invalid">
+                            <span ng-show="formulario.INT_DESCRIP_UI.$error.required">Es requerido.
+                            </span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="hr-line-dashed"></div>    
+            <!--<div class="form-group"><label class="col-sm-2 control-label">Conclusiones:</label>
+                <div class="col-sm-10">
+                    <textarea id="INT_PROVEIDO" name="INT_PROVEIDO" ng-model="datos.INT_PROVEIDO" class="form-control" required onkeyUp="return conMayusculas(this);"></textarea>
+                    <span style="color:red" ng-show="formulario.INT_PROVEIDO.$invalid">
+                        <span ng-show="formulario.INT_PROVEIDO.$error.required">Es requerido.
+                        </span>
+                    </span>
+                </div>
+            </div>
+            <div class="hr-line-dashed"></div>-->
+
+            <div ng-show = "verPublicidad == true">
+                <div class="ibox-title_2">
+                    <h5>Publicidad</h5>
+                </div>
+                <div class="form-group"><label class="col-sm-10">Actividad Económica Sin Publicidad</label></div>
+                <div class="col-md-12" ng-if = "verPublicidad == true">
+                    <table ng-table="tablaRoles" class="table table-striped table-bordered">
+                        <tr ng-repeat="pup in datosPublicidad" >
+                            <td data-title="'ID'">{{pup.nroElem}}</td>
+                            <td data-title="'TIPO LETRERO'" >{{pup.INT_TIPO_LETRE}}</td>
+                            <td data-title="'CARACTERISTICA'" >{{pup.INT_CARA}}</td>
+                            <td data-title="'FECHA INICIO'" >{{pup.FECHAINICIO}}</td>
+                            <td data-title="'DESCRIPCIÓN'" >{{pup.INT_DESC}}</td>
+                            <td data-title="'ALTO'" >{{pup.INT_ALTO}}</td>
+                            <td data-title="'ANCHO'" >{{pup.INT_ANCHO}}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+           
+            <!--<div class="form-group"><label class="col-sm-2 control-label">Historial:</label>
+                <div class="col-sm-10">
+                    <textarea id="INT_HISTORIAL" name="INT_HISTORIAL" ng-model="datos.INT_HISTORIAL" class="form-control" required onkeyUp="return conMayusculas(this);"></textarea>
+                    <span style="color:red" ng-show="formulario.INT_HISTORIAL.$invalid">
+                        <span ng-show="formulario.INT_HISTORIAL.$error.required">Es requerido.
+                        </span>
+                    </span>
+                </div>
+            </div>-->
+            
+            <!-- <a class="btn btn-primary" ng-disabled="false" ng-click="volver()">
+                <i class="glyphicon fa fa-times"></i>
+                 Cancelar
+            </a>
+            <a class="btn btn-primary" ng-click="cargarDatos(datos);guardarData(datos);" ng-disabled="formulario.$invalid">
+                <i class="glyphicon fa fa-save"></i>
+                 Guardar / Continuar
+            </a> -->
+            <button type="button" class="btn btn-primary" ng-disabled="false" ng-click="volver()"> <i class="glyphicon fa fa-times"></i> Cancelar </button> 
+
+            <button type="button" class="btn btn-primary" ng-click="cargarDatos(datos);guardarData(datos)" ng-disabled="formulario.$invalid"> <i class="glyphicon fa fa-save"></i> Guardar / Continuar</button>
+        </div>
+    </form>
+</div>
+

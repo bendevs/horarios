@@ -1,0 +1,116 @@
+<div class="col-md-12" class="container" ng-controller="usuariosController" data-ng-init="inicioUsuarios()">
+    <div class="col-lg-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>Usuarios</h5>
+
+                <div ibox-tools></div> <div class="botones_inspinia_lmc">
+                        <a class="btn btn-primary" ng-click="limpiar()" data-toggle="modal" data-target="#registro">
+                        <i class="glyphicon glyphicon-plus-sign"></i> Nuevo Usuario</a>
+                    </div>
+            </div>
+            <div class="ibox-content">
+                <table ng-table="tablaUsuarios" show-filter="true" class="table table-striped">
+                        <tr ng-repeat="usuario in $data" ng-class="{'colorInactivo': usuario.usrEstado == 'INACTIVO'}">
+                            <td align="center" data-title="'Opciones'" style="width: 80px;">
+                                <a ng-click="modificarUsuarioCargar(usuario)" class="btn btn-info btn-circle" data-toggle="modal" data-target="#registro"><i class="fa fa-pencil"></i></a>
+                                <a ng-click="eliminarUsuarioCargar(usuario)" class="btn btn-info btn-circle" data-toggle="modal" data-target="#registro"><i class="fa fa-trash-o"></i></a>
+                            </td>
+                           <td data-title="'Nombre'" sortable="'usrnombre'" filter="{'usrnombre':'text'}">{{usuario.usrnombre}}</td>
+                           <td data-title="'Codigo'" sortable="'usrusuario'" filter="{'usrusuario':'text'}">{{usuario.usrusuario}}</td>
+                           <td data-title="'Clave'" sortable="'usrclave'" filter="{'usrclave':'text'}">{{usuario.usrclave}}</td>
+                           <td data-title="'Estado'" sortable="'usrestado'" filter="{'usrestado':'text'}">{{usuario.usrestado}}</td>
+                        </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+<!-- end tabla inspinia lizz -->
+
+    <!-- MODAL -->
+    <div class="modal fade" id="registro" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Cerrar</span></button>
+                    <h4 class="modal-title" id="myModalLabel">{{titulo}}  </h4>
+                </div>
+                <div class="modal-body" >
+                    <form name="formularioUsuarios" novalidate>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group" >
+                                    <label for="url">Persona</label>
+                                    <div class="controls">
+                                        <select ng-model="datosUsuario.psrid" name="psrid" id="psrid" class="form-control" ng-disabled="desabilitado" ng-required="true">
+                                            <option ng-repeat="persona in personas" value="{{persona.idprs}}">{{persona.prs}}</option>
+                                        </select>
+                                        <span style="color:red" ng-show="formularioUsuarios.psrid.$invalid">
+                                            <span ng-show="formularioUsuarios.psrid.$error.required">Seleccione Persona.
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>  
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="title">Codigo</label>
+                                    <div class="controls">
+                                        <input ng-model="datosUsuario.usrusuario" id="usrusuario" name="usrusuario" class="form-control" type="text" placeholder="Ingrese codigo" ng-disabled="desabilitado" required>
+                                        <span style="color:red" ng-show="formularioUsuarios.usrusuario.$invalid">
+                                            <span ng-show="formularioUsuarios.usrusuario.$error.required">Código es requerido.
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="url">Clave</label>
+                                    <div class="controls">
+                                        <input ng-model="datosUsuario.usrclave" id="usrclave" name="usrclave" class="form-control" type="text" placeholder="ingrese clave" ng-disabled="desabilitado" required>
+                                        <span style="color:red" ng-show="formularioUsuarios.usrclave.$invalid">
+                                            <span ng-show="formularioUsuarios.usrclave.$error.required">Clave es requerida.
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="colm-sm-2">
+                                <label for="url">Nodo</label>    
+                            </div>
+                            <div class="col-sm-12 no-padding-left" >
+                                <div class="col-sm-6 no-padding-left" >
+                                    <div class="controls">
+                                        <select name="nodoid" id="nodoid" ng-model="datosUsuario.nodoid" class="form-control" ng-options="nodo.nodo_id as nodo.nodo_nombre for nodo in nodos" required="true" ng-disabled="only">
+                                        <option style="display:none" value="{{nodo.nodo_id}}">{{nodo.nodo_nombre}}</option>
+                                        </select>
+                                        <span style="color:red" ng-show="formularioUsuarios.nodoid.$invalid">
+                                            <span ng-show="formularioUsuarios.nodoid.$error.required">Seleccione Nodo.
+                                            </span>
+                                        </span>                                        
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 no-padding-left">
+                                        <input  ng-model="datosNodo.nombre_nodo" id="nombre_nodo" name="nombre_nodo" class="form-control" type="text" placeholder="ingrese el Nodo"  ng-disabled="desabilitado" style="width:180px;">
+                                </div>
+                                <div align="right" class="col-sm-2 no-padding-left">            
+                                        <button  ng-click="buscarNodo(datosNodo.nombre_nodo, 1)" type="button" class="btn btn-success fa fa-search">Filtrar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <button ng-click="adicionarUsuario(datosUsuario)" data-dismiss="modal" type="button" class="btn btn-primary" ng-show="boton=='new'" ng-hide="boton=='upd' || boton=='del'" ng-disabled="formularioUsuarios.$invalid">Guardar</button>
+                    <button ng-click="modificarUsuario(datosUsuario.usrid,datosUsuario)" data-dismiss="modal" type="button" class="btn btn-primary" ng-show="boton=='upd'" ng-hide="boton=='new' || boton=='del'" ng-disabled="formularioUsuarios.$invalid">Modificar</button>
+                    <button ng-click="eliminarUsuario(datosUsuario.usrid)" data-dismiss="modal" type="button" class="btn btn-primary" ng-show="boton=='del'" ng-hide="boton=='new' || boton=='upd'">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript"> 
+   // alert($scope.only);    
+</script>

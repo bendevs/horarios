@@ -1,0 +1,79 @@
+<div class="col-md-12" class="row" ng-controller="SeguroController" data-ng-init="inicioCrear()">
+  <table  width="100%">
+    <td><h3>SEGURO DE BIENES INMUEBLES </h3></td> 
+  </table>
+  <br/>
+
+  <div class="modal-body" >
+    <div class="col-md-3">
+      <div class="form-group">
+        <label class="col-sm-3 control-label no-padding-right" for="url">FECHA DE INICIO:</label>
+        <div class="controls">
+          <p class="input-group">
+            <input name="FECHA1" id="registro1[]" type="text" class="form-control" datepicker-popup="" ng-model="registro.FECHA1" is-open="startDateOpened1" ng-required="true" close-text="Close" ng-disabled="desabilitado"/>
+            <span class="input-group-btn">
+              <button type="button" class="btn btn-default" ng-click="startDateOpen1($event)"><i class="glyphicon glyphicon-calendar"></i>
+              </button>
+            </span>
+          </p>
+        </div>
+      </div>
+    </div> 
+    <div class="col-md-3">
+      <div class="form-group">
+        <label class="col-sm-3 control-label no-padding-right" for="url">FECHA FIN:</label>
+        <div class="controls">    
+          <p class="input-group"><input name="FECHA2" id="registro2[]" type="text" class="form-control" datepicker-popup="" ng-model="registro.FECHA2" is-open="startDateOpened" ng-required="true" close-text="Close" ng-disabled="desabilitado"/>
+            <span class="input-group-btn">
+              <button type="button" class="btn btn-default" ng-click="startDateOpen($event)"><i class="glyphicon glyphicon-calendar"></i>
+              </button>
+            </span>
+          </p>
+        </div>
+      </div>
+    </div> 
+    <div class="col-md-6">
+      <button ng-click="getMostrarTabla(registro);" data-dismiss="modal" type="button" class="btn btn-primary" >Buscar</button>
+    </div>
+    <div class="col-md-12" >
+      <div class="col-lg-12">
+        <div class="ibox float-e-margins">
+          <div class="ibox-title">
+            <h5>Listado de Bienes Inmuebles  </h5> 
+            <div ibox-tools></div>
+            <div align="right">
+              <a class="btn btn-primary" ng-click="listado()" >
+                <i class="glyphicon fa fa-eye"></i>
+                Imprimir Listado
+              </a>
+            </div>
+          </div>  
+          <div class="ibox-content" >
+            <div class="table-responsive"> 
+              <table  class="table table-striped"  >
+                <thead>      
+                  <th>#&nbsp;</th>
+                  <th>Codigo&nbsp;</th>
+                  <th>Nombre&nbsp;</th>
+                  <th>Direccion&nbsp;</th>
+                  <th>Valor&nbsp;</th>
+                  <th>Gestion&nbsp;</th>
+                </thead>
+                <tbody> 
+                  <tr ng-repeat="grupo in grupos" >
+                    <td>{{$index+1}}</td>
+                    <td>{{grupo.codigo}}</td>
+                    <td>{{grupo.nombre}}</td>
+                    <td>{{grupo.direccion}}</td>
+                    <td>{{grupo.valor}}</td> 
+                    <td>{{grupo.gestion}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,112 @@
+<html  ng-app="moduloRouting">
+<script src="api_li.js"></script>
+<script src="../../app/libs/jss/angular.min.js"></script>
+<script src="../../app/libs/jss/angular-route.min.js"></script>
+<script src="../../app/libs/js_dashboard/bootstrap.js"></script>
+<script src="../../app/libs/js_dashboard/jquery-1.7.2.min.js"></script>
+<link rel="stylesheet" href="../../app/libs/components/bootstrap/dist/css/bootstrap.min.css"/>
+
+<script src="../../app/libs/js_dashboard/bootstrap.js"></script>
+<link rel="stylesheet" href="../../app/libs/components/bootstrap/dist/css/bootstrap.min.css"/>
+<link rel="stylesheet" href="../../app/libs/css_dashboard/font-awesome.css"/>
+<link rel="stylesheet" href="../../app/libs/css_dashboard/styleinspinia.css"/>
+
+<script src="../../app/libs/jquery-tree/tree.jquery.js"></script>
+<link rel="stylesheet" href="../../app/libs/jquery-tree/jqtree.css">
+<link rel="stylesheet" href="../../app/libs/styles/styles.css">
+
+
+<div class="col-md-12" class="row" id="contenedorPrincipal" class="slide-animation" ng-controller="mainController" data-ng-init="inicioDag()">
+
+  <div class="container">
+    <div class="col-xs-12">
+      <center><h1 class="jumbotron">HORARIOS</h1></center>
+    </div>
+    <div id="main">
+      <nav>
+        <a href="index.html" class="aulas">Aulas</a>
+        <a href="index.html" class="materias">Materias</a>
+        <a href="index.html" class="horarios">Horarios</a>
+        <a href="index.html" class="docentes">Docentes</a>
+      </nav>
+    </div>
+    <div class="container">
+      <div class='col-md-3'>
+        <div class="form-group">
+          <label for="ex1">AULA</label>
+          <input  ng-model="data.aula" id="aula" name="aula" class="form-control" value=" " type="text" placeholder="Ingrese  aula">
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-12 margin-tb">
+        <div class="pull-left">
+          <h1 style="color:#3276B1"><strong>Listado de Aula</h1>
+        </div>
+        <div class="pull-right" style="padding-top:30px">
+
+         <button ng-click="buscarvia(data);" data-dismiss="modal"  class="btn btn-primary" >Agregar</button>
+       </div>
+     </div>
+   </div>
+
+   <table ng-table="tablaAula" class="table table-striped table-bordered table-hover">
+    <thead>
+      <tr >
+        <th>N°</th>
+        <th>Aula</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat = "data in datos">
+        <td>{{ $index + 1 }}</td>
+        <td>{{ data.au_aula }}</td>
+      </tr>
+    </tbody>
+  </table>
+  <dir-pagination-controls class="pull-right" on-page-change="pageChanged(newPageNumber)" template-url="templates/dirPagination.html" ></dir-pagination-controls>
+</div>
+</div>
+<script type="text/javascript">
+ var moduloRouting = angular.module('moduloRouting',['ngRoute']);
+
+ moduloRouting.controller('mainController', function($scope,$timeout ) {
+
+  $scope.buscarvia = function (data) {
+    console.log("dataaaaaaaaa:",data);
+    try{
+      var Catalo = new spCatalogo();
+      Catalo.via=data.via;
+      Catalo.ini='2016-01-01';
+      Catalo.fin='2017-01-01';
+
+      Catalo.listavia(function(res){
+        console.log("ingresa",res);
+        x = JSON.parse(res);
+                          //resultado= x.success.data;
+
+                          response = x.success.data;
+                          //resultado= x.success.data;
+                          //var DetItem = resultado;
+
+                          $scope.datos = response;
+
+                          //var DetItem = resultado;
+                          console.log('|',x);
+
+                        });
+    }catch(e){
+      console.log("nooo");
+
+    }
+  };
+
+  $scope.$on('api:ready',function(){
+
+  });
+  $scope.inicioDag = function () {
+  };
+});
+</script>
+</html>

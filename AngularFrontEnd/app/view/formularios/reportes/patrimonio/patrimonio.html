@@ -1,0 +1,707 @@
+<script type="text/javascript">
+    $('.spin-icon').click(function (){
+        $(".theme-config-box_2").toggleClass("show");
+    });
+</script>
+<script type="text/javascript">
+    $('.spin-icon_3').click(function (){
+        $(".theme-config-box_3").toggleClass("show");
+    });
+</script>
+<script type="text/javascript">
+    $(function() {
+        $( "#accordion" ).accordion();
+    });
+</script>
+<style>
+    input:required:invalid {
+        border: 1px solid red;
+    }
+    input:required:valid {
+        border: 1px solid green;
+    }
+    select:required:invalid {
+        border: 1px solid red;
+    }
+    select[value="-1"]:optional {
+        border: 1px solid red;
+    }
+    select:required:valid {
+        border: 1px solid green;
+    }
+    .form-group {
+        padding-left: 8px;
+    }
+</style>
+<style>
+    .custom-upload {
+        position: relative;
+        height: 40px;
+        width: 100%;
+
+    }
+    .custom-upload input[type=file]
+    {
+        outline:none;
+        position: relative;
+        text-align: right;    
+        -moz-opacity:0 ;
+        filter:alpha(opacity: 0);
+        opacity: 0;
+        z-index: 2;
+        width:85%;
+        height:100%;
+
+    }
+    .custom-upload .fake-file
+    {
+        background:url(http://www.fold3.com/i/upload-icon.png) center right no-repeat;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        width: 85%;
+        padding: 0;
+        margin: 0;
+        z-index: 1;
+        line-height: 100%;
+    }
+    .custom-upload .fake-file input
+    {
+        font-size:16px;
+        height:40px;
+        width:85%;
+    }
+</style>
+<script type="text/javascript">
+    $('.custom-upload input[type=file]').change(function(){
+        $(this).next().find('input').val($(this).val());
+        angular.element(this).scope().cambiarFiles(this, $(this).val());
+    });
+</script>
+
+<div class="col-md-12" class="row" ng-controller="BusquedaPatriController" data-ng-init="inicioCrear()">
+    <div class="ibox-content" ng-show="panelbuscador">
+        <div class="ibox-title">
+            <h5>Busqueda de Fichas de Patrimonio</h5>
+            <div ibox-tools></div>
+            <div class="botones_inspinia_lmc">
+                <a  class="btn btn-primary" data-toggle="modal" ng-click="limpiar()" data-target="#registro"><i class="glyphicon glyphicon-plus"></i>Nueva Ficha</a>
+            </div>
+        </div>
+        <div class="modal-body" >
+            <div>
+                <div class="ng-binding">
+                    <div class="row"> 
+                        <form name="formularioImpresion"  readOnly="true" novalidate>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Proceso: </label>
+                                    <select id="proceso" ng-change="datoscampos(dat.espacio);cargarfichas(dat.espacio)" ng-model="dat.espacio" class="form-control" ng-required="true">
+                                        <option value="-3">Seleccione...</option>
+                                        <option ng-repeat="rol in getFractividad" value="{{rol.id}}">{{rol.nompro}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                             
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label >Campo : </label>   
+                                    <select ng-change="getAccesos(selecteIdi)" name="campo" id="campo" ng-model="dat.campo" class="form-control" ng-required="true">
+                                        <option value="-3">Seleccione...</option>
+                                        <option ng-repeat="rol in getbsq" value="{{rol.bsq_campo}}">{{rol.bsq_nombre}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label >Valor : </label>   
+                                    <input  ng-value="&nbsp;"  name="valor" id="valor" ng-model="dat.valor" class="form-control" type="text" placeholder="Ingrese valor a buscar" ng-required="true" >
+                                </div>
+                            </div>
+                        </form>
+                        <div class="modal-footer">
+                            <button data-dismiss="modal" ng-click="getcasos10(dat)" type="button" class="btn btn-primary" ng-disabled="formularioImpresion.$invalid">Buscar</button>
+                        </div>
+                        <div ng-controller="misCasosController" class="ibox-content" ng-show="panelCasos" style="z-index: 999">
+                            <div class="col-lg-12">
+                                <div class="ibox float-e-margins">
+                                    <div class="ibox-title">
+                                        <h5>Lista de Fichas</h5>
+                                        <div ibox-tools></div>
+                                    </div>
+                                    <div class="ibox-content" ng-show="conArchivo != null">
+                                        <table ng-table="tablaBandeja" show-filter="true" class="table table-striped">
+                                            <tr class="column" ng-repeat="caso in datosGrilla">
+                                                <td data-title="'#'">{{$index+1}}</td>
+                                                <td data-title="'Opciones'" style="width:180px">
+                                                    <div class="fixed-action-btn">
+                                                        <ul class="horizontal">
+                                                            <li>
+                                                                <a tooltip = "Archivo" class="btn-floating" ng-click="archivo(caso)"><i class="fa fa-folder-open-o"></i></a>
+                                                            </li> 
+                                                            <li>
+                                                                <a tooltip = "Actualizar" class="btn-floating" ng-click="busquedaAtenderCaso(caso,'ACTIVIDAD')"><i class="fa fa-pencil"></i></a>
+                                                            </li> 
+                                                            <li>
+                                                                <a tooltip = "Fotografias" class="btn-floating" ng-click="fotografias(caso)"><i class="fa fa-camera" ></i></a>
+                                                            </li>
+                                                            <li>
+                                                                <a tooltip = "Imprimir" class="btn-floating" ng-click="impresion(caso)"><i class="fa fa-print" ></i></a>
+                                                            </li>
+                                                            <li ng-show='bloquess'>
+                                                                <a ng-click="bloque(caso.casid)" class="btn-floating" data-toggle="tooltip" tooltip = "Bloques"><i class="fa fa-bank" ></i></a>
+                                                            </li>
+                                                            <li>
+                                                                <a tooltip = "Eliminar" class="btn-floating" ng-click="eliminar(caso)"><i class="fa fa-trash-o"></i></a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </td>
+                                                <td data-title="'Nro de Ficha &nbsp;'" sortable="'casnrocaso'" >{{caso.casnrocaso}}</td>
+                                                <td data-title="'Código de Ficha &nbsp;'" sortable="'casnombrecaso'" >{{caso.casnombrecaso}}</td>
+                                                <td data-title="'Codigo Catastral  &nbsp;'" sortable="'casnombrecaso'" >{{caso.casodato.PTR_COD_CAT}}</td>
+                                                <td data-title="'Denominación  &nbsp;'" sortable="'casnombrecaso'" >{{caso.denominacion}}</td>
+                                                <td data-title="'Fecha &nbsp;'" sortable="'casnombrecaso'" >{{caso.fechaini}}</td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="divPopup4" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog" style="width:700px">
+             <div class="modal-content">
+                 <div class="modal-header">
+                     <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Cerrar</span></button>
+                 </div>
+                 <div class="modal-body">
+                     <!--pdf-->
+                     <div id="visorFu">
+                         <object data="" type="application/pdf" width="650" height="500"></object>
+                     </div>
+                     <!--imagen-->
+                 </div>
+                 <div class="modal-footer">
+                     <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                 </div>
+             </div>
+        </div>
+    </div>
+    <div id="bloques" ng-show="bloques">
+        <div id="VOLVER" align="right" class="col-md-7 col-sm-7 col-xs-7" >
+            <a class="btn btn-primary" ng-click="volvers()" >
+                <i class="glyphicon fa fa-reply"></i>
+                Volver
+            </a>
+        </div>
+        <br>
+        <br>
+        <div id="bloq1" ng-show="bloq1"  class="col-md-12 col-sm-12 col-xs-12">
+            <div class="col-md-6 col-sm-6 col-xs-6">
+                <label>{{NombreBloque1}}</label>
+            </div>
+            <div class="col-md-6 col-sm-6 col-xs-6">
+                <a class="btn btn-primary" ng-click="fotos(casoid,1)" >
+                    <i class="glyphicon fa fa-print"></i>
+                    Bloque 1
+                </a>
+            </div>
+        </div>
+        <br>
+        <br>
+        <div id="bloq2" ng-show="bloq2" class="col-md-12 col-sm-12 col-xs-12">
+            <div class="col-md-6 col-sm-6 col-xs-6">
+                <label>{{NombreBloque2}}</label>
+            </div>
+            <div class="col-md-6 col-sm-6 col-xs-6">
+                <a class="btn btn-primary" ng-click="fotos(casoid,2)" >
+                    <i class="glyphicon fa fa-print"></i>
+                    Bloque 2
+                </a>
+            </div>
+        </div>
+        <br>
+        <br>
+        <div id="bloq3" ng-show="bloq3" class="col-md-12 col-sm-12 col-xs-12">
+            <div class="col-md-6 col-sm-6 col-xs-6">
+                <label>{{NombreBloque3}}</label>
+            </div>
+            <div class="col-md-6 col-sm-6 col-xs-6">
+                <a class="btn btn-primary" ng-click="fotos(casoid,3)" >
+                    <i class="glyphicon fa fa-print"></i>
+                    Bloque 3
+                </a>
+            </div>
+        </div>
+        <br>
+        <br>
+        <div id="bloq4" ng-show="bloq4" class="col-md-12 col-sm-12 col-xs-12">
+            <div class="col-md-6 col-sm-6 col-xs-6">
+                <label>{{NombreBloque4}}</label>
+            </div>
+            <div class="col-md-6 col-sm-6 col-xs-6">
+                <a class="btn btn-primary"  ng-click="fotos(casoid,4)" >
+                    <i class="glyphicon fa fa-print"></i>
+                    Bloque 4
+                </a>
+            </div>
+        </div>
+        <br>
+        <br>
+        <div id="bloq5" ng-show="bloq5" class="col-md-12 col-sm-12 col-xs-12">
+            <div class="col-md-6 col-sm-6 col-xs-6">
+                <label>{{NombreBloque5}}</label>
+            </div>
+            <div class="col-md-6 col-sm-6 col-xs-6">
+                <a class="btn btn-primary" ng-click="fotos(casoid,5)" >
+                    <i class="glyphicon fa fa-print"></i>
+                    Bloque 5
+                </a>
+            </div>
+        </div>
+    </div>
+    <div id="archivos" ng-show="archivos">
+        <div id="VOLVER" align="right" class="col-md-12 col-sm-12 col-xs-12" >
+            <a class="btn btn-primary" ng-click="volvers()" >
+                <i class="glyphicon fa fa-reply"></i>
+                Volver
+            </a>
+        </div>
+        <br>
+        <br>
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>Documentos Adjuntos</h5>
+
+                    <div ibox-tools></div>
+                    <div class="botones_inspinia_lmc">
+                        <a class="btn btn-primary" ng-click="limpiaradjs()" data-toggle="modal" data-target="#adjuntos">
+                            <i class="glyphicon glyphicon-plus-sign"></i>Nuevo Documento</a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <table ng-table="tablaRegistros"  show-filter="true" class="table table-striped">
+                        <tr ng-repeat="registro in obtRegistros" ng-class="{'colorInactivo': registro.prsEstado == 'INACTIVO'}">
+                            <td align="center" data-title="'Opciones'" style="width: 120px;">
+                                <a ng-click="modificarRegistroCargars(registro)" class="btn btn-info btn-circle" data-toggle="modal" data-target="#adjuntos"><i class="fa fa-pencil"></i></a>
+                                <a ng-click="eliminarRegistroCargars(registro)" class="btn btn-info btn-circle" data-toggle="modal" data-target="#adjuntos"><i class="fa fa-trash-o" ></i></a>
+                                <a ng-click="verImagens(registro)" class="btn btn-info btn-circle" data-toggle="modal" data-target="#imagens">
+                            <i class="fa fa-eye" style="color:#249FE6"></i></a>
+                            </td>
+                            <td data-title="'Posicion'" >{{registro.doc_correlativo}}</td>
+                            <td data-title="'Posicion'" >{{registro.doc_tipo_documentacion}}</td>
+                            <td data-title="'Título'" sortable="'doc_titulo'" filter="{'doc_titulo':'text'}">{{registro.doc_titulo}}</td>
+                            <td data-title="'Descripción'" sortable="'doc_datos'" filter="{'doc_datos':'text'}">{{registro.doc_datos}}</td>
+                            <td data-title="'Nombre'" sortable="'doc_nombre'" filter="{'doc_nombre':'text'}">{{registro.doc_nombre}}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+      
+        <div class="modal fade" id="imagens" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Cerrar</span></button>
+                        <h4 class="modal-title" id="myModalLabel">IMAGEN</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div id="visorFums" ng-show="archpdf">
+                           <object data="" type="application/pdf" width="100%" height="500"></object>
+                        </div>
+                        <div ng-show="archotro">
+                            <img id="imgSalidas" ng-src="{{archivoP}}" width="100%" height="100%">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="cerrar" name="cerrar" type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <div class="modal fade" id="adjuntos" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Cerrar</span></button>
+                        <h4 class="modal-title" id="myModalLabel">{{titulo}}</h4>
+                    </div>
+                    <div class="modal-body" >
+                        <form name="formularioRegistros" readOnly="true" novalidate>
+                            <div class="row">
+                                <div class="ibox-title_2">
+                                    <h5>ADJUNTAR DOCUMENTO</h5>
+                                </div>
+                                <div class="col-md-12" id="div_doc_nombre">
+                                    <div class="form-group" >
+                                        <label for="url">DOCUMENTO ADJUNTO:</label>
+                                        <div class="controls">
+                                           <div class="custom-upload">
+                                                <input type="file" name="doc_nombres" id="doc_nombres" uploader-model="doc_nombres"  >
+                                                <div class="fake-file">
+                                                    <input id = "doc_nombress" ng-model="dato.doc_nombre " type="text">
+                                                </div>             
+                                            </div>         
+                                        </div>
+                                    </div>
+                                </div>                            
+                                <div class="col-md-12" id="div_doc_tps_doc_id">
+                                    <div class="form-group" >
+                                        <label for="url">TIPIFICACION:</label>
+                                        <div class="controls">
+                                            <select id="doc_tps_doc_id" ng-change = "mostpos(dato)" name="registro[]" class="form-control" ng-model="dato.doc_tps_doc_id">
+                                                <option value="-1"> -- Seleccione -- </option>
+                                                <option value="2">Fotografias</option>
+                                                <option value="1">Autocad</option>
+                                                <option value="3">Mapas o Planos</option>
+                                                <option value="4">Texto</option>
+                                                <option value="5">Video o Sonido</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12" ng-show="patrimonio == 'PTR_CBI'" id="div_doc_correlativo">
+                                    <div class="form-group" >
+                                        <label for="url">POSICION:</label>
+                                        <div class="controls">
+                                            <select id="doc_correlativoPTR_CBI" name="registro[]" class="form-control" ng-model="dato.doc_correlativo">
+                                                <option value= 1>Foto Principal</option> 
+                                                <option value= 2>Plano de Ubicacion</option>
+                                                <option value= 3>Tipologia Arquitectonica</option>
+                                                <option value= 4 >Perfil de Acera</option>
+                                                <option value= 5>Fotografia 1</option>
+                                                <option value= 6>Fotografia 2</option>   
+                                                <option value= 7>Fotografia 3</option>
+                                                <option value= 8>Fotografia 4</option>   
+                                                <option value= 9>Fotografia 5</option>
+                                                <option value= 10>Fotografia 6</option>
+                                                <option value="Otro">Otro</option>  
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12" ng-show="patrimonio == 'PTR_BMA'" id="div_doc_correlativo">
+                                    <div class="form-group" >
+                                        <label for="url">POSICION:</label>
+                                        <div class="controls">
+                                            <select id="doc_correlativoPTR_BMA" name="registro[]" class="form-control" ng-model="dato.doc_correlativo">
+                                                <option value= 1>Fotografia del Plano de Ubicación</option>
+                                                <option value= 5>Fotografia 1</option>
+                                                <option value= 6>Fotografia 2</option>   
+                                                <option value= 7>Fotografia 3</option>
+                                                <option value= 8>Fotografia 4</option>   
+                                                <option value= 9>Fotografia 5</option>
+                                                <option value= 10>Fotografia 6</option>
+                                                <option value="Otro">Otro</option>  
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12" ng-show="patrimonio == 'PTR-PCI'" id="div_doc_correlativo">
+                                    <div class="form-group" >
+                                        <label for="url">POSICION:</label>
+                                        <div class="controls">
+                                            <select id="doc_correlativoPTR-PCI" name="registro[]" class="form-control" ng-model="dato.doc_correlativo">
+                                                <option value= 1>Fotografia Principal 1</option>
+                                                <option value= 2>Fotografia Principal 2</option>
+                                                <option value= 5>Fotografia 1</option>
+                                                <option value= 6>Fotografia 2</option>   
+                                                <option value= 7>Fotografia 3</option>
+                                                <option value= 8>Fotografia 4</option>   
+                                                <option value= 9>Fotografia 5</option>
+                                                <option value= 10>Fotografia 6</option>
+                                                <option value="Otro">Otro</option>  
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12" ng-show="patrimonio == 'PTR_IME'" id="div_doc_correlativo">
+                                    <div class="form-group" >
+                                        <label for="url">POSICION:</label>
+                                        <div class="controls">
+                                            <select id="doc_correlativoPTR_IME" name="registro[]" class="form-control" ng-model="dato.doc_correlativo">
+                                                <option value= 1>Fotografia Frente</option>
+                                                <option value= 2>Fotografia Perfil</option>
+                                                <option value= 3>Fotografia incluyendo pedestal y placas</option>
+                                                <option value= 4>Plano de Ubicación</option>
+                                                <option value= 5>Fotografia 1</option>
+                                                <option value= 6>Fotografia 2</option>   
+                                                <option value= 7>Fotografia 3</option>
+                                                <option value= 8>Fotografia 4</option>   
+                                                <option value= 9>Fotografia 5</option>
+                                                <option value= 10>Fotografia 6</option>
+                                                <option value="Otro">Otro</option>  
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12" ng-show="patrimonio == 'PTR-ESP'" id="div_doc_correlativo">
+                                    <div class="form-group" >
+                                        <label for="url">POSICION:</label>
+                                        <div class="controls">
+                                            <select id="doc_correlativoPTR-ESP" name="registro[]" class="form-control" ng-model="dato.doc_correlativo">
+                                                <option value= 1>Plano de Ubicación</option>
+                                                <option value= 2>Esquema Arquitectonico</option>
+                                                <option value= 3>Angulo Visual Horizontal</option>
+                                                <option value= 5>Fotografia 1</option>
+                                                <option value= 6>Fotografia 2</option>   
+                                                <option value= 7>Fotografia 3</option>
+                                                <option value= 8>Fotografia 4</option>   
+                                                <option value= 9>Fotografia 5</option>
+                                                <option value= 10>Fotografia 6</option>
+                                                <option value="Otro">Otro</option>  
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12" id="div_doc_titulo">
+                                    <div class="form-group" >
+                                        <label for="url">TITULO:</label>
+                                        <div class="controls">
+                                            <input type="text"  class="form-control" ng-disabled="only" id="doc_titulo" name="registro[]"  value="" ng-model="dato.doc_titulo">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12" id="div_doc_datos">
+                                    <div class="form-group" >
+                                        <label for="url">DESCRIPCION:</label>
+                                        <div class="controls">
+                                            <input type="text"  class="form-control" ng-disabled="only" id="doc_datos" name="registro[]" value="" ng-model="dato.doc_datos">
+                                        </div>
+                                    </div>
+                                </div> 
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="demo2" type="button" class="btn btn-default" data-dismiss="modal">Cerrar </button>
+                        <button ng-click="adicionarRegistross(dato);" data-dismiss="modal" type="button" class="btn btn-primary" ng-show="boton=='new'" ng-hide="boton=='upd' || boton=='del'"  ng-disabled="formularioRegistros.$invalid">Guardar</button>
+                        <button ng-click="modificarRegistross(dato.doc_idd,dato);" data-dismiss="modal" type="button" class="btn btn-primary" ng-show="boton=='upd'" ng-hide="boton=='new' || boton=='del'" ng-disabled="formularioRegistros.$invalid">Modificar</button>
+                        <button ng-click="eliminarRegistross(dato.doc_idd)" data-dismiss="modal" type="button" class="btn btn-primary" ng-show="boton=='del'" ng-hide="boton=='new' || boton=='upd'">Eliminar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    <div class="modal fade" id="registro" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Cerrar</span></button>
+                    <h4 class="modal-title" id="myModalLabel">{{titulo}}</h4>
+                </div>
+                <div class="modal-body" >
+                    <form name="formularioCasos"  readOnly="true" novalidate>
+                        <div class="row">
+                            <table class="table table-striped">
+                                <thead>
+                                    <th>#&nbsp;</th>
+                                    <th>Proceso&nbsp;</th>
+                                    <th>Actividad Inicial&nbsp;</th>
+                                </thead>
+                                <tbody>
+                                    <tr class="column" ng-repeat="proceso in obtProcesos" ng-click="seleccionarProceso(proceso)" ng-style="proceso.procid==procesoSeleccionado && {'background-color':'#E1FFF9','font-color':'#A2D5AE'}">
+                                        <td>{{$index+1}}</td>
+                                        <td>{{proceso.procnombre}}</td>
+                                        <td>{{proceso.actnombre}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <button ng-click="adicionarCaso(datosCaso)" data-dismiss="modal" type="button" class="btn btn-primary" ng-show="boton=='new'" ng-hide="boton=='upd' || boton=='del'">Crear</button>
+                    <button ng-click="modificarCaso(datosCaso)" data-dismiss="modal" type="button" class="btn btn-primary" ng-show="boton=='upd'" ng-hide="boton=='new' || boton=='del'" ng-disabled="formularioProcesos.$invalid">Modificar</button>
+                    <button ng-click="eliminarCaso(datosCaso)" data-dismiss="modal" type="button" class="btn btn-primary" ng-show="boton=='del'" ng-hide="boton=='new' || boton=='upd'" >Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div> 
+    <div class="row" ng-show="panelFormularios">
+        <div class="{{classCuerpo}}">
+            <div class="ibox-title" style="height: 65px; position: relative; top: 0px; left: 18%; background-color: #CDFBF2 !important;">
+                <h5>
+                    <div ng-show="seleccionado" style="font-size: 12px !important; position: relative;top: -7px">                
+                        <p style="line-height: 0.7">FICHA: <b style="font-weight: normal; color: #676a6c">{{casoActual.casonombre}}</b></p>
+                        <p style="line-height: 0.7">PROCESO: <b style="font-weight: normal; color: #676a6c">{{casoActual.procnombre}}</b></p>
+                    </div>
+                </h5>
+                <div class="botones_inspinia_lmc" style="top: -8px !important">
+                    <a ng-click="volver();" class="btn btn-info btn-circle" data-toggle="tooltip" tooltip = "Volver">
+                        <i class="fa fa-home"></i>
+                    </a>
+                    <a ng-click="volverFormulario();" class="btn btn-info btn-circle" data-toggle="tooltip" tooltip = "Volver" ng-show="contador-2>=0">
+                        <i class="fa fa-reply"></i>
+                    </a>
+                    <a ng-click="llamarHistorico();" class="btn btn-info btn-circle" data-toggle="modal" data-target="#formhistorico" tooltip = "Ver historico">
+                        <i class="fa fa-history"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="ibox-content" style="position: relative; top: 0px; left: 18%; box-shadow: 0 2px 2px 0 rgba(0,0,0,.14),0 3px 1px -2px rgba(0,0,0,.2),0 1px 5px 0 rgba(0,0,0,.12);">
+                <div ng-include src="template"></div>
+            </div>
+        </div>
+        <div ng-show="mostrardepuracion">
+            <div class="theme-config">
+                <div class="theme-config-box_2">
+                    <div class="spin-icon">
+                        <i class="fa fa-cogs fa-spin"></i>
+                    </div>
+                    <div class="skin-setttings_2">
+                        <div class="title" style="text-align: left;">Depurador</div>
+                        <div class="setings-depurador" style="background: #f3f3f4 !important;"> 
+                            <div class="ibox float-e-margins">
+                                <div class="ibox-title" style="border-color:#DEDEDE">
+                                    <h5>Formularios</h5>
+                                    <div ibox-tools></div>
+                                    <div class="botones_inspinia_lmc"></div>
+                                </div>
+                                <div class="ibox-content">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <th>#&nbsp;</th>
+                                            <th>Órden&nbsp;</th>
+                                            <th>Descripci&oacute;n&nbsp;</th>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="column" ng-repeat="formulario in obtFormularios" ng-click="cargarFormulario(formulario,$index)" ng-style="formulario.formid==formularioSeleccionado && {'background-color':'#E1FFF9'}">
+                                                <td>{{$index+1}}</td>
+                                                <td>{{formulario.formorden}}</td>
+                                                <td>{{formulario.formdescripcion}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="ibox float-e-margins">
+                                <div class="ibox-title" style="border-color: #DEDEDE">
+                                    <h5>Campos Formulario  </h5>
+                                    <div ibox-tools></div>
+                                    <div class="botones_inspinia_lmc">
+                                    </div>
+                                </div>
+                                <div class="ibox-content">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <th>Campo&nbsp;</th>
+                                            <th>Valor&nbsp;</th>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="column" ng-repeat="(key, value) in trmFormulario">
+                                                <td>{{key}}</td>
+                                                <td>{{value}}</td>                       
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="theme-config_3">
+            <div class="theme-config-box_3">
+                <div class="spin-icon_3" ng-click="llamarHistorico();">
+                    <i class="fa fa-history fa-spin"></i>
+                </div>
+                <div class="skin-setttings_3">
+                    <div class="title" style="text-align: left;">Historico</div>
+                    <div class="setings-depurador" style="background: #f3f3f4 !important;"> 
+                        <form name="formularioHistorico"  readOnly="true" novalidate>
+                            <div class="ibox float-e-margins">
+                                <div class="ibox-content">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped ">
+                                            <thead>
+                                                <th>#&nbsp;</th>
+                                                <th>Caso&nbsp;</th>
+                                                <th>Actividad&nbsp;</th>
+                                                <th>Nodo&nbsp;</th>
+                                                <th>Usuario&nbsp;</th>
+                                                <th>Fecha Inicio&nbsp;</th>
+                                                <th>Fecha Limite&nbsp;</th>
+                                            </thead>
+                                            <tbody>
+                                                <tr class="column" ng-repeat="historico in obtHistorico">
+                                                    <td>{{$index+1}}</td>
+                                                    <td>{{historico.cadoid}}</td>
+                                                    <td>{{historico.actividad}}</td>
+                                                    <td>{{historico.nodonombre}}</td>
+                                                    <td>{{historico.usuario}}</td>
+                                                    <td>{{historico.fechaini}}</td>
+                                                    <td>{{historico.fechalim}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ibox float-e-margins">
+                                <div class="ibox-title">
+                                    <h5>{{procTitulo}}</h5>
+                                    <h5>{{casoTitulo}}</h5>
+                                </div>
+                                <div id="sample">
+                                    <div style="display: none; vertical-align: top; padding: 10px;" id="SVGArea"></div>
+                                    <div style="width:100%; white-space:nowrap;">
+                                        <span style="display: none; vertical-align: top; padding: 5px; width:100px">
+                                            <div id="myPaletteDiv" style="border: solid 1px gray; height: 500px;"></div>
+                                        </span>
+                                        <span style="display: inline-block; vertical-align: top; padding: 5px; width:80%">
+                                            <div id="myDiagramDiv" style="border: solid 1px gray; height: 300px;"></div>
+                                            <textarea ng-model="ImagenProceso" id="mySavedModel" style="width:100%;height:200px;display:none;">
+                                                {{ImagenProceso}}
+                                            </textarea>
+                                        </span>                                    
+                                    </div>
+                                    <div id="myInspector">
+                                    </div>
+                                </div>                               
+                            </div>                            
+                            <div class="col-md-12" ng-show="panelReglaNegocioActividadMapa">
+                                <div class="col-lg-12">
+                                    <div class="ibox float-e-margins">
+                                        <div class="ibox-title">
+                                            <h5>{{tituloRNMapa}}</h5>
+                                        </div>
+                                        <div class="ibox-content">
+                                            <table class="table table-striped ">
+                                                <thead>
+                                                    <th>#&nbsp;</th>
+                                                    <th>Orden&nbsp;</th>
+                                                    <th>Actividad Siguiente&nbsp;</th>
+                                                    <th>Regla&nbsp;</th>
+                                                </thead>
+                                                <tbody>
+                                                    <tr class="column" ng-repeat="rnActividadMapa in obtNRactividadMapa" ng-style="rnActividad.rna_id==formularioSeleccionado && {'background-color':'#A2D5AE','font-color':'#A2D5AE'}">
+                                                        <td>{{$index+1}}</td>
+                                                        <td>{{rnActividadMapa.rna_orden}}</td>
+                                                        <td>{{rnActividadMapa.rna_actnombre}}</td>
+                                                        <td>{{rnActividadMapa.rna_regla}}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,238 @@
+<script type="text/javascript">
+    $(document).ready(function(){
+      $('#multiDocsButon').click(function(){
+        $("#multiDocsFile").click();
+      });    
+    });
+
+function tipoOnChange(sel) {
+///alert("muestra el sel" + sel);
+      if (sel.value=="1" || sel.value=="3" || sel.value=="8" || sel.value=="10" || sel.value=="11" || sel.value=="16" || sel.value=="17"){
+           divC = document.getElementById("subtipo");
+           divC.style.display = "";
+      }else{
+
+           divC = document.getElementById("subtipo");
+           divC.style.display="none";
+		   //alert ("entro" + sel.value);
+      }
+}
+</script> 
+<div  class="row" ng-controller="busquedaController" data-ng-init="inicioNexoForm();">
+	<div ng-show= "formFormulario" class="col-md-12" class="row" >
+		<div id="envio" class="col-md-12" tabindex="-1"  role="dialog"  aria-hidden="true">
+			<div class="col-md-12">
+				<h3>Consultas</h3>
+				<div class="col-md-6" ng-show= "filtros">
+					<div class="form-group" >
+						<div class="col-md-6">
+							<label>Nº de Tr&aacute;mite:</label>
+							<div class="controls">  
+								<input ng-model="datos.app_uid1" id="CI_BIGDATA" name="CI_BIGDATA" class="form-control" ng-disabled="false"></input>
+							</div>      
+						</div>
+						<div class="col-md-6">
+						  	<label>Al:</label>
+						  	<div class="controls">  
+						  		<input ng-model="datos.app_uid2" id="CI_BIGDATA" name="CI_BIGDATA" class="form-control" ng-disabled="false"></input>
+							</div>     
+						</div>
+						<div class="form-group" >
+							<label for="url" >Tipo de Tr&aacute;mite</label>
+							<div class="controls">
+								<select id="tipoTramite" name="tipoTramite" ng-model="datos.tipoTramite" class="form-control" ng-options="datos.id as datos.descripcion for datos in dataTipoTramites"  ng-change="subTipoTramites(datos.tipoTramite);formulariosTramites(datos.tipoTramite); limpiar();" ng-disabled="desabilitado" onChange="tipoOnChange(this);"> 
+									<option style="display:none" value="datos.id">-- Seleccione Tipo --</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-group" id="subtipo" name="subtipo" style="display:none;">
+							<label for="url" >Subtipo de Tr&aacute;mite:</label>
+							<div class="controls">
+							    <select id="subTipoTramite" name="subTipoTramite" ng-disabled="desabilitado" ng-model="datos.subTipoTramite" class="form-control" ng-options="datos.id as datos.descripcion for datos in dataSubTipoTramites" ng-show="">           
+							   </select> 
+							</div>
+						</div>
+						<div class="form-group" >
+							<label for="url" >Procedencia:</label>
+							<div class="controls">
+							    <select id="tipoHojaRuta" name="tipoHojaRuta" ng-model="datos.tipoHojaRuta" class="form-control">
+								 	<option value="EXTERNO">EXTERNO</option>
+                                   	<option value="INTERNO">INTERNO</option>
+							   	</select> 
+							</div>
+						</div>
+						<div class="form-group" >
+							<label for="url" >Asunto:</label>
+							<div class="controls">
+								<input  ng-model="datos.asunto" id="asunto" name="asunto" class="form-control" type="text" placeholder="ingrese el asunto" onkeyUp="return conMayusculas(this);"  ng-disabled="desabilitado">           
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="categoria">Estado:</label>
+							<select id="estado" name="estado" class="form-control"  ng-model="datos.estado" >
+								<option value="" selected>-- Estado --</option>
+								<option value="ACTIVO">ACTIVO</option>
+								<option value="ANULADO">ANULADO</option>
+								<option value="FUSIONADO">FUSIONADO</option>
+								<option value="CERRADO">CERRADO</option>
+							</select>
+						</div>
+						<div class="col-md-6"> 
+							<div class="form-group" >
+								<label for="url" >Fecha de Creaci&oacute;n Desde:</label>
+								<div class="controls">
+									<p class="input-group"><input name="prsfecnmt1" id="prsfecnmt1" type="text" class="form-control" datepicker-popup="" ng-model="datos.fchDesde" is-open="startDateOpened1" ng-required="true" close-text="Close" placeholder="aaaa/dd/mm" ng-disabled="desabilitado"/>
+										<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="startDateOpen1($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+										</span>
+									</p>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="form-group" >
+								<label for="url" > Hasta:</label>
+								<div class="controls">
+									<p class="input-group"><input name="prsfecnmt" id="prsfecnmt" type="text" class="form-control" datepicker-popup="" ng-model="datos.fchHasta" is-open="startDateOpened" ng-required="true" close-text="Close" placeholder="aaaa/dd/mm" ng-disabled="desabilitado"/>
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-default" ng-click="startDateOpen($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+									</span></p>
+								</div>
+							</div>
+						</div>
+						<!--BOTON QUE MUESTRA EL ARBOL-->
+						<div>
+							<span><b>Nodo :</b> {{nodoNombre}}</span>
+							<a class="btn btn-primary" ng-click="arbolNodos();" data-toggle="modal" data-target="#arbol">
+							<i class="glyphicon glyphicon-plus-sign"></i> Listar Nodos</a>
+				  		</div>
+						<div class="modal-footer">
+							<button  ng-click="Recargar();" data-dismiss="modal" type="reset" class="btn btn-success  fa fa-search "> <span class="textoAux"> Limpiar</span></button> &nbsp;&nbsp;&nbsp;
+							<button  ng-click="buscarDatos(datos);" data-dismiss="modal" type="button" class="btn btn-success  fa fa-search "> <span class="textoAux"> Buscar</span></button>
+						</div>
+					</div>
+				</div>
+				<!-- PANEL QUE MUESTRA RESULTADO DE BUSQUEDA-->    
+				<div ng-show="ResultadoBusqueda">
+					<div class="modal-header">
+						<button  ng-click="cargarNuevaBusqueda();" data-dismiss="modal" type="button" class="btn btn-success  fa fa-reply "> Nueva B&uacute;squeda</button>
+					</div>
+					<div class="row" ng-show="tablaDatos" class="col-md-9">
+						<table class="table table-striped table-bordered" ng-table="tablaDatosRecuperados" show-filter="true">
+							<tr ng-repeat="datos in $data">
+								<td align="center" data-title="'Opciones'">     
+									<!--
+									<a ng-click="verCopias(datos.uid)" tooltip="Ver Copias"  class="btn btn-default btn-circle"><i class="fa fa-eye" style="color:#249FE6"></i></a>
+									-->
+									<a ng-click="verHisto(datos.vid)" tooltip="Ver Copias"  class="btn btn-default btn-circle"><i class="fa fa-eye" style="color:#249FE6"></i></a>
+								</td>
+								<td data-title = "'Nº Tr&aacute;mite'" sortable="'vnro_caso'" filter="{'vnro_caso':'text'}">{{datos.vnro_caso}}</td>
+								<td data-title = "'Proceso - Actividad'" sortable="'vactividad'" filter="{'asunto':'text'}">{{datos.vactividad}}</td>
+								<td data-title = "'Fecha Inicio'" sortable="'vinicio'" filter="{'estado_copia':'text'}">{{datos.vinicio}}</td>
+								<td data-title = "'Fecha L&iacute;mite'" sortable="'vlimite'" filter="{'fechacreacion':'text'}">{{datos.vlimite}}</td>      
+							</tr>  
+						</table>
+					</div>
+				</div>
+				<!-- PANEL QUE MUESTRA LAS COPIAS las copias-->
+				<div ng-show="MostrarCopias"> 
+					<div class="modal-header">
+						<button  ng-click="cargarBuscador();" data-dismiss="modal" type="button" class="btn btn-success  fa fa-reply "> Volver</button>
+					</div>
+					<table ng-table="tablaCopias" class="table table-striped table-bordered">
+						<tr ng-repeat="tramite in DataTable"> 
+							<td data-title="'Actividad'">{{tramite.actividad}}</td>
+							<td data-title="'Nodo'" >{{tramite.nodonombre}}</td>
+							<td data-title="'Usuario'">{{tramite.usuario}}</td>
+							<td data-title="'Fecha inicio'">{{tramite.fechaini}}</td>
+							<td data-title="'Fecha Limite'">{{tramite.fechalim}}</td>
+							<td data-title="'Debug'"><a ng-click="seleccionaTramite(tramite)" class="btn btn-info btn-circle" data-toggle="modal" data-target="#debug" tooltip = "Ver debug"><i class="fa fa-navicon"></i></a></td> 
+						</tr>
+					</table> 
+					<div class="ibox float-e-margins">
+		                <div class="ibox-title">
+		                  	<h5>Campos Formulario {{trmFormulario}}</h5>
+		                    <div ibox-tools></div>
+		                    <div class="botones_inspinia_lmc">
+		                    </div>
+		                </div>
+		                <div class="ibox-content">
+		                    <table class="table table-striped">
+		                        <thead>
+			                        <!--<th>#&nbsp;</th>-->
+			                        <th>Campo&nbsp;</th>
+			                        <th>Valor&nbsp;</th>
+		                        </thead>
+		                        <tbody>
+		                            <tr class="column" ng-repeat="(key, value) in trmFormulario">
+		                                <!--<td>{{$index+1}}</td>-->
+		                                <td>{{key}}</td>
+		                                <td>{{value}}</td>
+		                            </tr>
+		                        </tbody>
+		                    </table>
+
+		                 </div>
+		            </div>   
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- MODAL NODOS -->
+	<div class="modal fade" id="arbol" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Cerrar</span></button>
+					<h4 class="modal-title" id="myModalLabel">&Aacute;rbol de Nodos</h4>
+				</div>
+				<div class="modal-body" >
+					<div id="tree1"></div>
+				</div>
+				<div class="modal-footer">
+		          	<button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="alestra()">Aceptar</button>
+		        </div>
+			</div>
+		</div>
+	</div>
+	<!-- modal de debug -->
+	<div class="modal fade" id="debug" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Cerrar</span></button>
+					<h4 class="modal-title" id="myModalLabel">Debug {{aaaaaa}}</h4>
+				</div>
+				<div class="modal-body" >
+					<div class="ibox float-e-margins">
+		                <div class="ibox-title">
+		                  	<h5>Campos Formulario </h5>
+		                    <div ibox-tools></div>
+		                    <div class="botones_inspinia_lmc">
+		                    </div>
+		                </div>
+		                <div class="ibox-content">
+		                    <table class="table table-striped">
+		                        <thead>
+			                        <!--<th>#&nbsp;</th>-->
+			                        <th>Campo&nbsp;</th>
+			                        <th>Valor&nbsp;</th>
+		                        </thead>
+		                        <tbody>
+		                            <tr class="column" ng-repeat="(key, value) in trmFormulario">
+		                                <!--<td>{{$index+1}}</td>-->
+		                                <td>{{key}}</td>
+		                                <td>{{value}}</td>
+		                            </tr>
+		                        </tbody>
+		                    </table>
+		                 </div>
+		            </div>
+				</div>
+				<div class="modal-footer">
+		          	<button type="button" class="btn btn-primary" data-dismiss="modal">Cerrar</button>
+		        </div>
+			</div>
+		</div>
+	</div>
+</div>

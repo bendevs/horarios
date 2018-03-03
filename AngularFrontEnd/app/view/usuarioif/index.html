@@ -1,0 +1,74 @@
+
+<div  class="col-md-12" ng-controller="usrifController" data-ng-init="inicioRoles()">
+    <div class="col-lg-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>Asignaciones de Usuarios</h5>
+
+                <div ibox-tools></div>
+                <div class="botones_inspinia_lmc">
+                    <a class="btn btn-primary" ng-click="limpiar()" data-toggle="modal" data-target="#registro"><i class="glyphicon glyphicon-plus-sign"></i>Nueva Asignación</a>
+                </div>
+            </div>
+            <div class="ibox-content">
+                <table ng-table="tablaRoles" show-filter="true" class="table table-striped">
+                    <tr ng-repeat="rol in $data" ng-class="{'colorInactivo': rol.uig_estado == 'INACTIVO'}" >
+                        <td align="center" data-title="'Opciones'" style="width: 80px;">
+                            <a class="btn btn-info btn-circle" data-toggle="modal" data-target="#registro" ng-click="modificarRolCargar(rol)"><i class="fa fa-pencil"></i></a>
+                            <a class="btn btn-info btn-circle" onclick="" data-toggle="modal" data-target="#registro" ng-click="eliminarRolCargar(rol)"><i class="fa fa-trash-o"></i></a>
+                        </td>
+                        <td data-title="'Usuario IF'" sortable="'usuario_if'" filter="{'usuario_if':'text'}">{{rol.usuarioif}}</td>
+                        <td data-title="'Usuario Genesis'" sortable="'usuario_genesis'" filter="{'usuario_genesis':'text'}">{{rol.usuariogenesis}}</td>
+                        <td data-title="'Registrado'" sortable="'uig_registrado'" filter="{'uig_registrado':'text'}">{{rol.uigregistrado}}</td>
+                        <td data-title="'Modificado'" sortable="'uig_modificado'" filter="{'uig_modificado':'text'}">{{rol.uigmodificado}}</td>
+                        <td data-title="'Estado'" sortable="'uig_estado'" filter="{'uig_estado':'text'}">{{rol.uigestado}}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="registro" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Cerrar</span></button>
+                    <h4 class="modal-title" id="myModalLabel">{{titulo}}</h4>
+                </div>
+                <div class="modal-body" >
+                    <form name="formularioRoles" novalidate>
+                        <div class="form-group">
+                            <div class="col-md-12"  >
+                                <div class="form-group">
+                                    <label for="category" >Usuarios IF:</label>
+                                    <div class="controls">
+                                        <input type="text" id="usuarioif" name="usuarioif" ng-model="datosRol.usuarioif" class="form-control" list="Usuarios"  ng-required="true" />
+                                        <datalist id="Usuarios">
+                                            <option ng-repeat="usuario in ifs" value="{{usuario.usrusuario}}">{{usuario.usrusuario}}</option>
+                                        </datalist> 
+                                    </div>
+                                </div>
+                            </div> 
+                            <div class="col-md-12"  >
+                                <div class="form-group">
+                                    <label for="category" >Usuarios genesis:</label>
+                                    <div class="controls">
+                                        <input type="text" id="usuariogenesis"  name="usuariogenesis" ng-required="true" class="form-control" ng-model="datosRol.usuariogenesis" list="Genesis"  />
+                                        <datalist id="Genesis">
+                                            <option ng-repeat="usuario in genes" value="{{usuario.usuario}}">{{usuario.usuario}}</option>
+                                        </datalist> 
+                                    </div>
+                                </div>
+                            </div> 
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <button data-dismiss="modal" ng-click="adicionarRol(datosRol)" type="button" class="btn btn-primary" ng-show="boton=='new'" ng-hide="boton=='upd' || boton=='del'" ng-disabled="formularioRoles.usuario_genesis.$invalid">Asignar</button>
+                    <button ng-click="modificarRol(datosRol.uigid,datosRol)" data-dismiss="modal" type="button" class="btn btn-primary" ng-show="boton=='upd'" ng-hide="boton=='new' || boton=='del'" ng-disabled="formularioRoles.usuario_genesis.$invalid">Modificar</button>
+                    <button ng-click="eliminarRol(datosRol.uigid)" data-dismiss="modal" type="button" class="btn btn-primary" ng-show="boton=='del'" ng-hide="boton=='new' || boton=='upd'">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

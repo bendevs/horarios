@@ -1,0 +1,299 @@
+<script type="text/javascript">
+            // When the document is ready
+    function conMayusculas(field) {
+        field.value = field.value.toUpperCase()
+    };
+      //*** Este Codigo permite Validar que sea un campo Numerico
+    function soloNumerico(variable){
+        Numer=parseInt(variable);
+        if (isNaN(Numer)){
+            return "";
+        }
+        return Numer;
+    }
+    function valNumero(Control){
+        Control.value=soloNumerico(Control.value);
+    }
+    //*** Fin del Codigo para Validar que sea un campo Numerico       
+</script>
+
+<div  class="col-md-12" ng-controller="ct_nodoController" data-ng-init="inicioCT_NODO()">   
+   <div class="col-lg-6" style="height: 50px">
+            <div class="ibox float-e-margins">
+                <div class="ibox-content" style="padding: 5px 20px 5px 20px !important;!important;">
+                    <form role="form" class="form-inline">
+                        <div class="form-group">
+                           <!-- <label>Nodo: </label> -->
+                           <select id = "vnodo_estadoNodo" name = "vnodo_estadoNodo" ng-model="datosNodo.vnodo_estadoNodo" class="form-control" ng-required="true" ng-disabled="only">
+                              <option style="display:none" value="">-- Seleccione Estado --</option>
+                              <option value="TODOS">TODOS</option>
+                              <option value="ACTIVO">ACTIVO</option>
+                              <option value="INACTIVO">INACTIVO</option>
+                           </select>
+                           <a class="btn btn-primary" ng-click="buscarNodoEstado(datosNodo.vnodo_estadoNodo)">
+                              <i class="fa fa-search"></i>
+                              filtrar
+                           </a>
+                        </div>
+                    </form>
+              </div>
+            </div>
+        </div>
+
+
+
+
+
+
+<!--     <div align="right">
+        <a class="btn btn-success" ng-click="limpiar()" data-toggle="modal" data-target="#registro">
+            <i class="glyphicon glyphicon-plus-sign"></i> Nuevo Nodo
+        </a>
+        <a class="btn btn-warning" ng-click="actualizarArbol()">
+            <i class="fa fa-undo"></i> Actualizar Arbol
+        </a>
+    </div><br>
+    <div class="row">
+        <table ng-table="tablaCTNODO" show-filter="true" class="table table-striped table-bordered">
+            <tr ng-repeat="nodo in $data" ng-class="{'colorInactivo': nodo.vnodo_estado == 'INACTIVO'}">
+                <td align="center" data-title="'USUARIOS'" >
+                    <a tooltip = "Asignar Usuario" class="btn btn-default btn-circle" data-toggle="modal"  ng-click="asignarUser(nodo, nodo.vnodo_id)" data-target="#registroAsignacionUsuario" ng-if="nodo.vnodo_estado == 'ACTIVO'"><i class="fa fa-users" style="color:#249FE6"></i></a>
+                </td>
+                    <td align="center" data-title="'OPCIONES'">
+                    <a tooltip = "Modificar Nodo" ng-if="nodo.vnodo_estado == 'ACTIVO'" class="btn btn-default btn-circle" data-toggle="modal" data-target="#registro" ng-click="modificarNodoCargar(nodo)"><i class="fa fa-pencil" style="color:#249FE6"></i></a>
+                    <a tooltip = "Eliminar Nodo" ng-if="nodo.vnodo_estado == 'ACTIVO'" ng-click="activarDesactivarNodo(nodo.vnodo_id,2)" class="btn btn-default btn-circle" ><i class="fa fa-trash-o" style="color:#249FE6"></i></a>
+                    <a tooltip = "Activar Nodo"ng-if="nodo.vnodo_estado=='INACTIVO'" ng-click="activarDesactivarNodo(nodo.vnodo_id,1)" class="btn btn-default btn-circle" ><i class="fa fa-check" style="color:#249FE6"></i></a>
+                </td>
+                <td data-title="'ID'" sortable="'vnodo_id'" filter="{'vnodo_id':'text'}">{{nodo.vnodo_id}}</td>
+                <td data-title="'ID PADRE'" sortable="'vnodo_padre'" filter="{'vnodo_padre':'text'}">{{nodo.vnodo_padre}}</td>
+                <td data-title="'NODO'" sortable="'vnodo_nombre'" filter="{'vnodo_nombre':'text'}">{{nodo.vnodo_nombre}}</td>
+                <td data-title="'SIGLA'" sortable="'vnodo_sigla'" filter="{'vnodo_sigla':'text'}">{{nodo.vnodo_sigla}}</td>
+                <td data-title="'UNIDAD ORGANIZACIONAL'" sortable="'vnodo_id_uo'" filter="{'vnodo_id_uo':'text'}">{{nodo.vnodo_id_uo}}</td>
+                <td data-title="'ESTADO'" sortable="'vnodo_estado'" filter="{'vnodo_estado':'text'}">{{nodo.vnodo_estado}}</td>
+                <td data-title="'NODO CIERRE'" sortable="'vnodo_cierre_tramite'" filter="{'vnodo_cierre_tramite':'text'}">{{nodo.vnodo_cierre_tramite}}</td>
+                <td data-title="'FECHA DE CREACI&Oacute;N'" sortable="'vnodo_registrado'" filter="{'vnodo_registrado':'text'}">{{nodo.vnodo_registrado}}</td>
+            </tr>
+        </table>
+    </div> -->
+
+
+
+
+
+<div class="col-lg-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>Administraci&oacute;n de nodos</h5>
+
+                <div ibox-tools></div>
+                    <div class="botones_inspinia_lmc">
+                        <a class="btn btn-primary" ng-click="limpiar()" data-toggle="modal" data-target="#registro">
+                            <i class="glyphicon glyphicon-plus-sign"></i> Nuevo Nodo
+                        </a>
+                        <a class="btn btn-primary" ng-click="actualizarArbol()">
+                            <i class="fa fa-undo"></i> Actualizar Arbol
+                        </a>
+                    </div>
+            </div>
+            <div class="ibox-content">
+                <table ng-table="tablaCTNODO" show-filter="true" class="table table-striped">
+                    <tr ng-repeat="nodo in $data" ng-class="{'colorInactivo': nodo.vnodo_estado == 'INACTIVO'}">
+                        <td align="center" data-title="'USUARIOS'" >
+                            <a tooltip = "Asignar Usuario" class="btn btn-info btn-circle" data-toggle="modal"  ng-click="asignarUser(nodo, nodo.vnodo_id)" data-target="#registroAsignacionUsuario" ng-if="nodo.vnodo_estado == 'ACTIVO'"><i class="fa fa-users"></i></a>
+                        </td>
+                            <td align="center" data-title="'OPCIONES'">
+                            <a tooltip = "Modificar Nodo" ng-if="nodo.vnodo_estado == 'ACTIVO'" class="btn btn-info btn-circle"data-toggle="modal" data-target="#registro" ng-click="modificarNodoCargar(nodo)"><i class="fa fa-pencil"></i></a>
+                            <a tooltip = "Eliminar Nodo" ng-if="nodo.vnodo_estado == 'ACTIVO'" ng-click="activarDesactivarNodo(nodo.vnodo_id,2)" class="btn btn-info btn-circle"><i class="fa fa-trash-o"></i></a>
+                            <a tooltip = "Activar Nodo"ng-if="nodo.vnodo_estado=='INACTIVO'" ng-click="activarDesactivarNodo(nodo.vnodo_id,1)"><i class="fa fa-check"></i></a>
+                        </td>
+                        <td data-title="'ID'" sortable="'vnodo_id'" filter="{'vnodo_id':'text'}">{{nodo.vnodo_id}}</td>
+                        <td data-title="'ID PADRE'" sortable="'vnodo_padre'" filter="{'vnodo_padre':'text'}">{{nodo.vnodo_padre}}</td>
+                        <td data-title="'NODO'" sortable="'vnodo_nombre'" filter="{'vnodo_nombre':'text'}">{{nodo.vnodo_nombre}}</td>
+                        <td data-title="'SIGLA'" sortable="'vnodo_sigla'" filter="{'vnodo_sigla':'text'}">{{nodo.vnodo_sigla}}</td>
+                        <td data-title="'UNIDAD ORGANIZACIONAL'" sortable="'vnodo_id_uo'" filter="{'vnodo_id_uo':'text'}">{{nodo.vnodo_id_uo}}</td>
+                        <td data-title="'ESTADO'" sortable="'vnodo_estado'" filter="{'vnodo_estado':'text'}">{{nodo.vnodo_estado}}</td>
+                        <td data-title="'NODO CIERRE'" sortable="'vnodo_cierre_tramite'" filter="{'vnodo_cierre_tramite':'text'}">{{nodo.vnodo_cierre_tramite}}</td>
+                        <td data-title="'FECHA DE CREACI&Oacute;N'" sortable="'vnodo_registrado'" filter="{'vnodo_registrado':'text'}">{{nodo.vnodo_registrado}}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+    <!-- MODAL -->
+    <div class="modal fade" id="registro" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Cerrar</span></button>
+                    <h4 class="modal-title" id="myModalLabel">{{titulo}}</h4>
+                </div>
+                <div class="modal-body" >
+                    <form name="formularioNodos" novalidate>
+                        <div class="form-group">
+                            <label for="url" >ID:</label>
+                            <div class="controls">
+                                <input  ng-value="&nbsp;" ng-model="datosNodo.vnodo_id" name="rlsRol" id="rlsRol" class="form-control" type="text" placeholder="{{obtId}}" ng-disabled="only" ng-required="true" onkeyUp="return conMayusculas(this)" readonly = "readonly">
+                                <span style="color:red" ng-show="formularioRoles.rlsRol.$invalid">
+                                </span>
+                            </div>
+                        </div>
+                            <div class="form-group">
+                                <label for="url" >NOMBRE DE NODO:</label>
+                                <div class="controls">
+                                    <input  ng-value="&nbsp;" ng-model="datosNodo.vnodo_nombre" name="vnodo_nombre" id="vnodo_nombre" class="form-control" type="text" placeholder="ingrese nombre de nodo" ng-disabled="only" ng-required="true" onkeyUp="return conMayusculas(this)">
+                                    <span style="color:red" ng-show="formularioNodos.vnodo_nombre.$invalid">
+                                    <span ng-show="formularioNodos.vnodo_nombre.$error.required">Nombre de Nodo es requerido.
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+                            <div class="form-group">
+                                <label for="url" >SIGLA DE NODO:</label>
+                                <div class="controls">
+                                    <input  ng-value="&nbsp;" ng-model="datosNodo.vnodo_sigla" name="vnodo_sigla" id="vnodo_sigla" class="form-control" type="text" placeholder="ingrese sigla de nodo" ng-disabled="only" ng-required="true" onkeyUp="return conMayusculas(this)">
+                                    <span style="color:red" ng-show="formularioNodos.vnodo_sigla.$invalid">
+                                    <span ng-show="formularioNodos.vnodo_sigla.$error.required">Sigla de Nodo es requerido.
+                                    </span>
+                                    </span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="url" >NODO PADRE:</label>
+                          
+                            <div class="col-sm-12 no-padding-left">
+                                <div class="col-sm-6 no-padding-left">
+                                    <select id="nodopadre" name="nodopadre" ng-model="datosNodo.vnodo_padre" class="form-control" ng-options="nodopadre.vnodo_id as nodopadre.vnodo_nombre for nodopadre in nodopadres" required="true" ng-disabled="only">
+                                        <option style="display:none" value="">-- Seleccione Tipo --</option>
+                                    </select>
+                                    <span style="color:red" ng-show="formularioNodos.nodopadre.$invalid">
+                                        <span ng-show="formularioNodos.nodopadre.$error.required">Nodo Padre es requerido.
+                                        </span>
+                                    </span>
+                                </div>
+                                <div class="col-sm-6 no-padding-left">
+                                        <input  ng-model="datosNodo.nombre_nodo" id="nombre_nodo" name="nombre_nodo" class="form-control" type="text" placeholder="ingrese el Nodo"  ng-disabled="desabilitado">
+                                        <button  ng-click="buscarNodo(datosNodo.nombre_nodo, 1)" type="button" class="btn btn-success fa fa-search">Filtrar</button>
+                                </div>
+                            </div>
+                        </div>
+                            <div class="form-group">
+                                <label for="url" >UNIDAD ORGANIZACIONAL:</label>
+                                <div class="col-sm-12 no-padding-left">
+                                    <div class="col-sm-6 no-padding-left">
+                                        <select id="unidador" name="unidador" ng-model="datosNodo.vnodo_id_uo" class="form-control" ng-options="nodounidad.vnodo_id as nodounidad.vnodo_nombre for nodounidad in nodounidades" required="true" ng-disabled="only">
+                                        <option style="display:none" value="">-- Seleccione Tipo --</option>
+                                        </select> 
+                                            <span style="color:red" ng-show="formularioNodos.unidador.$invalid">
+                                            <span ng-show="formularioNodos.unidador.$error.required">Unidad Organizacional es requerido.
+                                        </span>
+                                        </span>
+                                    </div>
+                                    <div class="col-sm-6 no-padding-left">
+                                        <input  ng-model="datosNodo.nombre_uo" id="nombre_uo" name="nombre_uo" class="form-control" type="text" placeholder="ingrese Unidad"  ng-disabled="desabilitado">
+                                        <button  ng-click="buscarNodo(datosNodo.nombre_uo, 2)" type="button" class="btn btn-success fa fa-search">Filtrar</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-show="estadoNodo" >
+                                <label for="url" >Estado:</label>
+                                <div class="controls">
+                                    <select id = "vnodo_estado" name = "vnodo_estado" ng-model="datosNodo.vnodo_estado" class="form-control" ng-required="true" ng-disabled="only">
+                                        <option style="display:none" value="">-- Seleccione Estado --</option>
+                                        <option value="ACTIVO">ACTIVO</option>
+                                        <option value="INACTIVO">INACTIVO</option>
+                                    </select>
+                                    <span style="color:red" ng-show="formularioNodos.vnodo_estado.$invalid">
+                                        <span ng-show="formularioNodos.vnodo_estado.$error.required">Estado es requerido.
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group" >
+                                <label for="url" >NODO DE ARCHIVO:&nbsp;&nbsp;&nbsp;&nbsp;
+                                </label> 
+                                    <input type="checkbox" ng-checked="datosNodo.vnodo_cierre_tramiteF" ng-model="datosNodo.vnodo_cierre_tramiteF" ng-disabled="only"> 
+                            </div> 
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <button data-dismiss="modal" ng-click="adicionarNodo(datosNodo)" type="button" class="btn btn-primary" ng-show="boton=='new'" ng-hide="boton=='upd' || boton=='del'" ng-disabled="formularioRoles.rlsRol.$invalid">Guardar</button>
+                    <button ng-click="modificarNodo(datosNodo)" data-dismiss="modal" type="button" class="btn btn-primary" ng-show="boton=='upd'" ng-hide="boton=='new' || boton=='del'" ng-disabled="formularioRoles.rlsRol.$invalid">Modificar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!--////////////////////////////////////////////////////////////-->
+
+    <div class="modal fade" id="registroAsignacionUsuario" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Cerrar</span></button>
+                    <h4 class="modal-title" id="myModalLabel">{{titulo}}</h4>
+                </div>
+                <div class="modal-body" >
+                    <form name="formularioNodosUsuarios" novalidate>
+                        <div class="form-group">
+                            <label for="url" >NODO:</label>
+                            <div class="controls">
+                                <input  ng-value="&nbsp;" ng-model="datosNodo.vnodo_nombre" name="nombre_nodo" id="nombre_nodo" class="form-control" type="text" readonly = "readonly" ng-disabled="only">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="url" >USUARIOS:</label>
+                            <div class="col-sm-12 no-padding-left">
+                                <div class="col-sm-6 no-padding-left">
+                                    <select id="usuarioNodo" name="usuarioNodo" ng-model="datosUsuario.usu_usuario" class="col-sm-4 form-control no-padding-right" ng-options="usuario.usu_usuario as usuario.usu_nombrecompleto for usuario in usuarios" required="true" ng-disabled="only">
+                                    <option style="display:none" value="">-- Seleccione Usuario --</option>
+                                    </select>
+                                    <span style="color:red" ng-show="formularioNodosUsuarios.usuarioNodo.$invalid">
+                                    <span ng-show="formularioNodosUsuarios.usuarioNodo.$error.required">Usuario es requerido.
+                                    </span>
+                                    </span>
+                                </div>
+                                <div class="col-sm-6 no-padding-left">
+                                        <input  ng-model="datosUsuario.usuario" id="usuario" name="usuario" class="form-control" type="text" placeholder="ingrese el Usuario"  ng-disabled="desabilitado">
+                                        <button  ng-click="buscarUsuario(datosNodo.vnodo_id, datosUsuario.usuario)" type="button" class="btn btn-success fa fa-search">Filtrar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="row">
+                        <br>
+                        <br>
+                        <H4>NODOS ASIGNADOS</H4>
+                        <table id = "tablaAsignausuario" ng-table="tablaAsignausuario" class="table table-striped ">
+                            <tr ng-repeat="nodouser in $data" ng-class="{'colorInactivo': rol.rlsEstado == 'INACTIVO'}">
+                                <td align="center" data-title="'OPCIONES'">
+                                    <a tooltip="Asignar Responsable del Nodo" data-toggle="modal" ng-click="asignarResponsable(nodouser.asig_nodo_user,nodouser.asig_nodoid,nodouser.asig_nombreusuario)" class="btn btn-default btn-circle" ><i class="fa fa-pencil" style="color:#249FE6"></i></a>
+                                    <a tooltip="Eliminar Usuario del Nodo" data-toggle="modal" ng-click="eliminarNodoUsuario(nodouser,datosNodo.vnodo_id)" class="btn btn-default btn-circle" ><i class="fa fa-trash-o" style="color:#249FE6"></i></a>
+                                </td>
+                                <td data-title="'NODO'" sortable="'asig_nombrenodo'" filter="{'asig_nombrenodo':'text'}">{{nodouser.asig_nombrenodo}}</td>
+                                <td data-title="'USUARIO'" sortable="'asig_nombrecompleto'" filter="{'asig_nombrecompleto':'text'}">{{nodouser.asig_nombrecompleto}}</td>
+                                <td data-title="'NU_ID'" sortable="'asig_nodo_user'" filter="{'asig_nodo_user':'text'}">{{nodouser.asig_nodo_user}}</td>
+                                <td data-title="'RESP.'" sortable="'asig_responsable'" filter="{'asig_responsable':'text'}">{{nodouser.asig_responsable}}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <button ng-click="asignacionUsuarios(datosUsuario, datosNodo)" type="button" class="btn btn-primary" ng-show="boton=='new'" ng-hide="boton=='upd' || boton=='del'" ng-disabled="formularioNodosUsuarios.usuarioNodo.$invalid">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,157 @@
+<script type="text/javascript">
+            // When the document is ready
+      function conMayusculas(field) {
+        field.value = field.value.toUpperCase()
+      };
+      //*** Este Codigo permite Validar que sea un campo Numerico
+            function soloNumerico(variable){
+                Numer=parseInt(variable);
+                if (isNaN(Numer)){
+                    return "";
+                }
+                return Numer;
+            }
+            function valNumero(Control){
+                Control.value=soloNumerico(Control.value);
+            }
+            //*** Fin del Codigo para Validar que sea un campo Numerico
+            
+</script>
+<div  class="col-md-12" ng-controller="asignacionNodosController" data-ng-init="inicioAsignacionNodos()">   
+    <div class="row">
+        <table ng-table="tablaUsuario" show-filter="true" class="table table-striped table-bordered">
+            <tr ng-repeat="asignaNodo in $data" >
+                <td align="center" data-title="'ACCI&Oacute;N'">
+                    <a class="btn btn-default btn-circle" data-toggle="modal" data-target="#registroAccion" ng-click="asignaAccionUsuario(asignaNodo, asignaNodo.usu_usuario)"><i class="fa fa-users" style="color:#249FE6"></i></a>
+                </td>
+              <!--   <td align="center" data-title="'TR&Aacute;MITE'">
+                    <a class="btn btn-default btn-circle" data-toggle="modal" data-target="#registroTramite" ng-click="AsignaTramite(asignaNodo, asignaNodo.usu_usuario)"><i class="fa fa-pencil" style="color:#249FE6"></i></a>
+                </td> -->
+                <td data-title="'NOMBRES'" sortable="'usu_nombrecompleto'" filter="{'usu_nombrecompleto':'text'}">{{asignaNodo.usu_nombrecompleto}}</td>
+            </tr>
+        </table>
+    </div>
+    <!-- MODAL -->
+    <div class="modal fade" id="registroAccion" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Cerrar</span></button>
+                    <h4 class="modal-title" id="myModalLabel">{{titulo}}</h4>
+                </div>
+                <div class="modal-body" >
+                    <form name="formularioNodos" novalidate>
+                        <div class="form-group">
+                            <label for="url" >USUARIO:</label>
+                            <div class="controls">
+                                <label for="url" >{{usuario.usu_nombrecompleto}}</label>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="url">NODO:</label>
+                            <div class="col-sm-12 no-padding-left">
+                                <div class="col-sm-6 no-padding-left">
+                                    <select id="nodopadre" name="nodopadre" ng-model="usuario.vnodo_padre" class="form-control" ng-options="nodopadre.vnodo_id as nodopadre.vnodo_nombre for nodopadre in nodopadres" ng-required="true" ng-disabled="only">
+                                        <option style="display:none" value="">-- Seleccione Tipo --</option>
+                                    </select>
+                                    <span style="color:red" ng-show="formularioNodos.nodopadre.$invalid">
+                                        <span ng-show="formularioNodos.nodopadre.$error.required">Nodo es requerido.
+                                        </span>
+                                    </span>
+                                </div>
+                                <div class="col-sm-6 no-padding-left">
+                                    <input  ng-model="datosNodo.nodo" id="nodo" name="nodo" class="form-control" type="text" placeholder="ingrese el Nodo"  ng-disabled="desabilitado">
+                                       <button  ng-click="buscarNodo(usuario.usu_usuario, datosNodo.nodo)" type="button" class="btn btn-success fa fa-search">Filtrar</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="url" >NOMBRE DE USUARIO:   {{usuario.usu_usuario}}</label>
+                        </div>
+                        <div class="form-group" >
+                            <h4 class="modal-title" id="myModalLabel">{{tituloTabla}}</h4>
+                        </div>
+                    </form>
+                                <!--tabla de nodos de usuarios-->
+                    <div class="row" >
+                        <table ng-table="tablaAccion" class="table table-striped table-bordered">
+                            <tr ng-repeat="asignaUsuario in $data">
+                                <td align="center" data-title="'OPCIONES'">
+                                    <a data-toggle="modal" data-target="#registro" ng-click="eliminarAsignacionUsuario(asignaUsuario, usuario.usu_usuario)" class="btn btn-default btn-circle" ><i class="fa fa-trash-o" style="color:#249FE6"></i></a>
+                                </td>
+                                <td data-title="'NODO ID'" sortable="'asig_id'">{{asignaUsuario.asig_id}}</td>
+                                <td data-title="'NODO'" sortable="'asig_nombre'">{{asignaUsuario.asig_nombre}}</td>
+                                <td data-title="'RESP'" sortable="'usu_nombres'">{{asignaUsuario.asig_responsable}}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" >Cerrar</button>
+                    <button type="button" ng-click="Adiciona_asignacionUsuario(usuario, usuario.usu_usuario);" class="btn btn-primary" ng-show="boton=='upd'" ng-hide="boton=='new' || boton=='del'" ng-disabled="formularioNodos.nodopadre.$invalid" >Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--/////////////////////////////////////////////////////-->
+        <div class="modal fade" id="registroTramite" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Cerrar</span></button>
+                    <h4 class="modal-title" id="myModalLabel">{{titulo}}</h4>
+                </div>
+                <div class="modal-body" >
+                    <form name="formularioTramites" novalidate>
+                            <div class="form-group">
+                                <label for="url" >USUARIO:</label>
+                                <div class="controls">
+                                <label for="url" >{{asignaTramite.usu_nombrecompleto}}</label>
+                                </span>
+                            </div>
+                        </div>
+                            <div class="form-group">
+                                <label for="url">TIPO DE TR&Aacute;MITE:</label>
+                                <div class="controls">
+                                    <select id="cod_tramite" name="cod_tramite" ng-model="asignaTramite.cod_tramite" class="form-control" ng-options="tipotramite.cod_tramite as tipotramite.nombre_tramite for tipotramite in tipotramites" ng-required="true" ng-disabled="only">
+                                    <option style="display:none" value="">-- Seleccione Tipo --</option>
+                                    </select>
+                                    <span style="color:red" ng-show="formularioTramites.cod_tramite.$invalid">
+                                    <span ng-show="formularioTramites.cod_tramite.$error.required">Tipo de Tr&aacute;mite es requerido.
+                                    </span>
+                                    </span>
+                                </div>
+                            </div>
+                                <div class="form-group">
+                                    <label for="url" >NOMBRE DE USUARIO:   {{asignaTramite.usu_usuario}}</label>
+                                </div> 
+                                <div class="form-group" >
+                                    <h4 class="modal-title" id="myModalLabel">{{tituloTabla}}</h4>
+                                    </label> 
+                                </div>
+                            <div class="form-group">
+                                <div class="row" >
+                                    <table ng-table="tablaTramite" class="table table-striped table-bordered">
+                                        <tr ng-repeat="tramite in $data" ng-class="{'colorInactivo': rol.rlsEstado == 'INACTIVO'}">
+                                        <td align="center" data-title="'OPCIONES'">
+                                            <a tooltip="Activar Tr&aacute;mite" data-toggle="modal" ng-click="eliminarAsignacionTramite(tramite.asig_estado,tramite.asig_id, asignaTramite.usu_usuario, 1)" class="btn btn-default btn-circle" ><i class="fa fa-pencil" style="color:#249FE6"></i></a>
+                                            <a tooltip="Eliminar Tr&aacute;mite" data-toggle="modal" ng-click="eliminarAsignacionTramite(tramite.asig_estado,tramite.asig_id, asignaTramite.usu_usuario, 0)" class="btn btn-default btn-circle" ><i class="fa fa-trash-o" style="color:#249FE6"></i></a>
+                                        </td>
+                                        <td data-title="'TIPO TR&Aacute;MITE ID'" sortable="'usu_nombres'">{{tramite.asig_id}}</td>
+                                        <td data-title="'TIPO TR&Aacute;MITE'" sortable="'usu_nombres'">{{tramite.asig_nombre_tramite}}</td>
+                                        <td data-title="'TIPO TR&Aacute;MITE ACTIVO'" sortable="'usu_nombres'">{{tramite.asig_estado}}</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" >Cerrar</button>
+                    <button type="button" ng-click="Adiciona_asignacionTramite(asignaTramite, asignaTramite.usu_usuario);" class="btn btn-primary" ng-show="boton=='upd'" ng-hide="boton=='new' || boton=='del'" ng-disabled="formularioTramites.cod_tramite.$invalid ">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

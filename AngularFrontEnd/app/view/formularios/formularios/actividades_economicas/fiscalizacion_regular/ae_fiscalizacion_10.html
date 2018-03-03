@@ -1,0 +1,1242 @@
+
+<script>
+    function deshabilita(form)
+    {
+        if (form.vNroActividadBusqueda.value != "")
+        {   var valorCi = form.vNroActividadBusqueda.value;
+            if (valorCi.length >=5 ) 
+                {form.btnBuscar.disabled = false; }
+            else
+                {form.btnBuscar.disabled = true;} 
+        }         
+    }
+</script>
+
+<script>
+
+    function frmAEFiscalizacion10Controller($scope, $rootScope, $routeParams, $location, $http, Data, sessionService, CONFIG, LogGuardarInfo, DreamFactory,ngTableParams,$filter,sweet, $sce, registroLog,FileUploader) {
+    var fecha= new Date();
+    var fechactual=fecha.getFullYear() + "-" + fecha.getMonth() + "-" + fecha.getDate() + " " + fecha.getHours() + ":" + fecha.getMinutes() + ":" + fecha.getSeconds();
+
+    $scope.busquedaActividad = true;
+    $scope.tablaBusquedaActividad = false;
+    $scope.formularioFisca = false;
+    $scope.datosDenunciante = false;
+    $scope.datosUnidadOrganizacional = false;
+    $scope.motivoDenuncia = false;
+    $scope.btnGuardar = false;
+    $scope.existeDatos = true;
+
+    
+
+    $rootScope.datosTipoDenunciaAmbiente = {};
+    $rootScope.datosTipoDenunciaHecho = {};
+    
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////// BUSCADOR DE PERSONA NATURAL - JURIDICA ///////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    $scope.buscarDatosActividad = function (datos) {
+        $.blockUI(); 
+        var paramPersona = {
+            "procedure_name":"AE.spCActividadEconomicaSimgep",
+            "body":{
+                "params": [
+                    {"name":"denominacion","param_type":"IN","value":datos.vRazonSocialBusqueda},
+                    {"name":"direccion","param_type":"IN","value":datos.vNombreViaBusqueda},
+                    {"name":"idZona","param_type":"IN","value":datos.vZonaBusqueda},
+                    {"name":"tipoVia","param_type":"IN","value":datos.vTipoViaBusqueda},
+                    {"name":"nroActividadEconomica","param_type":"IN","value":datos.vNroActividadBusqueda}
+                ]
+            }
+        };
+        var obj=DreamFactory.api[CONFIG.SERVICEGENESIS].callStoredProcWithParams(paramPersona);
+        obj.success(function(response){
+            $.unblockUI();
+            if(response.length > 0){ 
+                $scope.tablaBusquedaActividad = true;
+                $scope.obtDatos = response;
+                sweet.show('', "Datos Encontrados !!!", 'success'); 
+            } else {
+                sweet.show('', "No existen ninguno ciudadano", 'warning');
+                $scope.tablaBusquedaActividad = false;
+                $scope.obtDatos={};
+            } 
+        })
+        obj.error(function(response){  
+            sweet.show('', "Datos no Encontrados !!!", 'error');
+            $scope.tablaBusquedaActividad = false;
+            $.unblockUI();           
+        });
+    };
+    
+    /////////////////////////////////// FIN BUSCADOR DE PERSONA NATURAL - JURIDICA ///////////////////////////////////
+
+
+    
+    ///////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////// DATOS ACTIVIDAD ///////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////// 
+
+    $scope.volverBusqueda = function() {
+        $scope.busquedaActividad = true;
+        $scope.tablaBusquedaActividad = false;
+        $scope.formularioFisca = false;
+        $scope.datosDenunciante = false;
+        $scope.datosUnidadOrganizacional = false;
+        $scope.motivoDenuncia = false;
+        $scope.btnGuardar = false;
+    };
+
+
+    $scope.cargarDatosActividad = function (datos) {
+        $.unblockUI();
+        console.log(datos);
+        $scope.getTipoFiscalizacion();
+        $scope.getTipoActividadFiscalizacion();
+        $scope.getMacrodistritos();
+
+        $scope.datos.f01_tipo_per = "";
+        $scope.datos.f01_id_act_eco = datos.idActividadEconomica;
+
+        switch(datos.Clase)
+        {
+            case "NATURAL": 
+                $scope.datos.f01_tipo_per = "N"; 
+                
+                break;
+            case "JURIDICO": 
+                $scope.datos.f01_tipo_per = "J"; 
+                break;
+        }
+
+        if($scope.datos.f01_tipo_per != "" && $scope.datos.f01_tipo_per != null)
+        {
+            var paramPersona = {
+                "procedure_name":"AE.spDatosGeneralesActividadEconomicaSimgep",
+                "body":{
+                    "params": [
+                        {"name":"idActividadEconomica","param_type":"IN","value":$scope.datos.f01_id_act_eco},
+                        {"name":"tipo","param_type":"IN","value":$scope.datos.f01_tipo_per}
+                    ]
+                }
+            };
+
+            var obj=DreamFactory.api[CONFIG.SERVICEGENESIS].callStoredProcWithParams(paramPersona);
+            obj.success(function(response){
+                $.unblockUI();
+
+                $scope.busquedaActividad = false;
+                $scope.tablaBusquedaActividad = false;
+                $scope.formularioFisca = true;
+                $scope.btnGuardar = true;
+                $scope.existeDatos = true;
+
+                switch($scope.datos.f01_tipo_per)
+                {
+                    case "N": $scope.datosContribuyenteNatural(response); break;
+                    case "J": $scope.datosContribuyenteJuridico(response); break;
+                }
+            })
+            obj.error(function(response){  
+                sweet.show('', "Datos no Encontrados !!!", 'warning');
+                $.unblockUI();
+            });   
+        }
+    }
+
+    $scope.datosContribuyenteNatural = function (datosNatural) {
+        console.log("datosNatural", datosNatural);
+
+        $scope.datos.f01_nit_act = datosNatural[0].identificacion;
+        $scope.datos.f01_raz_soc_act = datosNatural[0].denominacion;
+        $scope.datos.f01_pri_nom_prop = datosNatural[0].primerNombre;
+        $scope.datos.f01_seg_nom_prop = datosNatural[0].segundoNombre;
+        $scope.datos.f01_ter_nom_prop = "";
+        $scope.datos.f01_ape_pat_prop = datosNatural[0].primerApellido;
+        $scope.datos.f01_ape_mat_prop = datosNatural[0].segundoApellido;
+        $scope.datos.f01_ape_cas_prop = "";
+        
+        $scope.datos.f01_tip_doc_prop = datosNatural[0].tipoIdentidad;
+        $scope.datos.f01_num_dos_prop = datosNatural[0].nroDocumento;
+        $scope.datos.f01_expedido_prop = datosNatural[0].expedido;
+        $scope.datos.f01_telef_prop = datosNatural[0].telefono_ae;
+        $scope.datosActividadEconomica(datosNatural);
+    }
+
+    $scope.datosContribuyenteJuridico = function (datosJuridico) {
+        console.log("datosJuridico", datosJuridico); 
+
+        $scope.datos.f01_nit_act = datosJuridico[0].identificacion;
+        $scope.datos.f01_raz_soc_act = datosJuridico[0].empresa;
+        $scope.datos.f01_pri_nom_rep = datosJuridico[0].primerNombreRl;
+        $scope.datos.f01_seg_nom_rep = datosJuridico[0].segundoNombreRl;
+        $scope.datos.f01_ter_nom_rep = "";
+        $scope.datos.f01_ape_pat_rep = datosJuridico[0].primerApellidoRl;
+        $scope.datos.f01_ape_mat_rep = datosJuridico[0].segundoApellidoRl;
+        $scope.datos.f01_ape_cas_rep = "";
+        $scope.datos.f01_tip_doc_rep = datosJuridico[0].tipoIdentidadRl;
+        $scope.datos.f01_num_doc_rep = datosJuridico[0].identificacionRl;
+        $scope.datos.f01_expedido_rep = datosJuridico[0].expedicionRl;
+        $scope.datos.f01_telef_rep = datosJuridico[0].telefono_ae;
+        $scope.datosActividadEconomica(datosJuridico);
+    }
+
+    $scope.datosActividadEconomica = function (datosActividad) {
+        console.log("datosActividad", datosActividad); 
+        
+        $scope.datos.f01_macro_act = parseInt(datosActividad[0].IdMacroDistrito);
+        $scope.datos.f01_macro_act_descrip = datosActividad[0].MacroDistrito;
+        
+        console.log($scope.datos.f01_macro_act);
+        console.log($scope.datos.f01_macro_act_descrip);
+        $scope.getDistritos($scope.datos.f01_macro_act);
+
+        $scope.datos.f01_dist_act = parseInt(datosActividad[0].idDistrito);
+        $scope.datos.f01_dist_act_descrip = "DISTRITO "+datosActividad[0].idDistrito;
+        $scope.datos.f01_zona_act = parseInt(datosActividad[0].idzona_ae);
+        $scope.datos.f01_zona_act_descrip = datosActividad[0].zona_ae;
+        $scope.datos.f01_tip_via_act = datosActividad[0].Tipo_Via_ae;
+        $scope.datos.f01_nom_via_act = datosActividad[0].via_ae;
+        $scope.datos.f01_num_act = datosActividad[0].numero_ae;
+        $scope.datos.f01_edificio_act = datosActividad[0].edificio_ae;
+        $scope.datos.f01_bloque_act = datosActividad[0].bloque_ae;
+        $scope.datos.f01_piso_act = datosActividad[0].piso_ae;
+        $scope.datos.f01_dpto_of_loc = "";
+        
+        $scope.datos.f01_tip_act_eco = datosActividad[0].tipoActividad;
+        $scope.datos.f01_tipo_lic = datosActividad[0].TipoLicencia;
+        $scope.datos.f01_cat_act_eco = datosActividad[0].desc_desarrollada;
+        $scope.datos.f01_id_tipo_categoria = datosActividad[0].idActividadDesarrollada;
+        $scope.datos.f01_fecha_vencimiento = datosActividad[0].VencimientoLicencia;
+        $scope.datos.f01_mot_den_desc = "";
+        $scope.datos.f01_estado_act = datosActividad[0].ESTADO;
+        $scope.datos.f01_fecha_estado = datosActividad[0].fechaBloqueoBaja;
+        $scope.datos.f03_tipo_bloqueo = datosActividad[0].tipoBloqueo;
+        $scope.datos.f06_id_contribuyente = datosActividad[0].idContribuyente;
+        
+        $scope.datos.f01_derivacion_por_formulario_fiscalizacion = "";
+        $scope.datos.f01_derivacion_por_formulario_fiscalizacion_descripcion = "";
+        $scope.datos.f01_hojas_recibidas = "";
+        $scope.datos.f01_nro_fojas_total = "";
+        $scope.datos.f01_observaciones_i = "";
+        $scope.datos.f01_descripcion = "";
+        $scope.datos.f01_id_area_recuadadora = "";
+
+        $rootScope.datosTipoDenunciaAmbiente = {};
+        $rootScope.datosTipoDenunciaHecho = {};
+        $scope.datos.f01_mot_de_den = {};
+        $scope.datos.f01_mot_de_den2 = {};
+
+        $scope.getInspectorOdim($scope.datos.f01_macro_act);
+    }
+    
+    $scope.getTipoDenunciaAmbiente = function(){
+        var aaaaa = {
+            "procedure_name":"ae.sp_tipo_denuncias_ambiente"
+        };
+        var obj=DreamFactory.api[CONFIG.SERVICE].callStoredProcWithParams(aaaaa);
+        obj.success(function (datosTipoDenunciaTmp) {
+            
+            console.log(datosTipoDenunciaTmp);
+            datoObjectFinal = [];
+            for(j=0; j<datosTipoDenunciaTmp.length; j++){
+                datoObject = new Object(); 
+                datoObject.resid = datosTipoDenunciaTmp[j].idtipoden; 
+                datoObject.resvalor = datosTipoDenunciaTmp[j].desctipoden; 
+                datoObject.estado=false;
+                datoObjectFinal[j] = datoObject;
+            }
+            $scope.datos.f01_mot_de_den = datoObjectFinal;
+            $rootScope.datosTipoDenunciaAmbiente = datoObjectFinal;
+
+            $scope.getTipoDenunciaHecho();
+
+        })
+        obj.error(function(error) {
+            
+        }); 
+    };
+
+    $scope.getTipoDenunciaHecho = function(){
+        var aaaaa = {
+            "procedure_name":"ae.sp_tipo_denuncias_hecho"
+        };
+        var obj=DreamFactory.api[CONFIG.SERVICE].callStoredProcWithParams(aaaaa);
+        obj.success(function (datosTipoDenunciaTmp) {
+            
+            console.log(datosTipoDenunciaTmp);
+            datoObjectFinal = [];
+            for(j=0; j<datosTipoDenunciaTmp.length; j++){
+                datoObject = new Object(); 
+                datoObject.resid = datosTipoDenunciaTmp[j].idtipoden; 
+                datoObject.resvalor = datosTipoDenunciaTmp[j].desctipoden; 
+                datoObject.estado=false;
+                datoObjectFinal[j] = datoObject;
+            }
+            $scope.datos.f01_mot_de_den2 = datoObjectFinal;
+            $rootScope.datosTipoDenunciaHecho = datoObjectFinal;
+
+        })
+        obj.error(function(error) {
+            
+        }); 
+    };
+
+    $scope.getInspectorOdim = function(idMacrodistrito){
+       var aaaaa = {
+            "procedure_name":"ae.sp_lista_inspector_ficalizacion",
+            "body":{
+                "params": [
+                    {"name":"macrodistrito","param_type":"IN","value":idMacrodistrito}
+                ]
+            }
+        };
+        var obj=DreamFactory.api[CONFIG.SERVICE].callStoredProcWithParams(aaaaa);
+        obj.success(function (response) {
+            console.log(response);
+            $scope.datosInspectorOdim= response;
+        })
+        obj.error(function(error) {
+            
+        }); 
+    };
+
+    $scope.GetValueTipoFiscalizacion = function () {
+        console.log("f01_tipos_fisca", $scope.datos.f01_tipos_fisca);
+        
+        if($scope.datos.f01_tipos_fisca)
+        {
+            switch($scope.datos.f01_tipos_fisca.toString())
+            {
+                case "1":
+                    $scope.datos.f01_uo = "";
+                    $scope.datos.f01_uo_descrip = "";
+                    $scope.datosDenunciante = true;
+                    $scope.datosUnidadOrganizacional = false;
+                    $scope.motivoDenuncia = true;
+                    $scope.getTipoDenunciaAmbiente();
+                    break;
+
+                case "2":
+                    $scope.datos.f01_uo = "65";
+                    $scope.datos.f01_uo_descrip = "INTENDENCIA MUNICIPAL";
+                    $scope.datosDenunciante = false;
+                    $scope.datosUnidadOrganizacional = true;
+                    $scope.motivoDenuncia = false;
+                    break;
+
+                default:
+                    $scope.datos.f01_uo = "";
+                    $scope.datos.f01_uo_descrip = "";
+                    $scope.datosDenunciante = false;
+                    $scope.datosUnidadOrganizacional = false;
+                    break;
+            }  
+        }
+        else
+        {
+            $scope.datos.f01_uo = "";
+            $scope.datos.f01_uo_descrip = "";
+            $scope.datosDenunciante = false;
+            $scope.datosUnidadOrganizacional = false;
+        }
+
+        console.log("f01_uo", $scope.datos.f01_uo);
+        console.log("f01_uo_descrip", $scope.datos.f01_uo_descrip);
+    }
+
+    $scope.GetValueUoDeOficio = function () {
+        var e = document.getElementById("f01_uo");
+        $scope.datos.f01_uo_descrip = e.options[e.selectedIndex].text;
+    }
+
+    $scope.GetValueResponsableOdim = function () {
+        var e = document.getElementById("f01_derivacion_por_formulario_fiscalizacion");
+        $scope.datos.f01_derivacion_por_formulario_fiscalizacion_descripcion = e.options[e.selectedIndex].text;
+    }
+
+    $scope.GetValueMacrodistrito = function () {
+        var e = document.getElementById("f01_macro_act");
+        $scope.datos.f01_macro_act_descrip = e.options[e.selectedIndex].text;
+    }
+
+    $scope.GetValueDistrito = function () {
+        var e = document.getElementById("f01_dist_act");
+        $scope.datos.f01_dist_act_descrip = "DISTRITO" + e.options[e.selectedIndex].text;
+    }
+
+    $scope.GetValueZonaActividad = function () {
+        var e = document.getElementById("f01_zona_act");
+        $scope.datos.f01_zona_act_descrip = e.options[e.selectedIndex].text;
+    }
+
+    /////////////////////////////////// FIN DATOS ACTIVIDAD ///////////////////////////////////
+
+    ////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////// ACTIVIDAD ILEGAL ///////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////// 
+
+    $scope.actividadIlegal = function() {
+        
+        $scope.busquedaActividad = false;
+        $scope.tablaBusquedaActividad = false;
+        $scope.formularioFisca = true;
+        $scope.datosDenunciante = false;
+        $scope.datosUnidadOrganizacional = false;
+        $scope.motivoDenuncia = false;
+        $scope.btnGuardar = false;
+        $scope.existeDatos = false;
+
+        $scope.getTipoFiscalizacion();
+        $scope.getTipoActividadFiscalizacion();
+        $scope.getMacrodistritos();
+
+        $scope.datos.f01_tipo_per = "";
+        $scope.datos.f01_id_act_eco = "0";
+        $scope.datos.f01_nit_act = "";
+        $scope.datos.f01_raz_soc_act = "";
+        
+        /////// NATURAL ///////
+        $scope.datos.f01_pri_nom_prop = "";
+        $scope.datos.f01_seg_nom_prop = "";
+        $scope.datos.f01_ter_nom_prop = "";
+        $scope.datos.f01_ape_pat_prop = "";
+        $scope.datos.f01_ape_mat_prop = "";
+        $scope.datos.f01_ape_cas_prop = "";
+        $scope.datos.f01_tip_doc_prop = "";
+        $scope.datos.f01_num_dos_prop = "";
+        $scope.datos.f01_expedido_prop = "";
+        $scope.datos.f01_telef_prop = "";
+
+        /////// JURIDICA ///////
+        $scope.datos.f01_nit_act = "";
+        $scope.datos.f01_raz_soc_act = "";
+        $scope.datos.f01_pri_nom_rep = "";
+        $scope.datos.f01_seg_nom_rep = "";
+        $scope.datos.f01_ter_nom_rep = "";
+        $scope.datos.f01_ape_pat_rep = "";
+        $scope.datos.f01_ape_mat_rep = "";
+        $scope.datos.f01_ape_cas_rep = "";
+        $scope.datos.f01_tip_doc_rep = "";
+        $scope.datos.f01_num_doc_rep = "";
+        $scope.datos.f01_expedido_rep = "";
+        $scope.datos.f01_telef_rep = "";
+
+        /////// ACTIVIDAD ///////
+        $scope.datos.f01_macro_act = "";
+        $scope.datos.f01_macro_act_descrip = "";
+        $scope.datos.f01_dist_act = "";
+        $scope.datos.f01_dist_act_descrip = "";
+        $scope.datos.f01_zona_act = "";
+        $scope.datos.f01_zona_act_descrip = "";
+        $scope.datos.f01_tip_via_act = "";
+        $scope.datos.f01_nom_via_act = "";
+        $scope.datos.f01_num_act = "";
+        $scope.datos.f01_edificio_act = "";
+        $scope.datos.f01_bloque_act = "";
+        $scope.datos.f01_piso_act = "";
+        $scope.datos.f01_dpto_of_loc = "";
+        $scope.datos.f01_tip_act_eco = "";
+        $scope.datos.f01_tipo_lic = "";
+        $scope.datos.f01_cat_act_eco = "";
+        $scope.datos.f01_id_tipo_categoria = "";
+        $scope.datos.f01_fecha_vencimiento = "";
+        $scope.datos.f01_mot_den_desc = "";
+        $scope.datos.f01_estado_act = "";
+        $scope.datos.f01_fecha_estado = "";
+        $scope.datos.f03_tipo_bloqueo = "";
+        $scope.datos.f06_id_contribuyente = "";
+        $scope.datos.f01_derivacion_por_formulario_fiscalizacion = "";
+        $scope.datos.f01_derivacion_por_formulario_fiscalizacion_descripcion = "";
+        $scope.datos.f01_hojas_recibidas = "";
+        $scope.datos.f01_nro_fojas_total = "";
+        $scope.datos.f01_observaciones_i = "";
+        $scope.datos.f01_descripcion = "";
+        $scope.datos.f01_id_area_recuadadora = "";
+
+        $rootScope.datosTipoDenunciaAmbiente = {};
+        $rootScope.datosTipoDenunciaHecho = {};
+        $scope.datos.f01_mot_de_den = {};
+        $scope.datos.f01_mot_de_den2 = {};
+
+        $scope.getInspectorOdim("0");
+    }
+
+    /////////////////////////////////// FIN ACTIVIDAD ILEGA ///////////////////////////////////
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////// GUARDAR FORMULARIO ///////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////// 
+
+    $scope.guardarForm = function() {
+        var tmpDatos = $scope.datos;
+        
+        if( tmpDatos &&
+            tmpDatos.f01_macro_act != "" && tmpDatos.f01_macro_act != null &&
+            tmpDatos.f01_dist_act != "" && tmpDatos.f01_dist_act != null &&
+            tmpDatos.f01_zona_act != "" && tmpDatos.f01_zona_act != null &&
+            tmpDatos.f01_tip_via_act != "" && tmpDatos.f01_tip_via_act != null &&
+            tmpDatos.f01_nom_via_act != "" && tmpDatos.f01_nom_via_act != null &&
+            tmpDatos.f01_num_act != "" && tmpDatos.f01_num_act != null)
+        {
+            $scope.cargarDatos($scope.datos);
+            $scope.guardarData($scope.datos);
+            $scope.evalReglasFormulario();  
+        }
+        else
+        {
+            sweet.show('', "Debe llenar todos los campos obligatorios * ", 'warning');
+        }
+    }
+
+    /////////////////////////////////// FIN GUARDAR FORMULARIO ///////////////////////////////////
+    
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////// FUNCIONES DE INICIO ///////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////// 
+    $scope.cargarZonaBusqueda = function(tipoVia, dato) {
+        var resproductos = {
+            "procedure_name":"ae.sp_datos_zona_todo_ficalizacion"
+        };
+        var obj=DreamFactory.api[CONFIG.SERVICE].callStoredProcWithParams(resproductos);
+        obj.success(function (data) {
+            $scope.datosZonaBusqueda = data;
+            $scope.datosZonaActividad = data;
+        })
+        obj.error(function(error) {
+        }); 
+    };
+    
+    $scope.getTipoFiscalizacion = function(){
+        var parametros = {
+                "procedure_name":"ae.sp_datos_tipo_fiscalizacion"
+        };
+        var ss = DreamFactory.api[CONFIG.SERVICE].callStoredProcWithParams(parametros).success(function (response){
+            $scope.datosTiposFiscalizacion= response;
+        });
+        ss.error(function(results){
+             alert("error");
+        });
+    }
+
+    $scope.getTipoActividadFiscalizacion = function(){
+        var parametros = {
+            "procedure_name":"ae.sp_datos_tipo_actividad_fiscalizacion"
+        };
+        var ss = DreamFactory.api[CONFIG.SERVICE].callStoredProcWithParams(parametros).success(function (response){
+            $scope.datosActividadesFiscalizacion= response;
+        });
+        ss.error(function(results){
+             alert("error");
+        });
+    }
+
+    $scope.getMacrodistritos = function(){
+        var parametros = {
+             "procedure_name":"ae.sp_lst_macrodistritos"            
+        };
+        var ss =  DreamFactory.api[CONFIG.SERVICE].callStoredProcWithParams(parametros).success(function (response){
+            $scope.datosMacrodistritos= response;
+        });
+        ss.error(function(results){
+             alert("error");
+        });
+    }
+    
+
+    $scope.getDistritos = function(macro){
+        var parametros = {
+            "procedure_name":"ae.sp_lst_distritos",
+            "body":{"params": [{"name":"id_macrodistrito","param_type":"IN","value":macro}]}            
+        };
+        var ss =  DreamFactory.api[CONFIG.SERVICE].callStoredProcWithParams(parametros).success(function (response){
+            $scope.datosDistritos= response;
+        });
+        ss.error(function(results){
+             alert("error");
+        });
+    }
+
+    $scope.getZonas = function(distrito){
+        var parametros = {
+            "procedure_name":"ae.sp_lst_zonas",
+            "body":{"params": [{"name":"id_distrito","param_type":"IN","value":distrito}]}            
+        };
+        var ss =  DreamFactory.api[CONFIG.SERVICE].callStoredProcWithParams(parametros).success(function (response){
+            $scope.datosZonaActividad = response;
+        });
+        ss.error(function(results){
+             alert("error");
+        });
+    }
+
+    $scope.datosTipoVia = [
+        {"idVia" : "AV", "nomVia": "AVENIDA"}, 
+        {"idVia" : "CA", "nomVia": "CALLE"}, 
+        {"idVia" : "CL", "nomVia": "CALLEJON"}, 
+        {"idVia" : "CN", "nomVia": "CANCHA"}, 
+        {"idVia" : "PR", "nomVia": "PARQUE"}, 
+        {"idVia" : "PL", "nomVia": "PLAZA"}, 
+        {"idVia" : "PA", "nomVia": "PASAJE"}, 
+        {"idVia" : "ND", "nomVia": "NO DEFINIDO"}];
+
+    
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////// PARA RECUPERAR DATOS GUARDADOS ///////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////// 
+
+    if( $scope.datos.f01_tipo_per != "" &&
+        ($scope.datos.f01_id_act_eco != 0 && $scope.datos.f01_id_act_eco != "0" && $scope.datos.f01_id_act_eco != null) &&
+        $scope.datos.f01_macro_act == "" &&
+        $scope.datos.f01_macro_act_descrip == "" &&
+        $scope.datos.f01_dist_act == "" &&
+        $scope.datos.f01_dist_act_descrip == "" &&
+        $scope.datos.f01_zona_act == "" &&
+        $scope.datos.f01_zona_act_descrip == ""
+    )
+    {
+        $scope.busquedaActividad = false;
+        $scope.tablaBusquedaActividad = false;
+        $scope.formularioFisca = true;
+        $scope.datosDenunciante = false;
+        $scope.datosUnidadOrganizacional = false;
+        $scope.motivoDenuncia = false;
+        $scope.btnGuardar = false;
+        $scope.existeDatos = true;
+    }
+    else
+    {
+        if( $scope.datos.f01_tipo_per != "" &&
+            ($scope.datos.f01_id_act_eco == 0 || $scope.datos.f01_id_act_eco == "0")
+        )
+        {
+            $scope.busquedaActividad = false;
+            $scope.tablaBusquedaActividad = false;
+            $scope.formularioFisca = true;
+            $scope.datosDenunciante = false;
+            $scope.datosUnidadOrganizacional = false;
+            $scope.motivoDenuncia = false;
+            $scope.btnGuardar = false;
+            $scope.existeDatos = false;
+        }
+    }
+
+    $scope.$on('api:ready',function(){            
+        $scope.cargarZonaBusqueda();
+    });
+    
+    $scope.inicioAEFiscalizacion = function () {
+        if(DreamFactory.api[CONFIG.SERVICE]){
+            $scope.cargarZonaBusqueda();
+        }
+    };
+}
+
+</script>
+
+<!-- ////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+<!-- ////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+<!-- ////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+<!-- //////////////////////////////////////// vista del formulario //////////////////////////////////////// -->
+<!-- ////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+<!-- ////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+<!-- ////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+
+<div class="wrap" ng-controller="frmAEFiscalizacion10Controller" data-ng-init="inicioAEFiscalizacion()">
+    <div>
+        <!-- ////////////////////////////////////// -->
+        <!-- /////// buscar persona natural /////// -->
+        <!-- ////////////////////////////////////// -->
+        <div ng-show = "busquedaActividad">
+            <form name="formularioBuscar" readOnly="true" novalidate>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group" >
+                            <label for="url" >Nro Act. Economica:</label>
+                            <input  ng-model="datos.vNroActividadBusqueda" id="vNroActividadBusqueda" name="vNroActividadBusqueda" class="form-control" type="text" placeholder="Ingrese Nro. Actividad" size="20" onkeyup="deshabilita(this.form);valNumero(this);" required>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group" >
+                            <label for="url" >Razon Social:</label>
+                            <input  ng-model="datos.vRazonSocialBusqueda" id="vRazonSocialBusqueda" name="vRazonSocialBusqueda" class="form-control" type="text" placeholder="Ingrese Razon Social" class="form-control"  onkeyUp="return conMayusculas(this);" ng-minlength="3" required>
+                        </div>
+                        <span style="color:red" ng-show="formularioBuscar.vRazonSocialBusqueda.$invalid">
+                          <span ng-show="formularioBuscar.vRazonSocialBusqueda.$error.required"></span>
+                        </span>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group" class="col-md-12">
+                            <label for="url" >ZONA: <font color="#FF0000"> * </font></label>
+                            <div class="controls">
+                                <select 
+                                    id="vZonaBusqueda" 
+                                    name="vZonaBusqueda" 
+                                    placeholder="-- Seleccione Zona --" 
+                                    ng-model="datos.vZonaBusqueda" 
+                                    class="form-control" 
+                                    ng-options="dato.idzona as dato.zona for dato in datosZonaBusqueda" 
+                                    required>
+                                    <option value=""></option>
+                                </select>
+                                <span style="color:red" ng-show="formularioBuscar.vZonaBusqueda.$invalid">
+                                    <span ng-show="formularioBuscar.vZonaBusqueda.$error.required">Es requerido.
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group" class="col-md-12">
+                            <label for="url" >TIPO DE VIA: <font color="#FF0000"> * </font></label>
+                            <div class="controls">
+                                <select id="vTipoViaBusqueda" name="vTipoViaBusqueda"  ng-model="datos.vTipoViaBusqueda"  class="form-control" placeholder="-- Seleccione Via --" required>
+                                    <option value="AV"> AVENIDA  </option>
+                                    <option value="CA"> CALLE  </option>
+                                    <option value="CL"> CALLEJON  </option>
+                                    <option value="CN"> CANCHA  </option>
+                                    <option value="PR"> PARQUE  </option>
+                                    <option value="PL"> PLAZA  </option>
+                                    <option value="ND"> NO DEFINIDO  </option>
+                                    <option value="PA"> PASAJE  </option>
+                                </select>
+                                <span style="color:red" ng-show="formularioBuscar.vTipoViaBusqueda.$invalid">
+                                    <span ng-show="formularioBuscar.vTipoViaBusqueda.$error.required">Es requerido.
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div  class="col-md-4" >
+                        <div class="form-group" >
+                            <label for="url" >Nombre Via:</label>
+                            <input  ng-model="datos.vNombreViaBusqueda" id="vNombreViaBusqueda" name="vNombreViaBusqueda" class="form-control" type="text" placeholder="Ingrese Nombre Via" onkeyUp="return conMayusculas(this);" ng-minlength="3" required >
+                        </div>
+                        <span style="color:red" ng-show="formularioBuscar.vNombreViaBusqueda.$invalid">
+                            <span ng-show="formularioBuscar.vNombreViaBusqueda.$error.required">
+                            </span>
+                        </span>
+                    </div>
+                </div>
+                <div>
+                    <button name="btnVolver" id="btnVolver" ng-click="volverBusqueda()" data-dismiss="modal" type="button" class="btn btn-primary"><i class="glyphicon fa fa-reply"></i> Volver </button>
+                    <button  name="btnBuscar" ng-click="buscarDatosActividad(datos)" data-dismiss="modal" type="button" class="btn btn-primary" ng-disabled="formularioBuscar.vRazonSocialBusqueda.$invalid && formularioBuscar.vZonaBusqueda.$invalid && formularioBuscar.vNombreViaBusqueda.$invalid"><i class="glyphicon fa fa-search"></i> Buscar</button>
+                    <button name="btnNumeroRegistro" id="btnNumeroRegistro" ng-click="actividadIlegal()" data-dismiss="modal" type="button" class="btn btn-primary"><i class="glyphicon fa fa-plus"></i> Denuncia Actividad Ilegal</button>
+                </div>
+            </form>
+        </div>
+        <br>
+
+        <!-- ////////////////////////////////////// -->
+        <!-- /////// tabla de datos natural /////// -->
+        <!-- ////////////////////////////////////// -->
+        <div class="row" ng-show="tablaBusquedaActividad"> 
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                   <h5>Lista de actividades</h5>
+                      <div ibox-tools></div>
+                </div>
+                <div class="ibox-content">
+                   <table class="table table-striped">
+                      <thead>
+                        <th>#&nbsp;</th>
+                        <th>ELEGIR&nbsp;</th>
+                        
+                        <th>ID CONTRIBUYENTE&nbsp;</th>
+                        <th>ID ACTIVIDAD ECONOMICA&nbsp;</th>
+                        <th>RAZON SOCIAL&nbsp;</th>
+                        <th>CLASE&nbsp;</th>
+                        <th>FECHA INICIO&nbsp;</th>
+                        <th>DESCRIPCION&nbsp;</th>
+                        <th>TIPO VIA&nbsp;</th>
+                        <th>VIA&nbsp;</th>
+                        <th>ZONA&nbsp;</th>
+                      </thead>
+                      <tbody>
+                         <tr class="column" ng-repeat="datos in obtDatos">
+                            <td>{{$index+1}}</td>
+                            <td>
+                                <a ng-click="cargarDatosActividad(datos)" tooltip = "Ver" class="btn btn-info btn-circle">
+                                    <i class="fa fa-folder-open"></i>
+                                </a>
+                            </td>
+                            <td>{{datos.Id}}</td>
+                            <td>{{datos.idActividadEconomica}}</td>
+                            <td>{{datos.denominacion}}</td>
+                            <td>{{datos.Clase}}</td>
+                            <td>{{datos.FechaInicio}}</td>
+                            <td>{{datos.Descripcion}}</td>
+                            <td>{{datos.TipoVia}}</td>
+                            <td>{{datos.Via}}</td>
+                            <td>{{datos.Zona}}</td>
+                          </tr>
+                      </tbody>
+                   </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- /////////////////////////// -->
+        <!-- /////// datos debug /////// -->
+        <!-- /////////////////////////// -->
+        <!--<div>
+            {{datos}}
+        </div>-->
+
+        <div ng-show = "formularioFisca">
+            <div >
+                <button name="btnVolver" id="btnVolver" ng-click="volverBusqueda()" data-dismiss="modal" type="button" class="btn btn-primary"><i class="glyphicon fa fa-reply"></i> Volver</button>
+            </div>
+            <br>
+            <form name="formularioBuscar" readOnly="true" novalidate>
+                <div class="ibox float-e-margins">
+                    <!--<legend>Datos Generales</legend>-->
+                    <div class="row">
+                        <div class="ibox-title_2">
+                            <h5>Tipos de Fiscalización</h5>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="col-md-12" align="left">
+                                <div class="form-group" class="col-md-12">
+                                    <label for="url" >TIPO DE FISCALIZACION: <font color="#FF0000"> * </font></label>
+                                    <div class="controls">
+                                        <select 
+                                            id="f01_tipos_fisca" 
+                                            name="f01_tipos_fisca" 
+                                            placeholder="-- Seleccione Zona --" 
+                                            ng-model="datos.f01_tipos_fisca" 
+                                            class="form-control" 
+                                            ng-options="dato.idtipofisca as dato.descfiscalizacion for dato in datosTiposFiscalizacion" 
+                                            ng-change="GetValueTipoFiscalizacion();"
+                                            required>
+                                            <option value=""></option>
+                                        </select>
+                                        <span style="color:red" ng-show="formularioBuscar.f01_tipos_fisca.$invalid">
+                                            <span ng-show="formularioBuscar.f01_tipos_fisca.$error.required">Es requerido.
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="col-md-12" align="left">
+                                <div class="form-group" class="col-md-12">
+                                    <label for="url" >TIPO DE ACTIVIDAD: <font color="#FF0000"> * </font></label>
+                                    <div class="controls">
+                                        <select 
+                                            id="vTipoActividadFisca" 
+                                            name="vTipoActividadFisca" 
+                                            placeholder="-- Seleccione Zona --" 
+                                            ng-model="datos.vTipoActividadFisca" 
+                                            class="form-control" 
+                                            ng-options="dato.idtipoacti as dato.descactifiscalizacion for dato in datosActividadesFiscalizacion" 
+                                            required>
+                                            <option value=""></option>
+                                        </select>
+                                        <span style="color:red" ng-show="formularioBuscar.vTipoActividadFisca.$invalid">
+                                            <span ng-show="formularioBuscar.vTipoActividadFisca.$error.required">Es requerido.
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- /////////////////////////////////////////////////// -->
+                    <!-- ////////////// DATOS DEL DENUNCIANTE ////////////// -->
+                    <!-- /////////////////////////////////////////////////// -->
+
+                    <div class="row" ng-show = "datosDenunciante">
+                        <div class="ibox-title_2">
+                            <h5>Datos del Denunciante</h5>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="col-md-12" align="left">
+                                <div class="form-group" class="col-md-12">
+                                    <label for="url" >NOMBRE/RAZON SOCIAL: </label>
+                                    <div class="controls">
+                                        <input  ng-model="datos.f01_nom_raz_soc_den" name="f01_nom_raz_soc_den" id="f01_nom_raz_soc_den" class="form-control" type="text" placeholder="Sin dato" onkeyUp="return conMayusculas(this);">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="col-md-12" align="left">
+                                <div class="form-group" class="col-md-12">
+                                    <label for="url" >TELEFONO/CELULAR:</label>
+                                    <div class="controls">
+                                        <input  ng-model="datos.f01_tel_den" name="f01_tel_den" id="f01_tel_den" class="form-control" type="text" placeholder="Sin dato" onkeyUp="return valNumero(this);"> 
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="col-md-12" align="left">
+                                <div class="form-group" class="col-md-12">
+                                    <label for="url" >TIPO DE DOCUMENTO: </label>
+                                    <div class="controls">
+                                        <select id="f01_tip_doc_den" name="f01_tip_doc_den"  ng-model="datos.f01_tip_doc_den"  class="form-control" placeholder="-- Seleccione --" >
+                                            <option value="CI"> CARNET DE IDENTIDAD  </option>
+                                            <option value="CEXT"> CARNET DE EXTRANJERO  </option>
+                                            <option value="PAS"> PASAPORTE  </option>
+                                            <option value="RUN"> RUN  </option>
+                                            <option value="NT"> NIT  </option>
+                                            <option value="RUC"> RUC  </option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="col-md-12" align="left">
+                                <div class="form-group" class="col-md-12">
+                                    <label for="url" >NRO. DE DOCUMENTO: </label>
+                                    <div class="controls">
+                                        <input  ng-model="datos.f01_num_den" name="f01_num_den" id="f01_num_den" class="form-control" type="text" placeholder="Sin dato" onkeyUp="return valNumero(this);"> 
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="col-md-12" align="left">
+                                <div class="form-group" class="col-md-12">
+                                    <label for="url" >EXPEDIDO: </label>
+                                    <div class="controls">
+                                        <select id="f01_exp_den" name="f01_exp_den"  ng-model="datos.f01_exp_den"  class="form-control" placeholder="-- Seleccione --" >
+                                            <option value="LPZ"> LA PAZ  </option>
+                                            <option value="ORU"> ORURO  </option>
+                                            <option value="PTS"> POTOSI  </option>
+                                            <option value="CBB"> COCHABAMBA  </option>
+                                            <option value="TJA"> TARIJA  </option>
+                                            <option value="CHQ"> CHUQUISACA  </option>
+                                            <option value="SCZ"> SANTA CRUZ  </option>
+                                            <option value="PND"> PANDO  </option>
+                                            <option value="BNI"> BENI  </option>
+                                            <option value="EXT"> EXTRANJERO  </option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- /////////////////////////////////////////////////// -->
+                    <!-- ////////////// DATOS DEL DENUNCIANTE ////////////// -->
+                    <!-- /////////////////////////////////////////////////// -->
+
+                    <div class="row" ng-show = "datosUnidadOrganizacional">
+                        <div class="ibox-title_2">
+                            <h5>Datos Unidad Organizacional</h5>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="col-md-12" align="left">
+                                <div class="form-group" class="col-md-12">
+                                    <label for="url" >UNIDAD ORGANIZACIONAL: </label>
+                                    <div class="controls">
+                                        <select id="f01_uo" name="f01_uo"  ng-model="datos.f01_uo"  class="form-control" ng-change="GetValueUoDeOficio();" placeholder="-- Seleccione --" >
+                                            <option value="65"> INTENDENCIA MUNICIPAL  </option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="col-md-12" align="left">
+                                <div class="form-group" class="col-md-12">
+                                    <label for="url" >NOMBRE INSPECTOR: </label>
+                                    <div class="controls">
+                                        <input  ng-model="datos.f01_nombre_insp_int" name="f01_nombre_insp_int" id="f01_nombre_insp_int" class="form-control" type="text" placeholder="Sin dato" onkeyUp="return conMayusculas(this);">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="ibox-title_2">
+                            <h5>Datos de la Actividad Economica</h5>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="col-md-12" align="left">
+                                <div class="form-group" class="col-md-12">
+                                    <label for="url" >NIT: </label>
+                                    <div class="controls">
+                                        <input  ng-model="datos.f01_nit_act" name="f01_nit_act" id="f01_nit_act" class="form-control" type="text" placeholder="Sin dato" ng-disabled="existeDatos">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="col-md-12" align="left">
+                                <div class="form-group" class="col-md-12">
+                                    <label for="url" >NOMBRE/RAZON SOCIAL: </label>
+                                    <div class="controls">
+                                        <input  ng-model="datos.f01_raz_soc_act" name="f01_raz_soc_act" id="f01_raz_soc_act" class="form-control" type="text" placeholder="Sin dato" onkeyUp="return conMayusculas(this);" ng-disabled="existeDatos">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="ibox-title_2">
+                            <h5>Dirección de la Actividad Economica</h5>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="col-md-12" align="left">
+                                <div class="form-group" class="col-md-12">
+                                    <label for="url" >MACRODISTRITO: <font color="#FF0000"> * </font></label>
+                                    <div class="controls">
+                                        <select 
+                                            id="f01_macro_act" 
+                                            name="f01_macro_act" 
+                                            placeholder="-- Seleccione --" 
+                                            ng-model="datos.f01_macro_act" 
+                                            class="form-control" 
+                                            ng-options="dato.idmacro as dato.macro for dato in datosMacrodistritos" 
+                                            ng-change="getDistritos(datos.f01_macro_act); GetValueMacrodistrito(); "
+                                            ng-disabled="existeDatos">
+                                            <option value=""></option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="col-md-12" align="left">
+                                <div class="form-group" class="col-md-12">
+                                    <label for="url" >DISTRITO: <font color="#FF0000"> * </font></label>
+                                    <div class="controls">
+                                        <select 
+                                            id="f01_dist_act" 
+                                            name="f01_dist_act" 
+                                            placeholder="-- Seleccione --" 
+                                            ng-model="datos.f01_dist_act" 
+                                            class="form-control" 
+                                            ng-options="dato.iddistrito as dato.distrito for dato in datosDistritos" 
+                                            ng-change="getZonas(datos.f01_dist_act); GetValueDistrito();"
+                                            ng-disabled="existeDatos">
+                                            <option value=""></option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="col-md-12" align="left">
+                                <div class="form-group" class="col-md-12">
+                                    <label for="url" >ZONA: <font color="#FF0000"> * </font></label>
+                                    <div class="controls">
+                                        <select 
+                                            id="f01_zona_act" 
+                                            name="f01_zona_act" 
+                                            placeholder="-- Seleccione --" 
+                                            ng-model="datos.f01_zona_act" 
+                                            class="form-control" 
+                                            ng-options="dato.idzona as dato.zona for dato in datosZonaActividad" 
+                                            ng-change=" GetValueZonaActividad();"
+                                            ng-disabled="existeDatos">
+                                            <option value=""></option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="col-md-12" align="left">
+                                <div class="form-group" class="col-md-12">
+                                    <label for="url" >TIPO DE VIA: <font color="#FF0000"> * </font></label>
+                                    <div class="controls">
+                                        <select 
+                                            id="f01_tip_via_act" 
+                                            name="f01_tip_via_act" 
+                                            placeholder="-- Seleccione --" 
+                                            ng-model="datos.f01_tip_via_act" 
+                                            class="form-control" 
+                                            ng-options="dato.idVia as dato.nomVia for dato in datosTipoVia" 
+                                            ng-disabled="existeDatos">
+                                            <option value=""></option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="col-md-12" align="left">
+                                <div class="form-group" class="col-md-12">
+                                    <label for="url" >NOMBRE DE VIA: <font color="#FF0000"> * </font></label>
+                                    <div class="controls">
+                                        <input  ng-model="datos.f01_nom_via_act" name="f01_nom_via_act" id="f01_nom_via_act" class="form-control" type="text" placeholder="Sin dato" onkeyUp="return conMayusculas(this);" ng-disabled="existeDatos">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="col-md-12" align="left">
+                                <div class="form-group" class="col-md-12">
+                                    <label for="url" >NÚMERO: <font color="#FF0000"> * </font></label>
+                                    <div class="controls">
+                                        <input  ng-model="datos.f01_num_act" name="f01_num_act" id="f01_num_act" class="form-control" type="text" placeholder="Sin dato" onkeyUp="return conMayusculas(this);" ng-disabled="existeDatos"> 
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="col-md-12" align="left">
+                                <div class="form-group" class="col-md-12">
+                                    <label for="url" >EDIFICIO:</label>
+                                    <div class="controls">
+                                        <input  ng-model="datos.f01_edificio_act" name="f01_edificio_act" id="f01_edificio_act" class="form-control" type="text" placeholder="Sin dato" onkeyUp="return conMayusculas(this);" ng-disabled="existeDatos"> 
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="col-md-12" align="left">
+                                <div class="form-group" class="col-md-12">
+                                    <label for="url" >BLOQUE:</label>
+                                    <div class="controls">
+                                        <input  ng-model="datos.f01_bloque_act" name="f01_bloque_act" id="f01_bloque_act" class="form-control" type="text" placeholder="Sin dato" onkeyUp="return conMayusculas(this);" ng-disabled="existeDatos"> 
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="col-md-12" align="left">
+                                <div class="form-group" class="col-md-12">
+                                    <label for="url" >PISO:</label>
+                                    <div class="controls">
+                                        <input  ng-model="datos.f01_piso_act" name="f01_piso_act" id="f01_piso_act" class="form-control" type="text" placeholder="Sin dato" onkeyUp="return conMayusculas(this);" ng-disabled="existeDatos"> 
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="col-md-12" align="left">
+                                <div class="form-group" class="col-md-12">
+                                    <label for="url" >DPTO/OF/LOC:</label>
+                                    <div class="controls">
+                                        <input  ng-model="datos.f01_dpto_of_loc" name="f01_dpto_of_loc" id="f01_dpto_of_loc" class="form-control" type="text" placeholder="Sin dato" onkeyUp="return conMayusculas(this);" ng-disabled="existeDatos"> 
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row" ng-show = "motivoDenuncia">
+                        <div class="ibox-title_2">
+                            <h5>Motivo de la Denuncia</h5>
+                        </div>
+                        <div class="col-md-10">
+                            <div class="col-md-12" align="left">
+                                <div class="form-group" class="col-md-12">
+                                    <label for="url" >AMBIENTE: </label>
+                                    <div class="controls">
+                                        <table class="table table-striped ">                        
+                                            <tbody>
+                                                <tr ng-repeat="role in datosTipoDenunciaAmbiente">
+                                                    <td><div class="ngSelectionCell">
+                                                        <input tabindex="-1" class="ngSelectionCheckbox" type="checkbox" ng-checked="role.estado" ng-model="role.estado"/></div></td>
+                                                    <td>{{role.resvalor}}</td>                                
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-10">
+                            <div class="col-md-12" align="left">
+                                <div class="form-group" class="col-md-12">
+                                    <label for="url" >HECHO: </label>
+                                    <div class="controls">
+                                        <table class="table table-striped ">                        
+                                            <tbody>
+                                                <tr ng-repeat="role in datosTipoDenunciaHecho">
+                                                    <td><div class="ngSelectionCell">
+                                                        <input tabindex="-1" class="ngSelectionCheckbox" type="checkbox" ng-checked="role.estado" ng-model="role.estado"/></div></td>
+                                                    <td>{{role.resvalor}}</td>                                
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="ibox-title_2">
+                            <h5>Programación de Inspección</h5>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="col-md-12" align="left">
+                                <div class="form-group" class="col-md-12">
+                                    <label for="url" >RESPONSABLE ODIM: <font color="#FF0000"> * </font></label>
+                                    <div class="controls">
+                                        <select 
+                                            id="f01_derivacion_por_formulario_fiscalizacion" 
+                                            name="f01_derivacion_por_formulario_fiscalizacion" 
+                                            placeholder="-- Seleccione --" 
+                                            ng-model="datos.f01_derivacion_por_formulario_fiscalizacion" 
+                                            class="form-control" 
+                                            ng-options="dato.idusuasrio as dato.inspector for dato in datosInspectorOdim" 
+                                            ng-change=" GetValueResponsableOdim();">
+                                            <option value=""></option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="ibox-title_2">
+                            <h5>Foliado y descripción</h5>
+                        </div>  
+                        <div class="col-md-4">
+                            <div class="col-md-12" align="left">
+                                <div class="form-group" class="col-md-12">
+                                    <label for="url" >NRO DE HOJAS: <font color="#FF0000"> * </font></label>
+                                    <div class="controls">
+                                        <input  ng-model="datos.f01_hojas_recibidas" name="f01_hojas_recibidas" id="f01_hojas_recibidas" class="form-control" type="text" placeholder="Sin dato" onkeyUp="return valNumero(this);" required> 
+                                        <span style="color:red" ng-show="formularioRegistro.f01_hojas_recibidas.$invalid">
+                                            <span ng-show="formularioRegistro.f01_hojas_recibidas.$error.required">Es requerido.
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="col-md-12" align="left">
+                                <div class="form-group" class="col-md-12">
+                                    <label for="url" >DESCRIPCIÓN: <font color="#FF0000"> * </font></label>
+                                    <div class="controls">
+                                        <textarea ng-model="datos.f01_observaciones_i" id="f01_observaciones_i" name="f01_observaciones_i" class="form-control" placeholder="Sin dato" onkeyUp="return conMayusculas(this);" required></textarea>
+                                        <span style="color:red" ng-show="formularioRegistro.f01_observaciones_i.$invalid">
+                                            <span ng-show="formularioRegistro.f01_observaciones_i.$error.required">Es requerido.
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <!-- ////////////////////////////////////////// -->
+        <!-- /////// botones guardar - cancelar /////// -->
+        <!-- ////////////////////////////////////////// -->
+        <br>
+        <br>
+        <a class="btn btn-primary" ng-disabled="false" ng-click="volver()"><i class="glyphicon fa fa-times"></i> Cancelar </a>
+        <a ng-show = "btnGuardar" class="btn btn-primary" ng-disabled="false" ng-click="guardarForm()"><i class="glyphicon fa fa-save"></i> Guardar / Continuar </a>
+        <br>
+        <br>
+    </div>
+</div>

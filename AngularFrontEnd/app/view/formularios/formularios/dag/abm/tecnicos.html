@@ -1,0 +1,150 @@
+
+ <script type="text/javascript">
+     function conMayusculas(field) {
+             field.value = field.value.toUpperCase()
+     }
+ </script>
+<div ng-controller="tecnicosController" data-ng-init="inicioTecnicos()" class="row">
+ <div class="col-lg-12">
+         <div class="ibox float-e-margins">
+             <div class="ibox-title">
+                 <h5>Técnicos</h5>
+                 <div ibox-tools></div>
+                     <div class="botones_inspinia_lmc">
+                         <a class="btn btn-primary" ng-click="limpiar()" data-toggle="modal" data-target="#registro"><i class="glyphicon glyphicon-plus-sign" ng-disabled="desabilitado"></i> Nuevo Técnico</a>
+                     </div>
+             </div>
+             <div class="ibox-content">
+               <table ng-table="tablaTecnicos"  format-fn="colorCellFormat"  show-filter="true"  class="table table-striped"  >
+                 <tr ng-repeat="tecnicos in $data" ng-class="{'colorInactivo': sectores.sec_estado == 'I', 'colorBloqueado': sectores.sec_estado == 'BLOQUEADO'}" >
+                   <td align="center" data-title="'Opciones'" style="width: 80px;">
+                     <a ng-click="modificarGrupoCargar(tecnicos)" class="btn btn-info btn-circle" data-toggle="modal" data-target="#registro"><i class="fa   fa-pencil "></i> </a>
+                     <a ng-click="eliminarGrupoCargar(tecnicos)"  class="btn btn-info btn-circle"  data-toggle="modal" data-target="#registro"><i class="fa  fa-trash-o "></i></a>
+                   </td>
+                   <td data-title="'Id'" sortable="'tec_id'" filter="{'tec_id':'text'}">{{tecnicos.tec_id}}</td>
+                   <td data-title="'Nombre Completo'" sortable="'tecnombre'" filter="{'tecnombre':'text'}">{{tecnicos.tecnombre}}</td>
+                   <td data-title="'Estado'" sortable="'tec_estado'" filter="{'tec_estado':'text'}" >{{tecnicos.tec_estado}}</td>
+                   <td data-title="'Nodo'"   sortable="'nodo'" >{{tecnicos.nodo}}</td>
+                 </tr>
+               </table>
+             </div>
+         </div>
+ </div>
+<!-- modal -->
+<div class="modal fade" id="registro" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+     <div class="modal-content">
+       <div class="modal-header">
+       <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Cerrar</span></button>
+       <h4 class="modal-title" id="myModalLabel">{{titulo}}  </h4>
+       </div>
+       <div class="modal-body" >
+         <form name="formularioGrupos"  readOnly="true" novalidate >
+           <div class="row">
+             <div class="col-md-13">
+               <div class="form-group">
+                 <div class="controls">
+                   <div class="form-group"><label class="col-sm-3 control-label">Espacio Trabajo: <font size="5px" color="#FF0000"> </font></label>
+                     <div class="col-sm-8">
+                       <select id="espacios"
+                            name="espacios"
+                            placeholder="-- Seleccione --"
+                            ng-model="datos.espacios"
+                            ng-change ="getTecnicosNuevos(datos.espacios)"
+                            class="form-control">
+                            <option style="display:none" value="">--Seleccione--</option>
+                           <option ng-repeat="obj in espacios" value="{{obj.ws_id}}"
+                           ng-selected="{{obj.ws_id == datos.espacios}}" >
+                           {{obj.ws_nombre}}
+                         </option>
+                       </select>
+                     </div>
+                   </div>
+                 </div>
+               </div>
+             </div>
+           </div>
+           <div class="row">
+             <div class="col-md-13">
+               <div class="form-group">
+                 <div class="controls">
+                   <div class="form-group"><label class="col-sm-3 control-label">Tecnicos: <font size="5px" color="#FF0000"> </font></label>
+                     <div class="col-sm-8">
+                       <select id="nuevos"
+                            name="nuevos"
+                            placeholder="-- Seleccione --"
+                            ng-model="datos.nuevos"
+                            ng-change = "getNodos(datos.nuevos)"
+                            class="form-control ng-pristine ng-invalid ng-invalid-required"
+                             required>
+                             <option style="display:none" value="">--Seleccione--</option>
+                           <option ng-repeat="obj in tecnicosnuevos" value="{{obj.usr_usuario}}-{{obj.prs_id}}"
+                           ng-selected="{{obj.usr_usuario+'-'+obj.prs_id == datos.nuevos}}" >
+                           {{ obj.nombre}}
+                         </option>
+                       </select>
+                     </div>
+                   </div>
+                 </div>
+               </div>
+             </div>
+           </div>
+           <div class="row">
+             <div class="col-md-13">
+               <div class="form-group">
+                 <div class="controls">
+                   <div class="form-group"><label class="col-sm-3 control-label">Tipo: <font size="5px" color="#FF0000"> </font></label>
+                     <div class="col-sm-8">
+                       <select id="tipo"
+                            name="tipo"
+                            placeholder="-- Seleccione --"
+                            ng-model="datos.tipo"
+                            class="form-control ng-pristine ng-invalid ng-invalid-required"
+                             required>
+                             <option  style="display:none"  value="">--Seleccione--</option>
+                             <option  value="1">TECNICO UBM</option>
+                             <option  value="2">SAF</option>
+                             <option  value="3">RPC</option>
+                             <option  value="4">ALCALDE</option>
+                       </select>
+                     </div>
+                   </div>
+                 </div>
+               </div>
+             </div>
+           </div>
+           <div class="row">
+             <div class="col-md-13">
+               <div class="form-group">
+                 <div class="controls">
+                   <div class="form-group"><label class="col-sm-3 control-label">Nodo: <font size="5px" color="#FF0000"> </font></label>
+                     <div class="col-sm-8">
+                       <select id="sector"
+                            name="sector"
+                            placeholder="-- Seleccione --"
+                            ng-model="datos.nodo"
+                            class="form-control ng-pristine ng-invalid ng-invalid-required"
+                             required>
+                             <option style="display:none" value="">--Seleccione--</option>
+                           <option ng-repeat="obj in nodos" value="{{obj.nodo_id}}"
+                           ng-selected="{{obj.nodo_id == datos.nodo}}" >
+                           {{obj.nodo_nombre}}
+                         </option>
+                       </select>
+                     </div>
+                   </div>
+                 </div>
+               </div>
+             </div>
+           </div>
+         </form>
+       </div>
+       <div class="modal-footer">
+       <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+       <button ng-click="adicionarUfvs(datos)" data-dismiss="modal" type="button" class="btn btn-primary" ng-show="boton=='new'" ng-hide="boton=='upd' || boton=='del'"  ng-disabled="formularioGrupos.grpGrupo.$invalid ">Guardar</button>
+       <button ng-click="modificarTecnicos(datos)" data-dismiss="modal" type="button" class="btn btn-primary" ng-show="boton=='upd'" ng-hide="boton=='new' || boton=='del'" ng-disabled="formularioGrupos.grpGrupo.$invalid ">Modificar</button>
+       <button ng-click="eliminarTecnicos(datos)" data-dismiss="modal" type="button" class="btn btn-primary" ng-show="boton=='del'" ng-hide="boton=='new' || boton=='upd'"   >Eliminar</button>
+       </div>
+     </div>
+   </div>
+</div>

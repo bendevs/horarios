@@ -1,0 +1,159 @@
+<div class="col-md-12" class="row" ng-controller="ReporteController" data-ng-init="inicioCrear()">
+    <table  width="100%">
+        <td><h3>Reporte</h3></td> 
+    </table>
+    <br/>
+
+	
+    <div class="modal-body" >
+        <div class="col-md-6">
+            <div class="form-group">
+                <label class="col-sm-4 control-label no-padding-right" for="url">FECHA INICIAL:</label>
+                <div class="controls">
+                    <p class="input-group">
+                    <input name="FECHA1" id="registro1[]" type="text" class="form-control" datepicker-popup="" ng-model="registro.FECHA1" is-open="startDateOpened1" ng-required="true" close-text="Close" ng-disabled="desabilitado"/>
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-default" ng-click="startDateOpen1($event)"><i class="glyphicon glyphicon-calendar"></i>
+                        </button>
+                    </span>
+                </p>
+                </div>
+            </div>
+        </div> 
+        <div class="col-md-6">
+            <div class="form-group">
+                <label class="col-sm-4 control-label no-padding-right" for="url">FECHA FINAL:</label>
+                    <div class="controls">    
+                        <p class="input-group"><input name="FECHA2" id="registro2[]" type="text" class="form-control" datepicker-popup="" ng-model="registro.FECHA2" is-open="startDateOpened" ng-required="true" close-text="Close" ng-disabled="desabilitado"/>
+                        <span class="input-group-btn">
+                            <button type="button" class="btn btn-default" ng-click="startDateOpen($event)"><i class="glyphicon glyphicon-calendar"></i>
+                            </button>
+                        </span></p>
+                    </div>
+                </div>
+            </div> 
+                  <!-- carga los procesos de la base de datos segun el espacio de trabajo -->                     
+                <div class="col-md-12">
+                <div class="form-group">
+                    <label for="category" >Proceso:</label>
+                    <div class="controls">
+                        <select ng-model="datosCrear.procid" id="procid" name="procid" class="form-control"  ng-required="true" ng-change="getCasos(datosCrear.procid)">
+                            <option ng-repeat="pro in proc" value="{{pro.procid}}">{{pro.procnombre}}</option>
+                        </select>
+                    </div>
+                </div>
+                </div>
+
+<!-- carga de casos segun el caso que se haya presentado  -->
+            <div class="col-md-12"   >
+                <div class="form-group">
+                    <label for="category" >Formularios:</label>
+                    <div class="controls">
+
+                        <select ng-model="datosCrear.campo_id" id="campo_id" name="campo_id" class="form-control"  ng-required="true" ng-change="cargarDatos(datosCrear.campo_id,registro.FECHA1,registro.FECHA2)" >
+                            <option ng-repeat="cas in casos" value="{{cas.cid}}">{{cas.cnombre}}</option>
+                        </select>
+                        
+                    </div>
+                </div>
+            </div>
+
+       
+            <br>
+            <br>
+                  
+   <!-- carga de casos segun el caso que se haya presentado  -->                 
+       
+   
+        <div class="col-md-6" >
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                       <h5>Datos </h5> 
+                       <div ibox-tools></div>
+                       <div align="right">
+                            <a class="btn btn-primary" ng-click="ejemplo()" >
+                                <i class="glyphicon fa fa-eye"></i>
+                                 Imprimir Listado
+                            </a>
+                        </div>
+                    </div>  
+                <div class="ibox-content" ng-show = "TablaCreacion">
+                    <div class="table-responsive"> 
+                         <table  class="table table-striped"  >
+                            <thead>      
+                                <th>#&nbsp;</th>
+                                <th>Codigo&nbsp;</th>
+                                <th>Inf. General&nbsp;</th>
+                                <th>Fecha de Creacion&nbsp;</th>
+                                <th>Ubic. Anterior&nbsp;</th>
+                                <th>Ubic. Actual&nbsp;</th>
+                            </thead>
+                    <tbody> 
+                  <tr ng-repeat="grupo in obtCreacion" >
+                    <td>{{grupo.caso_id}}</td>
+                    <td>{{grupo.cod}}</td>
+                    <td>{{grupo.infgral}}</td> 
+                    <td>{{grupo.feccrea}}</td>
+                    <td>{{grupo.ubicant}}</td>
+                    <td>{{grupo.ubicact}}</td>
+                    
+                  <td data-title="'VER'"><a  tooltip = "Ver Campos" ng-click="getCampos(grupo.caso_id,datosCrear.campo_id)" class="btn-floating"><i class="fa fa-eye" ></i></a></td>
+                  
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
+          </div>
+        </div>
+         </div>
+        </div>
+
+ <div class="col-md-6" ng-show = "panelVerCampos">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>Campos</h5>
+                    <div ibox-tools></div>
+                      <div align="right">     
+                    
+                        <a class="btn btn-primary" ng-click="ejemplo2()" >
+                        <i class="glyphicon fa fa-eye"></i>
+                        Imprimir Listado
+                        </a>                  
+                    </div>   
+                </div>
+                
+                <div class="ibox-content">
+                    <div class="table-responsive">
+                        <table class="table table-striped " >
+                            <thead>
+                                
+                                <th>#&nbsp;</th>
+                                
+                                <th>T&iacute;tulo&nbsp;</th>
+                                <th>Descripción&nbsp;</th>
+                                
+                            </thead>
+                            <tbody>
+                                <tr class="column" ng-repeat="campos in obtCampos" class="campos" >
+                                    
+                                    <td>{{$index+1}}</td>
+                                    
+                                    <td>{{campos.titulo}}</td>
+                                    <td>{{campos.descripcion}}</td>
+                                    
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+ </div>
+
+</div>

@@ -1,0 +1,3092 @@
+<style>
+    input:required:invalid {
+        border: 1px solid red;
+    }
+    input:required:valid {
+        border: 1px solid green;
+    }
+    select:required:invalid {
+        border: 1px solid red;
+    }
+    select[value="-1"]:optional {
+        border: 1px solid red;
+    }
+    select:required:valid {
+        border: 1px solid green;
+    }
+    .form-group {
+        padding-left: 8px;
+    }
+</style>
+<style>
+    .custom-upload {
+        position: relative;
+        height: 40px;
+        width: 100%;
+    }
+    .custom-upload input[type=file]
+    {
+        outline:none;
+        position: relative;
+        text-align: right;    
+        -moz-opacity:0 ;
+        filter:alpha(opacity: 0);
+        opacity: 0;
+        z-index: 2;
+        width:85%;
+        height:100%;
+    }
+    .custom-upload .fake-file
+    {
+        background:url(http://www.fold3.com/i/upload-icon.png) center right no-repeat;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        width: 85%;
+        padding: 0;
+        margin: 0;
+        z-index: 1;
+        line-height: 100%;
+    }
+    .custom-upload .fake-file input
+    {
+        font-size:16px;
+        height:40px;
+        width:85%;
+    }
+</style>
+<style>
+        body{
+            /*background:transparent url(title.png) no-repeat top center;
+            font-family:Arial;
+            height:2000px;*/
+        }
+        .header
+        {
+            /*width:600px;
+            height:56px;
+            position:absolute;
+            top:0px;
+            left:25%;
+            background:#fff url(title.png) no-repeat top left;*/
+        }
+        a.back{
+            /*width:256px;
+            height:73px;
+            position:fixed;
+            bottom:15px;
+            right:15px;
+            background:#fff url(codrops_back.png) no-repeat top left;
+            z-index:1;
+            cursor:pointer;*/
+        }
+        a.activator{
+            /*width:153px;
+            height:150px;
+            position:absolute;
+            top:0px;
+            left:0px;
+            background:#fff url(clickme.png) no-repeat top left;
+            z-index:1;
+            cursor:pointer;*/
+        }
+        /* Style for overlay and box */
+        .overlay{
+            background:transparent url(images/overlay.png) repeat top left;
+            position:fixed;
+            top:0px;
+            bottom:0px;
+            left:0px;
+            right:0px;
+            z-index:100;
+        }
+        .box{
+            position:fixed;
+            top:-200px;
+            left:30%;
+            right:30%;
+            background-color:#fff;
+            color:#7F7F7F;
+            padding:20px;
+            border:2px solid #ccc;
+            -moz-border-radius: 20px;
+            -webkit-border-radius:20px;
+            -khtml-border-radius:20px;
+            -moz-box-shadow: 0 1px 5px #333;
+            -webkit-box-shadow: 0 1px 5px #333;
+            z-index:101;
+        }
+        .box h1{
+            border-bottom: 1px dashed #7F7F7F;
+            margin:-20px -20px 0px -20px;
+            padding:10px;
+            background-color:#FFEFEF;
+            color:#EF7777;
+            -moz-border-radius:20px 20px 0px 0px;
+            -webkit-border-top-left-radius: 20px;
+            -webkit-border-top-right-radius: 20px;
+            -khtml-border-top-left-radius: 20px;
+            -khtml-border-top-right-radius: 20px;
+        }
+        a.boxclose{
+            float:right;
+            width:26px;
+            height:26px;
+            background:transparent url(images/cancel.png) repeat top left;
+            margin-top:-30px;
+            margin-right:-30px;
+            cursor:pointer;
+        }
+</style>
+<script type="text/javascript" src="../../libs/js/render.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $('#activator').click(function(){
+            $('#overlay').fadeIn('fast',function(){
+                $('#box').animate({'top':'160px'},500);
+            });
+        });
+        $('#boxclose').click(function(){
+            $('#box').animate({'top':'-200px'},500,function(){
+                $('#overlay').fadeOut('fast');
+            });
+        });
+    });
+</script>
+<script type="text/javascript">
+    $('.custom-upload input[type=file]').change(function(){
+        $(this).next().find('input').val($(this).val());
+        angular.element(this).scope().cambiarFile(this, $(this).val());
+    });
+</script>
+<script type="text/javascript">
+    var valoresOC = new Array();
+    var valoresOM = new Array();
+    var jsonError   =   "";
+    var BanderaValidar="1";
+    var prohib = false;
+    var prohibnombre = false;
+    var tipodoc = "";
+    function validarFormularioRender() {
+        var todoCorrecto = true;
+        campos = "";
+        for (var i = 1; i <= valoresOC.length - 1; i++) {
+            if (document.renderForm.elements[valoresOC[i]].value == null || document.renderForm.elements[valoresOC[i]].value.length == 0 || /^\s*$/.test(document.renderForm.elements[valoresOC[i]].value) || ( document.renderForm.elements[valoresOC[i]].type == "select-one" && document.renderForm.elements[valoresOC[i]].value == "-1" )){
+                todoCorrecto=false;
+                campos = campos + valoresOM[i] + ", ";
+            }
+        }
+        if (todoCorrecto ==true) {
+            angular.element(document.getElementById('renderFormulario')).scope().datosRender();
+        } else {
+            campos = campos.substring(0, campos.length - 2);
+            angular.element(document.getElementById('renderFormulario')).scope().mensajeError(campos);
+        }
+    } 
+    function guardargps(lat, lng, url,imga){  
+        var a = imga+"_IMG";         
+        angular.element(document.getElementById("renderFormulario")).scope().capturarImagen(url,a,lat,lng,imga);
+    }    
+    var Modal = document.createElement('div');
+    function verImagen(nombre){
+        console.log(nombre);
+        if(nombre == 0){   
+            sweetAlert('', 'No Existe Ninguna Imagen', 'warning');
+        } else{
+            if(document.getElementById('myModalMary') != null){
+                elemento=document.getElementById('myModalMary');
+                elemento.parentNode.removeChild(elemento);
+            }
+            Modal.innerHTML = '<div></div>';
+            Modal.id = 'myModalMary';
+            Modal.className = 'modal fade';
+            Modal.setAttribute("data-backdrop", "static");
+            document.body.appendChild(Modal);
+            var dialog = document.createElement('div');
+            dialog.className = 'modal-dialog';
+            Modal.appendChild(dialog);
+            var content = document.createElement('div');
+            content.className = 'modal-content';
+            dialog.appendChild(content);
+            var header = document.createElement('div');
+            header.className = 'modal-header';
+            content.appendChild(header);
+            var cerrarmodal = document.createElement('button');
+            cerrarmodal.type = "button"
+            cerrarmodal.className = 'close';
+            cerrarmodal.setAttribute("data-dismiss", "modal");
+            cerrarmodal.setAttribute("aria-label", "Close");
+            cerrarmodal.innerText = 'x';
+            header.appendChild(cerrarmodal);
+            var title = document.createElement('h4');
+            title.className = 'modal-title';
+            title.innerText = 'Vista Previa';
+            header.appendChild(title);
+            var img = document.createElement('img');
+            img.src = nombre;
+            img.setAttribute("height", "600");
+            img.setAttribute("width", "600");
+            content.appendChild(img); 
+            var footer = document.createElement('div');
+            footer.className = 'modal-footer';
+            footer.innerText = '  ';
+            content.appendChild(footer);
+            var closeBtn = document.createElement('button');
+            closeBtn.setAttribute("data-dismiss", "modal");
+            closeBtn.setAttribute("type", "button");
+            closeBtn.className = 'btn btn-primary btn-inverse';
+            closeBtn.innerText = 'Cerrar';
+            footer.appendChild(closeBtn);
+            $("#myModalMary").modal('show');
+        }
+    }
+    function verImagenRC(nombre){
+        if(nombre == 0){   
+            sweetAlert('', 'No Existe Ninguna Imagen', 'warning');
+        } else{
+            if(document.getElementById('myModalMary') != null){
+                elemento=document.getElementById('myModalMary');
+                elemento.parentNode.removeChild(elemento);
+            }
+            Modal.innerHTML = '<div></div>';
+            Modal.id = 'myModalMary';
+            Modal.className = 'modal fade';
+            Modal.setAttribute("data-backdrop", "static");
+            document.body.appendChild(Modal);
+            var dialog = document.createElement('div');
+            dialog.className = 'modal-dialog';
+            Modal.appendChild(dialog);
+            var content = document.createElement('div');
+            content.className = 'modal-content';
+            dialog.appendChild(content);
+            var header = document.createElement('div');
+            header.className = 'modal-header';
+            content.appendChild(header);
+            var cerrarmodal = document.createElement('button');
+            cerrarmodal.type = "button"
+            cerrarmodal.className = 'close';
+            cerrarmodal.setAttribute("data-dismiss", "modal");
+            cerrarmodal.setAttribute("aria-label", "Close");
+            cerrarmodal.innerText = 'x';
+            header.appendChild(cerrarmodal);
+            var title = document.createElement('h4');
+            title.className = 'modal-title';
+            title.innerText = 'Vista Previa';
+            header.appendChild(title);
+            var img = document.createElement('img');
+            img.src = nombre;
+            img.setAttribute("height", "600");
+            img.setAttribute("width", "600");
+            content.appendChild(img); 
+            var footer = document.createElement('div');
+            footer.className = 'modal-footer';
+            footer.innerText = '  ';
+            content.appendChild(footer);
+            var closeBtn = document.createElement('button');
+            closeBtn.setAttribute("data-dismiss", "modal");
+            closeBtn.setAttribute("type", "button");
+            closeBtn.className = 'btn btn-primary btn-inverse';
+            closeBtn.innerText = 'Cerrar';
+            footer.appendChild(closeBtn);
+            $("#myModalMary").modal('show');
+        }
+    } 
+    var sum = [];
+    function addRow(cadena,tableID){
+        var adicionarcalculo = 0;
+        var form_rc = 0;
+        var existe = 0;
+        var matriz = cadena.split(',');
+        if(document.getElementById('myModalMary') != null){
+            elemento=document.getElementById('myModalMary');
+            elemento.parentNode.removeChild(elemento);
+        }
+        Modal.innerHTML = '<div></div>';
+        Modal.id = 'myModalMary';
+        Modal.className = 'modal fade';
+        Modal.setAttribute("data-backdrop", "static");
+	    document.body.appendChild(Modal);
+        var dialog = document.createElement('div');
+        dialog.className = 'modal-dialog';
+	    Modal.appendChild(dialog);
+        var content = document.createElement('div');
+        content.className = 'modal-content';
+	    dialog.appendChild(content);
+        var header = document.createElement('div');
+        header.className = 'modal-header';
+        content.appendChild(header);
+        var cerrarmodal = document.createElement('button');
+        cerrarmodal.type = "button"
+        cerrarmodal.className = 'close';
+        cerrarmodal.setAttribute("data-dismiss", "modal");
+        cerrarmodal.setAttribute("aria-label", "Close");
+        cerrarmodal.innerText = 'x';
+        header.appendChild(cerrarmodal);       
+        var title = document.createElement('h4');
+        title.className = 'modal-title';
+        title.innerText = 'Nuevo Registro ';
+        header.appendChild(title);
+        var body = document.createElement('div');
+        body.className = 'modal-body';
+	    content.appendChild(body);
+        var calculo = 0;
+        var requerido = 0;
+        var obligatorio = 1;
+        var obligatori = 1;
+        for(var i = 0 ; i <= matriz.length-7 ;i=i+7){
+            var combo = matriz[i+2].split(':');
+            var br = document.createElement('br');
+            body.appendChild(br);
+            var div = document.createElement('div');
+            div.className = 'row';
+            body.appendChild(div);
+            var div1 = document.createElement('div');
+            div1.className = 'col-md-3';
+            div.appendChild(div1);
+            var div2 = document.createElement('div');
+            div2.className = 'col-md-7';
+            div.appendChild(div2);
+            var label = document.createElement("Label");
+            label.htmlFor = "text" + i
+            label.innerHTML= matriz[i];
+            div1.appendChild(label);
+            var tip;
+            if(matriz[i+4] == 'lectura'){
+                tip = document.createElement("input");
+                tip.id = matriz[i+1];
+                tip.className = "form-control";
+                tip.type = "text";
+                tip.readOnly = true;
+                tip.disabled = true;
+            }
+            else{
+                if(matriz[i+2]=='TXT'){                
+                    tip = document.createElement("input");
+                    tip.id = matriz[i+1];
+                    tip.className = "form-control";
+                    tip.type = "text";
+                    if (matriz[i+5] == 'BSQ'){
+                        var consulta = matriz[i+6];
+                        var busquedas = consulta.split("#");
+                        tip.onchange = function() {
+                            angular.element(document.getElementById('renderFormulario')).scope().bucarProhibidoNombre(document.getElementById(busquedas[0]).value,document.getElementById(busquedas[1]).value,document.getElementById(busquedas[2]).value);
+                        }
+                    } else if(matriz[i+5] == 'RC'){
+                        form_rc = 1;
+                        var consulta = matriz[i+6];
+                        var dependiente = matriz[i+5];
+                        var campo = matriz[i+1]; 
+                        var carnet = matriz[i-6];
+                        consultas = consulta.split("#");
+                        tip.onchange = function() {
+                            tipodoc = document.getElementById(carnet).value;
+                            ciciudadano = document.getElementById(campo).value;
+                            angular.element(document.getElementById('renderFormulario')).scope().bucarProhibido(ciciudadano,tipodoc);
+                            if(tipodoc == 'CI'){
+                                cicomplemento = " ";
+                                var cicomp = ciciudadano.split("-");
+                                var datosCiudadano = new rcNatural();
+                                if(cicomp.length>1){
+                                    ciciudadano = cicomp[0];
+                                    cicomplemento = cicomp[1];
+                                    datosCiudadano.complemento = cicomplemento; 
+                                }
+                                datosCiudadano.ci = ciciudadano;    
+                                datosCiudadano.buscarNatural(function(resultado){
+                                    results = JSON.parse(resultado);
+                                    console.log(results);
+                                    if(results.length > 0 ){
+                                        existe = 1;
+                                        sweetAlert('', 'Ciudadano Existente', 'success');
+                                        var consultsql = "select zona_id as valor, dist_nombre||& - &||zona_nombre as dato from ae._ae_distritos , ae._ae_zona where dist_macro_id = "+results[0].dtspsl_macrodistrito+" and zona_distrito_id = dist_id order by 2";
+                                        angular.element(document.getElementById('renderFormulario')).scope().datosComboRender(consultas[9],consultsql );
+                                        document.getElementById(consultas[0]).value = results[0].dtspsl_expedido;
+                                        document.getElementById(consultas[1]).value = results[0].dtspsl_nombres;
+                                        document.getElementById(consultas[2]).value = results[0].dtspsl_paterno;
+                                        document.getElementById(consultas[3]).value = results[0].dtspsl_materno;
+                                        var fecnac = new Date(results[0].dtspsl_fec_nacimiento);
+                                        var mes = fecnac.getMonth() + 1;
+                                        var dia = fecnac.getDate()
+                                        if(fecnac.getDate()<10){
+                                            dia = "0"+ dia;
+                                        }
+                                        if(fecnac.getMonth()<9){
+                                            mes = "0"+ mes;
+                                        }
+                                        results[0].dtspsl_fec_nacimiento = fecnac.getFullYear()+"-"+mes+"-"+dia;
+                                        document.getElementById(consultas[4]).value = results[0].dtspsl_fec_nacimiento;
+                                        document.getElementById(consultas[5]).value = results[0].dtspsl_lugar_nacimiento;
+                                        document.getElementById(consultas[6]).value = results[0].dtspsl_departamento;
+                                        document.getElementById(consultas[7]).value = results[0].dtspsl_sexo;
+                                        document.getElementById(consultas[8]).value = results[0].dtspsl_macrodistrito;
+                                        setTimeout(function(){ document.getElementById(consultas[9]).value = results[0].dtspsl_zona; }, 2000);
+                                        document.getElementById(consultas[10]).value = results[0].dtspsl_direccion;
+                                        document.getElementById(consultas[11]).value = results[0].dtspsl_telefono;
+                                        document.getElementById(consultas[12]).value = results[0].dtspsl_movil;
+                                       // document.getElementById(consultas[13]).value = results[0].dtspsl_file_fotocopia_ci;
+                                    }else{
+                                        existe = 0;
+                                        sweetAlert('', 'Ciudadano No Existente', 'error');
+                                        document.getElementById(consultas[0]).value = "";
+                                        document.getElementById(consultas[1]).value = "";
+                                        document.getElementById(consultas[2]).value = "";
+                                        document.getElementById(consultas[3]).value = "";
+                                        document.getElementById(consultas[4]).value = "";
+                                        document.getElementById(consultas[5]).value = "";
+                                        document.getElementById(consultas[6]).value = "";
+                                        document.getElementById(consultas[7]).value = "";
+                                        document.getElementById(consultas[8]).value = "";
+                                        document.getElementById(consultas[9]).value = "";
+                                        document.getElementById(consultas[10]).value = "";
+                                        document.getElementById(consultas[11]).value = "";
+                                        document.getElementById(consultas[12]).value = "";
+                                        document.getElementById(consultas[13]).value = "";
+                                    }
+                                });
+                            }
+                            else{
+                                document.getElementById(consultas[0]).value = "";
+                                document.getElementById(consultas[1]).value = "";
+                                document.getElementById(consultas[2]).value = "";
+                                document.getElementById(consultas[3]).value = "";
+                                document.getElementById(consultas[4]).value = "";
+                                document.getElementById(consultas[5]).value = "";
+                                document.getElementById(consultas[6]).value = "";
+                                document.getElementById(consultas[7]).value = "";
+                                document.getElementById(consultas[8]).value = "";
+                                document.getElementById(consultas[9]).value = "";
+                                document.getElementById(consultas[10]).value = "";
+                                document.getElementById(consultas[11]).value = "";
+                                document.getElementById(consultas[12]).value = "";
+                                document.getElementById(consultas[13]).value = "";
+                            }
+                        };
+                    } else if(matriz[i+5] != '-'  && matriz[i+5]  != ""){
+                        var consulta = matriz[i+6];
+                        var dependiente = matriz[i+5];
+                        var campo = matriz[i+1];  
+                        tip.onchange = function() {
+                            var valorDependencia = document.getElementById(campo).value;
+                            var xConsulta = consulta.replace("*",",");  
+                            xConsulta = xConsulta.replace("xId", valorDependencia); 
+                            angular.element(document.getElementById('renderFormulario')).scope().datosComboRender(dependiente, xConsulta);
+                        };
+                    }
+                }else if(matriz[i+2]=='NRO'){
+                    tip = document.createElement("input");
+                    tip.id = matriz[i+1];
+                    tip.className = "form-control";
+                    tip.type = "number";
+                    tip.step = "any";
+                }else if(matriz[i+2]=='SUM'){
+                    adicionarcalculo = 1;
+                    tip = document.createElement("input");
+                    tip.id = matriz[i+1];
+                    tip.className = "form-control";
+                    tip.type = "number";
+                    tip.step = "any";
+                }else if(matriz[i+2]=='PROM'){
+                    adicionarcalculo = 1;
+                    tip = document.createElement("input");
+                    tip.id = matriz[i+1]; 
+                    tip.type = "number";
+                    tip.step = "any";
+                    tip.className = "form-control";
+                }else if(matriz[i+2]=='ARC'){
+                    tip = document.createElement("div");
+                    tip.className = "custom-upload";
+                    var tip2;
+                    tip2 = document.createElement("input");
+                    tip2.type = "file";
+                    tip2.id = matriz[i+1];
+                    tip2.setAttribute("accept", "image/*");
+                    var campoArc = matriz[i+1];
+                    tip2.onchange = function(){
+                        console.log($(this).val(),"HOLAA",campoArc,"  .  ",document.getElementById('l_'+campoArc).value);
+                        var a = $(this).val();
+                        var z = a.split("\\");
+                        if (z[2] === undefined){
+                            document.getElementById('l_'+campoArc).value = a;
+                        }
+                        else{
+                            document.getElementById('l_'+campoArc).value = z[2];
+                        }                        
+                    }
+                    tip.appendChild(tip2);
+                    var tip3 = document.createElement("div");
+                    tip3.className = "fake-file";
+                    tip.appendChild(tip3);
+                    var tip4 = document.createElement("input");
+                    tip4.id = 'l_'+matriz[i+1];
+                    tip4.type = 'text';
+                    tip4.value = " ";
+                    tip3.appendChild(tip4);
+                }else if(matriz[i+2]=='CHK'){
+                    tip = document.createElement("input");
+                    tip.id = matriz[i+1];
+                    tip.type = "checkbox";
+                }else if(combo[0]=='CBO') { 
+                    tip = document.createElement('select');
+                    tip.id = matriz[i+1];
+                    tip.className = "form-control";
+                    filas = combo[1].split('#'); 
+                    if(matriz[i+5] != '-'  && matriz[i+5]  != ""){
+                        var cboConsulta = matriz[i+6];
+                        cboConsulta = cboConsulta.replace("*",","); 
+                        var dependienteCbo = matriz[i+5];
+                        var campoCbo = matriz[i+1];
+                        tip.onchange = function() {
+                            var valorDependencia = document.getElementById(campoCbo).value;
+                            var mValorDependencia = valorDependencia.split('~');    
+                            var xCboConsulta = cboConsulta.replace("*",",");              
+                            xCboConsulta = xCboConsulta.replace("xId", mValorDependencia[0]);
+                            angular.element(document.getElementById('renderFormulario')).scope().datosComboRender(dependienteCbo, xCboConsulta);
+                        };
+                    }
+                    if(matriz[i+4] == 'obligatorio'){
+                        tip.options[0] = new Option('--Seleccione--','');
+                    } else{
+                        tip.options[0] = new Option('--Seleccione--','-1');
+                    }
+                    for(var j = 0; j < filas.length ;j++){
+                        columna= filas[j].split('|');
+                        tip.options[j+1] = new Option(columna[1],columna[0]);
+                    }
+                }else if(matriz[i+2]=='FEC'){
+                    tip = document.createElement("input");
+                    tip.id = matriz[i+1];
+                    tip.type = "date";
+                    tip.className = "form-control";
+                }
+            }
+            if(matriz[i+4] == 'obligatorio'){
+                requerido = 1;
+                tip.required = true;
+                obligatori = obligatori+'#'+matriz[i+1];
+            } 
+            div2.appendChild(tip);  
+        }
+        var footer = document.createElement('div');
+        footer.className = 'modal-footer';
+        footer.innerText = '  ';
+        content.appendChild(footer);
+        var addBtn = document.createElement('button');
+        addBtn.onclick = function () { 
+            if(requerido == 1){
+                obligatorios = obligatori.split('#');
+                for(var i = 1;i<obligatorios.length;i++){
+                    if(document.getElementById(obligatorios[i]).value != ""){
+                       obligatorio = 0;
+                    }
+                    else{
+                        obligatorio = 1;
+                        break;
+                    }
+                }
+            }else{
+                obligatorio = 0;
+            }  
+            if(obligatorio == 0){     
+                if(adicionarcalculo == 1){ 
+                    var sum = document.getElementById(tableID+'_CAL').value.split(",").map(parseFloat);
+                    var count = parseInt(document.getElementById(tableID+'_CONT').value);
+                     count++;
+                    document.getElementById(tableID+'_CONT').value = count;
+                    var table = document.getElementById('tabla_'+tableID);
+                    var rowCount = table.rows.length;
+                    var row = table.insertRow(rowCount);
+                    row.id=tableID+"_row"+(rowCount);
+                    var newdiv = document.createElement('td');
+                    var jsonSting="{";
+                    var j = 0;
+                    var id = rowCount-1;
+                    var datos = JSON.parse(document.getElementById(tableID).value);
+                    delete datos[id];
+                    var nuevosDatos=[];
+                    nuevosDatos = JSON.stringify(datos);
+                    document.getElementById(tableID).value = nuevosDatos;
+                    cambiarDisplay(tableID+'_row'+ id);                
+                }
+                else{
+                    var table = document.getElementById('tabla_'+tableID);
+                    var rowCount = table.rows.length;
+                    var row = table.insertRow(rowCount);
+                    row.id=tableID+"_row"+(rowCount);
+                    var newdiv = document.createElement('td');
+                    var jsonSting="{";
+                    var j = 0;
+                }
+                for(var i = matriz.length-7; i >=0 ;i=i-7){
+                    cell1 = row.insertCell(0); 
+                    cell1.id = "c_"+matriz[i+1]+(rowCount);
+                    var componente = matriz[i+2].split(':');
+                    if(componente[0] == 'ARC'){
+                        var fArchivo = document.getElementById(matriz[i+1]);
+                        if(fArchivo.value == ""){
+                            var newlink = document.createElement('div'); 
+                            var currenttext = document.createElement('div');
+                            currenttext.innerHTML = '<div class = "col-md-12"><button  value = "0"  id="'+matriz[i+1]+(rowCount)+'" class = "btn btn-default btn-circle" onclick = "verImagen(0);"><i class = "fa fa-eye" style="color:#249FE6"></i></button><input style="border: none;" id="l_'+ matriz[i+1]+(rowCount)+'" value="0" readonly="readonly"></div></td>';   
+                            jsonSting = jsonSting+'"'+matriz[i+1]+'":"0",';
+                        } else{
+                            var url = angular.element(document.getElementById("renderFormulario")).scope().guardarArchivo(fArchivo);
+                            console.log('ULR 1',url);
+                            var a = url.split('"')
+                            var newlink = document.createElement('div'); 
+                            var currenttext = document.createElement('div');
+                            var b = a[4].split("/");
+                            b = b[7].split("?");
+                            currenttext.innerHTML = '<div class = "col-md-12"><button  value = "'+a[4]+'"  id="'+matriz[i+1]+(rowCount)+'" class = "btn btn-default btn-circle" onclick = "verImagen(\'' + a[4] +'\');"><i class = "fa fa-eye" style="color:#249FE6"></i></button><input style="border: none;" id="l_'+ matriz[i+1]+(rowCount)+'" value="'+b[0]+'" readonly="readonly"></div></td>';   
+                            jsonSting = jsonSting+'"'+matriz[i+1]+'":"'+a[4]+'",';
+                        }
+                    }else if(componente[0] == 'NRO'){
+                        jsonSting = jsonSting+'"'+matriz[i+1]+'":"'+document.getElementById(matriz[i+1]).value+'",';
+                        var currenttext = document.createElement("input"); 
+                        currenttext.id = matriz[i+1]+(rowCount);
+                        currenttext.type = "text";
+                        currenttext.disabled = "true";
+                        currenttext.readonly = "readonly";
+                        currenttext.className = "";
+                        currenttext.value = document.getElementById(matriz[i+1]).value;  
+                        if(document.getElementById(matriz[i+1]).value == ""){
+                            document.getElementById(matriz[i+1]).value = 0;
+                        } ;
+                        if(sum[j] == undefined){
+                            sum[j] = 0;
+                        } ;
+                        sum[j] = sum[j] + parseFloat(document.getElementById(matriz[i+1]).value);
+                    }else if(componente[0] == 'CHK'){
+                        if(document.getElementById(matriz[i+1]).checked){
+                            document.getElementById(matriz[i+1]).value = 'SI';
+                        }
+                        else {
+                            document.getElementById(matriz[i+1]).value = 'NO';
+                        }
+                        jsonSting = jsonSting+'"'+matriz[i+1]+'":"'+document.getElementById(matriz[i+1]).value+'",';
+                        var currenttext = document.createElement("input"); 
+                        currenttext.id = matriz[i+1]+(rowCount);
+                        currenttext.type = "text";
+                        currenttext.disabled = "true";
+                        currenttext.readonly = "readonly";
+                        currenttext.className = "";
+                        currenttext.value = document.getElementById(matriz[i+1]).value;
+                    }else if(componente[0] == 'CBO'){
+                        var selected = document.getElementById(matriz[i+1]);
+                        jsonSting = jsonSting+'"'+matriz[i+1]+'_valor":"'+document.getElementById(matriz[i+1]).value+'",';
+                        jsonSting = jsonSting+'"'+matriz[i+1]+'":"'+selected.options[selected.selectedIndex].text+'",';
+                        var cbovalor = document.createElement("input"); 
+                        cbovalor.id = matriz[i+1]+(rowCount);
+                        cbovalor.type = "text";
+                        cbovalor.disabled = "true";
+                        cbovalor.readonly = "readonly";
+                        cbovalor.value = selected.options[selected.selectedIndex].text;
+                        cell1.appendChild(cbovalor);
+                        var currenttext = document.createElement("input"); 
+                        currenttext.id = matriz[i+1]+(rowCount)+"_valor";
+                        currenttext.type = "hidden";
+                        currenttext.disabled = "true";
+                        currenttext.readonly = "readonly";
+                        currenttext.className = "";
+                        currenttext.value = document.getElementById(matriz[i+1]).value;
+                    }
+                    else {  
+                        jsonSting=jsonSting+'"'+matriz[i+1]+'":"'+document.getElementById(matriz[i+1]).value+'",';
+                        var currenttext = document.createElement("input"); 
+                        currenttext.id = matriz[i+1]+(rowCount);
+                        currenttext.type = "text";
+                        currenttext.disabled = "true";
+                        currenttext.readonly = "readonly";
+                        currenttext.className = "";
+                        currenttext.value = document.getElementById(matriz[i+1]).value;          
+                    }
+                    if(matriz[i+3] && matriz[i+3] != 0)
+                            currenttext.size = matriz[i+3];
+                        else
+                            currenttext.size = 10;
+                    cell1.appendChild(currenttext);
+                    j++;
+                }
+                newdiv.innerHTML = '<button class="btn btn-default btn-circle" onclick="eliminarTabla(' + rowCount + ',\'' + tableID + '\',\'' + cadena + '\');"><i class="fa fa-trash-o" style="color:#249FE6"></i></button> <button class="btn btn-default btn-circle" onclick="editarGrilla(' + rowCount + ',\'' + cadena + '\',\'' + tableID + '\');"><i class="fa fa-pencil" style="color:#249FE6"></i></button></td>';
+                newdiv.id="c_btn_"+row.id;
+                cell1 = row.insertCell(0);
+                cell1.appendChild(newdiv);
+                jsonSting = jsonSting.substring(0,jsonSting.length-1);
+                jsonSting = jsonSting + "}";
+                addRowJson(jsonSting,tableID);
+                if(adicionarcalculo == 1){
+                    var rowCount1 = table.rows.length;
+                    var row1 = table.insertRow(rowCount1);
+                    row1.id=tableID+"_row"+(rowCount1);
+                    var newdiv = document.createElement('td');
+                    var jsonSting="{";
+                    var j = 0;
+                    for(var i = matriz.length-7; i >=0 ;i=i-7){
+                        cell2 = row1.insertCell(0);
+                        cell2.id="c_"+matriz[i+1]+(rowCount1);
+                        var componente = matriz[i+2].split(':');               
+                        if(componente[0] == 'PROM'){
+                            var currenttext = document.createElement("input"); 
+                            currenttext.id = matriz[i+1]+(rowCount1);
+                            currenttext.type = "text";
+                            currenttext.disabled = "true";
+                            currenttext.readonly = "readonly";
+                            currenttext.className = ""; 
+                            if(document.getElementById(matriz[i+1]).value == ""){
+                                document.getElementById(matriz[i+1]).value = 0;
+                            } ;
+                            if(sum[j] == undefined || sum[j] == NaN){
+                                sum[j] = 0;
+                            } ;
+                            sum[j] = sum[j] + parseFloat(document.getElementById(matriz[i+1]).value);
+                            var prom = sum[j]/count;
+                            jsonSting=jsonSting+'"'+matriz[i+1]+'":"'+prom+'",';
+                            currenttext.value = prom; 
+                        }else if(componente[0] == 'SUM'){
+                            var currenttext = document.createElement("input"); 
+                            currenttext.id = matriz[i+1]+(rowCount);
+                            currenttext.type = "text";
+                            currenttext.disabled = "true";
+                            currenttext.readonly = "readonly";
+                            currenttext.className = "";  
+
+                            if(document.getElementById(matriz[i+1]).value == ""){
+                                document.getElementById(matriz[i+1]).value = 0;
+                            } ;
+                            if(sum[j] == undefined || sum[j] == NaN ){
+                                sum[j] = 0;
+                            } ;
+                            sum[j] = sum[j] + parseFloat(document.getElementById(matriz[i+1]).value);
+                            jsonSting=jsonSting+'"'+matriz[i+1]+'":"'+sum[j]+'",';
+                            currenttext.value = sum[j]; 
+                        }
+                        else {
+                           jsonSting=jsonSting+'"'+matriz[i+1]+'":" ",';
+                            var currenttext = document.createElement("input"); 
+                            currenttext.id = matriz[i+1]+(rowCount);
+                            currenttext.type = "text";
+                            currenttext.disabled = "true";
+                            currenttext.readonly = "readonly";
+                            currenttext.className = "";
+                            currenttext.value = " ";          
+                        }
+                        if(matriz[i+3] && matriz[i+3]!=0)
+                            currenttext.size = matriz[i+3];
+                        else
+                            currenttext.size = 10;
+                        cell2.appendChild(currenttext);
+                        j++;
+                    }
+                    newdiv.innerHTML = '<div></div></td>';
+                    newdiv.id="c_btn_"+row1.id;
+                    cell2 = row1.insertCell(0);
+                    cell2.appendChild(newdiv);
+                    jsonSting = jsonSting.substring(0,jsonSting.length-1);
+                    jsonSting = jsonSting + "}";
+                    addRowJson(jsonSting,tableID);
+                    document.getElementById(tableID+'_CAL').value = sum;
+                }
+                
+                if(form_rc==1 &&  tipodoc == 'CI'){
+                    if(existe == 1){
+                        var modificarCiudadano = new rcNatural();
+                        modificarCiudadano.oid = results[0]._id;
+                        modificarCiudadano.nombre = document.getElementById(consultas[1]).value;
+                        modificarCiudadano.paterno = document.getElementById(consultas[2]).value;
+                        modificarCiudadano.materno = document.getElementById(consultas[3]).value;
+                        modificarCiudadano.tercer_apellido = results[0].dtspsl_tercer_apellido;
+                        modificarCiudadano.ci = ciciudadano;
+                        modificarCiudadano.complemento = results[0].dtspsl_complemento;
+                        modificarCiudadano.expedido = document.getElementById(consultas[0]).value;
+                        var fecnac = new Date(document.getElementById(consultas[4]).value);
+                        var mes = fecnac.getMonth() + 1;
+                        if(fecnac.getMonth()<9){
+                            mes = "0"+ mes;
+                        }
+                        var dia =fecnac.getDate() + 2;
+                        if(dia < 10){
+                            dia = "0"+ dia;
+                        }
+                        fecnac = fecnac.getFullYear()+"-"+mes+"-"+dia;
+                        modificarCiudadano.fec_nacimiento = fecnac;
+                        modificarCiudadano.lugar_nacimiento = document.getElementById(consultas[5]).value;
+                        modificarCiudadano.pais_origen = results[0].dtspsl_pais;
+                        modificarCiudadano.sexo = document.getElementById(consultas[7]).value;
+                        if(results[0].dtspsl_id_estado_civil)
+                            modificarCiudadano.id_estado_civil = results[0].dtspsl_id_estado_civil;
+                        else 
+                            modificarCiudadano.id_estado_civil = " ";
+                        if(results[0].dtspsl_profesion)
+                            modificarCiudadano.profesion = results[0].dtspsl_profesion;
+                        else
+                            modificarCiudadano.profesion = " ";
+                        modificarCiudadano.otra_profesion = results[0].dtspsl_otra_profesion;
+                        modificarCiudadano.telefono = document.getElementById(consultas[11]).value
+                        modificarCiudadano.movil = document.getElementById(consultas[12]).value
+                        modificarCiudadano.correo = results[0].dtspsl_correo;
+                        modificarCiudadano.direccion = document.getElementById(consultas[10]).value;
+                        modificarCiudadano.pais = results[0].dtspsl_pais;
+                        modificarCiudadano.departamento = document.getElementById(consultas[6]).value;
+                        modificarCiudadano.provincia = results[0].dtspsl_provincia;
+                        modificarCiudadano.municipio = results[0].dtspsl_municipio;
+                        modificarCiudadano.macrodistrito = document.getElementById(consultas[8]).value;
+                        modificarCiudadano.macrodistrito_desc = results[0].dtspsl_macrodistrito_desc;
+                        modificarCiudadano.distrito = results[0].dtspsl_distrito;
+                        modificarCiudadano.distrito_desc = results[0].dtspsl_distrito_desc;
+                        modificarCiudadano.zona = document.getElementById(consultas[9]).value;
+                        modificarCiudadano.zona_desc = results[0].dtspsl_zona_desc;
+                        modificarCiudadano.tipo_via = results[0].dtspsl_tipo_via;
+                        modificarCiudadano.nombre_via = results[0].dtspsl_nombre_via;
+                        modificarCiudadano.numero_casa = results[0].dtspsl_numero_casa;
+                        modificarCiudadano.edificio = results[0].dtspsl_edificio;
+                        modificarCiudadano.bloque = results[0].dtspsl_bloque;
+                        modificarCiudadano.piso = results[0].dtspsl_piso;
+                        modificarCiudadano.oficina = results[0].dtspsl_oficina;
+                        modificarCiudadano.latitud = results[0].dtspsl_latitud;
+                        modificarCiudadano.longitud = results[0].dtspsl_longitud;
+                        modificarCiudadano.usr_id = results[0].dtspsl_id;
+                        modificarCiudadano.activacionf = "SI";
+                        modificarCiudadano.activaciond = "SI";
+                        modificarCiudadano.file_fotocopia_ci = document.getElementById(consultas[13]).value;
+                        modificarCiudadano.fec_vencimiento = results[0].dtspsl_fec_vencimiento;
+                        modificarCiudadano.file_factura_luz = results[0].dtspsl_file_factura_luz;
+                        if(results[0].dtspsl_URL)
+                            modificarCiudadano.URL = results[0].dtspsl_URL;
+                        else
+                            modificarCiudadano.URL = " ";
+                        modificarCiudadano.modificarNatural(function(resultado){
+                            resultadoApi = JSON.parse(resultado); 
+                            if( typeof(resultadoApi.success) != 'undefined')
+                            {
+                                console.log("MODIFICACION CORRECTA");
+                            } else {                    
+                                console.log(resultadoApi.error.message);
+                            }
+                        });
+                    } 
+                    else{
+                        var registrarCiudadano = new rcNatural();
+                        registrarCiudadano.ci = ciciudadano;
+                        registrarCiudadano.complemento = cicomplemento;
+                        registrarCiudadano.nombre = document.getElementById(consultas[1]).value;
+                        registrarCiudadano.paterno = document.getElementById(consultas[2]).value;
+                        registrarCiudadano.materno = document.getElementById(consultas[3]).value;
+                        registrarCiudadano.tercer_apellido = " ";
+                        registrarCiudadano.expedido = document.getElementById(consultas[0]).value;
+                        var fecnac = new Date(document.getElementById(consultas[4]).value);
+                        var mes = fecnac.getMonth() + 1;
+                        if(fecnac.getMonth()<9){
+                            mes = "0"+ mes;
+                        }
+                        var dia =fecnac.getDate() + 2;
+                        if(dia<10){
+                            dia = "0"+ dia;
+                        }
+                        fecnac = fecnac.getFullYear()+"-"+mes+"-"+dia;
+                        registrarCiudadano.fec_nacimiento = fecnac;
+                        registrarCiudadano.lugar_nacimiento = document.getElementById(consultas[5]).value;
+                        registrarCiudadano.pais_origen = " ";
+                        registrarCiudadano.sexo = document.getElementById(consultas[7]).value;
+                        registrarCiudadano.id_estado_civil = "S";
+                        registrarCiudadano.profesion = "50";
+                        registrarCiudadano.otra_profesion = " ";
+                        registrarCiudadano.telefono = document.getElementById(consultas[11]).value;
+                        registrarCiudadano.movil = document.getElementById(consultas[12]).value;
+                        registrarCiudadano.correo = " ";
+                        registrarCiudadano.direccion = document.getElementById(consultas[10]).value;
+                        registrarCiudadano.usr_id = "0";
+						registrarCiudadano.activacionf = "SI";
+                        registrarCiudadano.activaciond = "SI";
+                        registrarCiudadano.crearNatural(function(resultado){
+                            resultadoApi = JSON.parse(resultado);
+                            if( typeof(resultadoApi.success) != 'undefined')
+                            {
+                                console.log("REGISTRO CORRECTO");
+                            }
+                            else
+                            {                            
+                                console.log(resultadoApi.error.message);
+                            }
+                        });
+                    }
+
+                }
+                $("#myModalMary").modal('hide');
+            }else{
+                sweetAlert('','Complete Todos Los Datos','error');                    
+            }
+            
+        };
+        addBtn.setAttribute("type", "button");
+        addBtn.className = 'btn btn-primary btn-inverse';
+        addBtn.innerText = 'Guardar';
+        footer.appendChild(addBtn);        
+        var closeBtn = document.createElement('button');
+        closeBtn.setAttribute("data-dismiss", "modal");
+        closeBtn.setAttribute("type", "button");
+        closeBtn.className = 'btn btn-primary btn-inverse';
+        closeBtn.innerText = 'Cerrar';
+        footer.appendChild(closeBtn);
+        $("#myModalMary").modal('show');
+    }
+    function editarGrilla(k,item,nombre){
+        var editarCalculo = 0; 
+        var form_rc = 0;
+        var existe = 0;
+        var matriz = item.split(',');   
+        var table = document.getElementById('tabla_'+nombre);
+        var rowCount = table.rows.length - 1; 
+        if(document.getElementById('myModalMary') != null){
+            elemento=document.getElementById('myModalMary');
+            elemento.parentNode.removeChild(elemento);
+        }
+        Modal.innerHTML = '<div></div>';
+        Modal.id = 'myModalMary';
+        Modal.className = 'modal fade';
+        Modal.setAttribute("data-backdrop", "static");
+        document.body.appendChild(Modal);
+        var dialog = document.createElement('div');
+        dialog.className = 'modal-dialog';
+        Modal.appendChild(dialog);
+        var content = document.createElement('div');
+        content.className = 'modal-content';
+        dialog.appendChild(content);
+        var header = document.createElement('div');
+        header.className = 'modal-header';
+        content.appendChild(header);        
+        var cerrarmodal = document.createElement('button');
+        cerrarmodal.type = "button"
+        cerrarmodal.className = 'close';
+        cerrarmodal.setAttribute("data-dismiss", "modal");
+        cerrarmodal.setAttribute("aria-label", "Close");
+        cerrarmodal.innerText = 'x';
+        header.appendChild(cerrarmodal);
+        var title = document.createElement('h4');
+        title.className = 'modal-title';
+        title.innerText = 'Editar Registro';
+        header.appendChild(title);
+        var body = document.createElement('div');
+        body.className = 'modal-body';
+        content.appendChild(body);
+        var requerido = 0;
+        var obligatorio = 1;
+        var obligatori = 1;
+        var consultas ;
+        for(var i = 0 ; i <= matriz.length-7 ;i=i+7){            
+            var combo = matriz[i+2].split(':');
+            var br = document.createElement('br');
+            body.appendChild(br);
+            var div = document.createElement('div');
+            div.className = 'row';
+            body.appendChild(div);
+            var div1 = document.createElement('div');
+            div1.className = 'col-md-3';
+            div.appendChild(div1);
+            var div2 = document.createElement('div');
+            div2.className = 'col-md-7';
+            div.appendChild(div2);
+            var label = document.createElement("Label"); 
+            label.htmlFor = "text" + i
+            label.innerHTML= matriz[i];
+            div1.appendChild(label);
+            var tip;
+            if(matriz[i+4] == 'lectura'){
+                tip = document.createElement("input");
+                tip.id = matriz[i+1]; 
+                tip.type = "text";
+                tip.readOnly = true;
+                tip.disabled = true;
+                tip.value = document.getElementById(matriz[i+1]+k).value;
+            }
+            else{
+                if(matriz[i+2]=='TXT'){                
+                    tip = document.createElement("input");
+                    tip.id = matriz[i+1]; 
+                    tip.type = "text";
+                    tip.className = "form-control";
+                    tip.value = document.getElementById(matriz[i+1]+k).value;
+                    if (matriz[i+5] == 'BSQ'){
+                        var consulta = matriz[i+6];
+                        var busquedas = consulta.split("#");
+                        tip.onchange = function() {
+                            angular.element(document.getElementById('renderFormulario')).scope().bucarProhibidoNombre(document.getElementById(busquedas[0]).value,document.getElementById(busquedas[1]).value,document.getElementById(busquedas[2]).value);
+                            
+                        }
+                    } else if(matriz[i+5] == 'RC'){
+                        form_rc = 1;
+                        var consulta = matriz[i+6];
+                        var dependiente = matriz[i+5];
+                        var campo = matriz[i+1]; 
+                        var carnet = matriz[i-6]; 
+                        consultas = consulta.split("#");
+                        tipodoc = document.getElementById(carnet+k+'_valor').value;
+                        ciciudadano = document.getElementById(campo+k).value;
+                        if(tipodoc == 'CI'){
+                            cicomplemento = " ";
+                            var cicomp = ciciudadano.split("-");
+                            var datosCiudadano = new rcNatural();
+                            if(cicomp.length>1){
+                                ciciudadano = cicomp[0];
+                                cicomplemento = cicomp[1];
+                                datosCiudadano.complemento = cicomplemento; 
+                            }
+                            datosCiudadano.ci = ciciudadano;    
+                            datosCiudadano.buscarNatural(function(resultado){
+                                results = JSON.parse(resultado);
+                                if(results.length > 0 ){
+                                    existe = 1;
+                                }else{
+                                    existe = 0;
+                                    
+                                }
+                            });
+                        }
+                        tip.onchange = function() {
+                            tipodoc = document.getElementById(carnet).value;
+                            ciciudadano = document.getElementById(campo).value;
+                            angular.element(document.getElementById('renderFormulario')).scope().bucarProhibido(ciciudadano,tipodoc);                            
+                            if(tipodoc == 'CI'){
+                                cicomplemento = " ";
+                                var cicomp = ciciudadano.split("-");
+                                var datosCiudadano = new rcNatural();
+                                if(cicomp.length>1){
+                                    ciciudadano = cicomp[0];
+                                    cicomplemento = cicomp[1];
+                                    datosCiudadano.complemento = cicomplemento; 
+                                }
+                                datosCiudadano.ci = ciciudadano;    
+                                datosCiudadano.buscarNatural(function(resultado){
+                                    results = JSON.parse(resultado);
+                                    if(results.length > 0 ){
+                                        existe = 1;
+                                        sweetAlert('', 'Ciudadano Existente', 'success');
+                                        var consultsql = "select zona_id as valor, dist_nombre||& - &||zona_nombre as dato from ae._ae_distritos , ae._ae_zona where dist_macro_id = "+results[0].dtspsl_macrodistrito+" and zona_distrito_id = dist_id order by 2";
+                                        angular.element(document.getElementById('renderFormulario')).scope().datosComboRender(consultas[9],consultsql );
+                                        document.getElementById(consultas[0]).value = results[0].dtspsl_expedido;
+                                        document.getElementById(consultas[1]).value = results[0].dtspsl_nombres;
+                                        document.getElementById(consultas[2]).value = results[0].dtspsl_paterno;
+                                        document.getElementById(consultas[3]).value = results[0].dtspsl_materno;
+                                        var fecnac = new Date(results[0].dtspsl_fec_nacimiento);
+                                        var mes = fecnac.getMonth() + 1;
+                                        var dia = fecnac.getDate();
+                                        if(dia<10){
+                                            dia = "0"+ dia;
+                                        }
+                                        if(fecnac.getMonth()<9){
+                                            mes = "0"+ mes;
+                                        }
+                                        results[0].dtspsl_fec_nacimiento = fecnac.getFullYear()+"-"+mes+"-"+dia;
+                                        document.getElementById(consultas[4]).value = results[0].dtspsl_fec_nacimiento;
+                                        document.getElementById(consultas[5]).value = results[0].dtspsl_lugar_nacimiento;
+                                        document.getElementById(consultas[6]).value = results[0].dtspsl_departamento;
+                                        document.getElementById(consultas[7]).value = results[0].dtspsl_sexo;
+                                        document.getElementById(consultas[8]).value = results[0].dtspsl_macrodistrito;
+                                        setTimeout(function(){ document.getElementById(consultas[9]).value = results[0].dtspsl_zona; }, 2000);
+                                        document.getElementById(consultas[10]).value = results[0].dtspsl_direccion;
+                                        document.getElementById(consultas[11]).value = results[0].dtspsl_telefono;
+                                        document.getElementById(consultas[12]).value = results[0].dtspsl_movil;
+                                        document.getElementById(consultas[13]).value = results[0].dtspsl_file_fotocopia_ci;
+                                    }else{
+                                        existe = 0;
+                                        sweetAlert('', 'Ciudadano No Existente', 'error');
+                                        document.getElementById(consultas[0]).value = "";
+                                        document.getElementById(consultas[1]).value = "";
+                                        document.getElementById(consultas[2]).value = "";
+                                        document.getElementById(consultas[3]).value = "";
+                                        document.getElementById(consultas[4]).value = "";
+                                        document.getElementById(consultas[5]).value = "";
+                                        document.getElementById(consultas[6]).value = "";
+                                        document.getElementById(consultas[7]).value = "";
+                                        document.getElementById(consultas[8]).value = "";
+                                        document.getElementById(consultas[9]).value = "";
+                                        document.getElementById(consultas[10]).value = "";
+                                        document.getElementById(consultas[11]).value = "";
+                                        document.getElementById(consultas[12]).value = "";
+                                        document.getElementById(consultas[13]).value = "";
+                                    }
+                                });
+                            }
+                            else{
+                                document.getElementById(consultas[0]).value = "";
+                                document.getElementById(consultas[1]).value = "";
+                                document.getElementById(consultas[2]).value = "";
+                                document.getElementById(consultas[3]).value = "";
+                                document.getElementById(consultas[4]).value = "";
+                                document.getElementById(consultas[5]).value = "";
+                                document.getElementById(consultas[6]).value = "";
+                                document.getElementById(consultas[7]).value = "";
+                                document.getElementById(consultas[8]).value = "";
+                                document.getElementById(consultas[9]).value = "";
+                                document.getElementById(consultas[10]).value = "";
+                                document.getElementById(consultas[11]).value = "";
+                                document.getElementById(consultas[12]).value = "";
+                                document.getElementById(consultas[13]).value = "";
+                            }
+                        };
+                    } else if(matriz[i+5] != '-'  && matriz[i+5]  != ""){
+                        var consulta = matriz[i+6];
+                        var dependiente = matriz[i+5];
+                        var campo = matriz[i+1];  
+                        tip.onchange = function() {
+                            var valorDependencia = document.getElementById(campo).value;
+                            var xConsulta = consulta.replace("*",",");  
+                            xConsulta = xConsulta.replace("xId", valorDependencia); 
+                            angular.element(document.getElementById('renderFormulario')).scope().datosComboRender(dependiente, xConsulta);
+                        };
+                    }
+                }else if(matriz[i+2]=='NRO'){
+                    tip = document.createElement("input");
+                    tip.id = matriz[i+1]; 
+                    tip.type = "number";
+                    tip.step = "any";
+                    tip.className = "form-control";
+                    tip.value = document.getElementById(matriz[i+1]+k).value;
+                }else if(matriz[i+2]=='SUM'){
+                    editarCalculo = 1;
+                    tip = document.createElement("input"); 
+                    tip.id = matriz[i+1]; 
+                    tip.className = "form-control";
+                    tip.type = "number";
+                    tip.step = "any";
+                    tip.value = document.getElementById(matriz[i+1]+k).value;
+                }else if(matriz[i+2]=='PROM'){
+                    editarCalculo = 1;
+                    tip = document.createElement("input");
+                    tip.id = matriz[i+1]; 
+                    tip.className = "form-control";
+                    tip.type = "number";
+                    tip.step = "any";
+                    tip.value = document.getElementById(matriz[i+1]+k).value;
+                }else if(matriz[i+2]=='CHK'){
+                    tip = document.createElement("input");
+                    tip.id = matriz[i+1]; 
+                    tip.type = "checkbox";
+                    if(document.getElementById(matriz[i+1]+k).value == 'SI'){
+                        tip.checked = true;
+                    } else{
+                        tip.checked = false;
+                    }
+                }else if(matriz[i+2]=='ARC'){
+                    tip = document.createElement("div");
+                    tip.className = "custom-upload";
+                    var tip2;
+                    tip2 = document.createElement("input");
+                    tip2.type = "file";
+                    tip2.id = matriz[i+1];
+                    tip2.setAttribute("accept", "image/*");
+                    var campoArc = matriz[i+1];
+                    tip2.onchange = function(){
+                        console.log($(this).val(),"HOLAA",campoArc,"  .  ",document.getElementById('l_'+campoArc).value);
+                        var a = $(this).val();
+                        var z = a.split("\\");
+                        if (z[2] === undefined){
+                            document.getElementById('l_'+campoArc).value = a;
+                        }
+                        else{
+                            document.getElementById('l_'+campoArc).value = z[2];
+                        }                        
+                    }
+                    tip.appendChild(tip2);
+                    var tip3 = document.createElement("div");
+                    tip3.className = "fake-file";
+                    tip.appendChild(tip3);
+                    var tip4 = document.createElement("input");
+                    tip4.id = 'l_'+matriz[i+1];
+                    tip4.type = 'text';
+                    tip4.value = document.getElementById("l_"+matriz[i+1]+k).value;
+                    tip3.appendChild(tip4);
+                }else if(combo[0]=='CBO') { 
+                    tip = document.createElement('select');
+                    tip.id = matriz[i+1]; 
+                    tip.className = "form-control";
+                    filas = combo[1].split('#'); 
+                    if(matriz[i+5] != '-'  && matriz[i+5]  != ""){
+                        var cboConsulta = matriz[i+6];
+                        cboConsulta = cboConsulta.replace("*",","); 
+                        var dependienteCbo = matriz[i+5];
+                        var campoCbo = matriz[i+1];
+                        var valorDependencia = document.getElementById(campoCbo+k+'_valor').value;
+                        var xCboConsulta = cboConsulta.replace("*",",");              
+                        xCboConsulta = xCboConsulta.replace("xId", valorDependencia);
+                        var valor = document.getElementById(dependienteCbo+k+'_valor').value;
+                        setTimeout(function(){ document.getElementById(dependienteCbo).value = valor; }, 2000);
+                        angular.element(document.getElementById('renderFormulario')).scope().datosComboRender(dependienteCbo, xCboConsulta);
+                        tip.onchange = function() {
+                            var valorDependencia = document.getElementById(campoCbo).value;
+                            var mValorDependencia = valorDependencia.split('~');    
+                            var xCboConsulta = cboConsulta.replace("*",",");              
+                            xCboConsulta = xCboConsulta.replace("xId", mValorDependencia[0]);
+                            angular.element(document.getElementById('renderFormulario')).scope().datosComboRender(dependienteCbo, xCboConsulta);
+                        };
+                    }
+                    
+                    if(matriz[i+4] == 'obligatorio'){
+                        tip.options[0] = new Option('--Seleccione--','');
+                    } else{
+                        tip.options[0] = new Option('--Seleccione--','-1');
+                    }
+                    for(var j = 0; j < filas.length ;j++){
+                        columna= filas[j].split('|');
+                        tip.options[j+1] = new Option(columna[1],columna[0]);
+                    }
+                    if(filas.length<=1)
+                    {
+                        var seleccion =document.getElementById(matriz[i+1]+k).value;
+                        var opcion = seleccion.split("~");
+                        tip.options[j] = new Option(opcion[1],document.getElementById(matriz[i+1]+k).value);
+                    }
+                    tip.value = document.getElementById(matriz[i+1]+k+'_valor').value;  
+
+                }else if(matriz[i+2]=='FEC'){
+                    tip = document.createElement("input");
+                    tip.id = matriz[i+1];  
+                    tip.type = "date";
+                    tip.className = "form-control";
+                    tip.value = document.getElementById(matriz[i+1]+k).value;
+                }
+            }
+            if(matriz[i+4] == 'obligatorio'){
+                requerido = 1;
+                tip.required = true;
+                obligatori = obligatori+'#'+matriz[i+1];
+            }               
+            div2.appendChild(tip); 
+        }
+        var footer = document.createElement('div');
+        footer.className = 'modal-footer';
+        footer.innerText = '  ';
+        content.appendChild(footer);
+        var addBtn = document.createElement('button');
+        addBtn.onclick = function () {
+             if(requerido == 1){
+                obligatorios = obligatori.split('#');
+                for(var i = 1;i<obligatorios.length;i++){
+                    if(document.getElementById(obligatorios[i]).value != ""){
+                       obligatorio = 0;
+                    }
+                    else{
+                        obligatorio = 1;
+                        break;
+                    }
+                }
+            }else{
+                obligatorio = 0;
+            }  
+            if(obligatorio == 0){ 
+                var jsonSting="{";
+                var j = 0;
+                if( editarCalculo != 0){
+                    var sum = document.getElementById(nombre+'_CAL').value.split(",").map(parseFloat);
+                    var count = parseInt(document.getElementById(nombre+'_CONT').value);
+                }
+                for(var i = 0 ; i <= matriz.length-7 ;i=i+7){
+                    j++;
+                }
+                for(var i = 0 ; i <= matriz.length-7 ;i=i+7){
+                    j--;
+                    try{
+                        var componente = matriz[i+2].split(':');
+                        if( componente[0] == 'CHK'){                        
+                            if(document.getElementById(matriz[i+1]).checked){
+                                jsonSting=jsonSting+'"'+matriz[i+1]+'":"SI",';
+                                document.getElementById(matriz[i+1]+k).value = 'SI';
+                            }
+                            else {
+                                jsonSting=jsonSting+'"'+matriz[i+1]+'":"NO",';
+                                document.getElementById(matriz[i+1]+k).value = 'NO';
+                            }
+                        }
+                        else if(componente[0] == 'SPAN'){
+                            jsonSting=jsonSting+'"'+matriz[i+1]+'":"'+document.getElementById(matriz[i+1]).innerText+'",';
+                        }
+                        else if(componente[0] == 'ARC'){
+                            var fArchivo = document.getElementById(matriz[i+1]);
+                            console.log(fArchivo);
+                            if(fArchivo.value == ""){
+                                jsonSting=jsonSting+'"'+matriz[i+1]+'":"'+document.getElementById(matriz[i+1]+k).value+'",';
+                            }
+                            else{
+                                var url = angular.element(document.getElementById("renderFormulario")).scope().guardarArchivo(fArchivo);
+                                console.log('URL 2',url);
+                                var a = url.split('"');
+                                document.getElementById(matriz[i+1]+k).onclick = function onclick(event) {
+                                    verImagen(a[4]);
+                                };
+                                var b=a[4].split("/");
+                                b = b[7].split("?");
+                                document.getElementById('l_'+matriz[i+1]+k).value = b[0];
+                                jsonSting=jsonSting+'"'+matriz[i+1]+'":"'+a[4]+'",';
+                            }
+                        }   else if(componente[0] == 'CBO'){
+                            var selected = document.getElementById(matriz[i+1]);
+                            jsonSting = jsonSting+'"'+matriz[i+1]+'_valor":"'+document.getElementById(matriz[i+1]).value+'",';
+                            jsonSting = jsonSting+'"'+matriz[i+1]+'":"'+selected.options[selected.selectedIndex].text+'",';
+                            document.getElementById(matriz[i+1]+k+'_valor').value = document.getElementById(matriz[i+1]).value;                   
+                            document.getElementById(matriz[i+1]+k).value = selected.options[selected.selectedIndex].text;
+                        }else if(componente[0] == 'SUM'){ 
+                            sum[j] = sum[j] - parseFloat(document.getElementById(matriz[i+1]+k).value) + parseFloat(document.getElementById(matriz[i+1]).value);
+                            document.getElementById(matriz[i+1]+k).value = document.getElementById(matriz[i+1]).value;
+                            jsonSting=jsonSting+'"'+matriz[i+1]+'":"'+document.getElementById(matriz[i+1]).value+'",';
+                        }else if(componente[0] == 'PROM'){
+                            sum[j] = sum[j] - parseFloat(document.getElementById(matriz[i+1]+k).value) + parseFloat(document.getElementById(matriz[i+1]).value);
+                            document.getElementById(matriz[i+1]+k).value = document.getElementById(matriz[i+1]).value;
+                            jsonSting=jsonSting+'"'+matriz[i+1]+'":"'+document.getElementById(matriz[i+1]).value+'",';
+                        }else { 
+                            document.getElementById(matriz[i+1]+k).value = document.getElementById(matriz[i+1]).value;
+                            jsonSting=jsonSting+'"'+matriz[i+1]+'":"'+document.getElementById(matriz[i+1]).value+'",';
+                        }
+                    }catch(e){}
+                }
+                jsonSting = jsonSting.substring(0,jsonSting.length-1);
+                jsonSting = jsonSting + "}";
+                updRowJson(jsonSting, nombre,k);  
+                if(editarCalculo != 0){
+                    document.getElementById(nombre+'_CAL').value = sum;
+                    datos = JSON.parse(document.getElementById(nombre).value);
+                    delete datos[rowCount];
+                    var nuevosDatos=[];
+                    nuevosDatos = JSON.stringify(datos);
+                    document.getElementById(nombre).value = nuevosDatos;
+                    cambiarDisplay(nombre+'_row'+ rowCount);
+                    var rowCount1 = table.rows.length;
+                    var row1 = table.insertRow(rowCount1);
+                    row1.id=nombre+"_row"+(rowCount1);
+                    var newdiv = document.createElement('td');
+                    var jsonSting="{";
+                    var j = 0;
+                    for(var i = matriz.length-7; i >=0 ;i=i-7){
+                        cell2 = row1.insertCell(0);
+                        cell2.id="c_"+matriz[i+1]+(rowCount1);
+                        var componente = matriz[i+2].split(':');               
+                        if(componente[0] == 'PROM'){
+                            var currenttext = document.createElement("input"); 
+                            currenttext.id = matriz[i+1]+(rowCount1);
+                            currenttext.type = "text";
+                            currenttext.disabled = "true";
+                            currenttext.readonly = "readonly";
+                            currenttext.className = "form-control";
+                            var prom = sum[j]/count;
+                            jsonSting=jsonSting+'"'+matriz[i+1]+'":"'+prom+'",';
+                            currenttext.value = prom; 
+                        }else if(componente[0] == 'SUM'){
+                            var currenttext = document.createElement("input"); 
+                            currenttext.id = matriz[i+1]+(rowCount);
+                            currenttext.type = "text";
+                            currenttext.disabled = "true";
+                            currenttext.readonly = "readonly";
+                            currenttext.className = "form-control";
+                            jsonSting=jsonSting+'"'+matriz[i+1]+'":"'+sum[j]+'",';
+                            currenttext.value = sum[j]; 
+                        }
+                        else {
+                            jsonSting=jsonSting+'"'+matriz[i+1]+'":" ",';
+                            var currenttext = document.createElement("input"); 
+                            currenttext.id = matriz[i+1]+(rowCount);
+                            currenttext.type = "text";
+                            currenttext.disabled = "true";
+                            currenttext.readonly = "readonly";
+                            currenttext.className = "form-control";
+                            currenttext.value = " ";          
+                        }
+                        cell2.appendChild(currenttext);
+                        j++;
+                    }
+                    newdiv.innerHTML = '<div></div></td>';
+                    newdiv.id="c_btn_"+row1.id;
+                    cell2 = row1.insertCell(0);
+                    cell2.appendChild(newdiv);
+                    jsonSting = jsonSting.substring(0,jsonSting.length-1);
+                    jsonSting = jsonSting + "}";
+                    addRowJson(jsonSting,nombre); 
+                }
+                if(form_rc==1 && tipodoc == 'CI'){
+                    if(existe == 1){
+                        var modificarCiudadano = new rcNatural();
+                        modificarCiudadano.oid = results[0]._id;
+                        modificarCiudadano.nombre = document.getElementById(consultas[1]).value;
+                        modificarCiudadano.paterno = document.getElementById(consultas[2]).value;
+                        modificarCiudadano.materno = document.getElementById(consultas[3]).value;
+                        modificarCiudadano.tercer_apellido = results[0].dtspsl_tercer_apellido;
+                        modificarCiudadano.ci = ciciudadano;
+                        modificarCiudadano.complemento = results[0].dtspsl_complemento;
+                        modificarCiudadano.expedido = document.getElementById(consultas[0]).value;
+                        var fecnac = new Date(document.getElementById(consultas[4]).value);
+                        var mes = fecnac.getMonth() + 1;
+                        if(fecnac.getMonth()<9){
+                            mes = "0"+ mes;
+                        }
+                        var dia =fecnac.getDate() + 2;
+                        if(dia < 9){
+                            dia = "0"+ dia;
+                        }
+                        fecnac = fecnac.getFullYear()+"-"+mes+"-"+dia;
+                        modificarCiudadano.fec_nacimiento = fecnac;
+                        modificarCiudadano.lugar_nacimiento = document.getElementById(consultas[5]).value;
+                        modificarCiudadano.pais_origen = results[0].dtspsl_pais;
+                        modificarCiudadano.sexo = document.getElementById(consultas[7]).value;
+                        if(results[0].dtspsl_id_estado_civil)
+                            modificarCiudadano.id_estado_civil = results[0].dtspsl_id_estado_civil;
+                        else 
+                            modificarCiudadano.id_estado_civil = " ";
+                        if(results[0].dtspsl_profesion)
+                            modificarCiudadano.profesion = results[0].dtspsl_profesion;
+                        else
+                            modificarCiudadano.profesion = " ";
+                        modificarCiudadano.otra_profesion = results[0].dtspsl_otra_profesion;
+                        modificarCiudadano.telefono = document.getElementById(consultas[11]).value
+                        modificarCiudadano.movil = document.getElementById(consultas[12]).value
+                        modificarCiudadano.correo = results[0].dtspsl_correo;
+                        modificarCiudadano.direccion = document.getElementById(consultas[10]).value;
+                        modificarCiudadano.pais = results[0].dtspsl_pais;
+                        modificarCiudadano.departamento = document.getElementById(consultas[6]).value;
+                        modificarCiudadano.provincia = results[0].dtspsl_provincia;
+                        modificarCiudadano.municipio = results[0].dtspsl_municipio;
+                        modificarCiudadano.macrodistrito = document.getElementById(consultas[8]).value;
+                        modificarCiudadano.macrodistrito_desc = results[0].dtspsl_macrodistrito_desc;
+                        modificarCiudadano.distrito = results[0].dtspsl_distrito;
+                        modificarCiudadano.distrito_desc = results[0].dtspsl_distrito_desc;
+                        modificarCiudadano.zona = document.getElementById(consultas[9]).value;
+                        modificarCiudadano.zona_desc = results[0].dtspsl_zona_desc;
+                        modificarCiudadano.tipo_via = results[0].dtspsl_tipo_via;
+                        modificarCiudadano.nombre_via = results[0].dtspsl_nombre_via;
+                        modificarCiudadano.numero_casa = results[0].dtspsl_numero_casa;
+                        modificarCiudadano.edificio = results[0].dtspsl_edificio;
+                        modificarCiudadano.bloque = results[0].dtspsl_bloque;
+                        modificarCiudadano.piso = results[0].dtspsl_piso;
+                        modificarCiudadano.oficina = results[0].dtspsl_oficina;
+                        modificarCiudadano.latitud = results[0].dtspsl_latitud;
+                        modificarCiudadano.longitud = results[0].dtspsl_longitud;
+                        modificarCiudadano.usr_id = results[0].dtspsl_id;
+                        modificarCiudadano.activacionf = "SI";
+                        modificarCiudadano.activaciond = "SI";
+                        modificarCiudadano.file_fotocopia_ci = document.getElementById(consultas[13]).value;
+                        modificarCiudadano.fec_vencimiento = results[0].dtspsl_fec_vencimiento;
+                        modificarCiudadano.file_factura_luz = results[0].dtspsl_file_factura_luz;
+                        if(results[0].dtspsl_URL)
+                            modificarCiudadano.URL = results[0].dtspsl_URL;
+                        else
+                            modificarCiudadano.URL = " ";
+                        modificarCiudadano.modificarNatural(function(resultado){
+                            resultadoApi = JSON.parse(resultado); 
+                            if( typeof(resultadoApi.success) != 'undefined')
+                            {
+                                console.log("MODIFICACION CORRECTA");
+                            }
+                            else
+                            {                    
+                                console.log(resultadoApi.error.message);
+                            }
+                        });
+                    } 
+                    else{
+                        var registrarCiudadano = new rcNatural();
+                        registrarCiudadano.ci = ciciudadano;
+                        registrarCiudadano.complemento = cicomplemento;
+                        registrarCiudadano.nombre = document.getElementById(consultas[1]).value;
+                        registrarCiudadano.paterno = document.getElementById(consultas[2]).value;
+                        registrarCiudadano.materno = document.getElementById(consultas[3]).value;
+                        registrarCiudadano.tercer_apellido = " ";
+                        registrarCiudadano.expedido = document.getElementById(consultas[0]).value;
+                        var fecnac = new Date(document.getElementById(consultas[4]).value);
+                        var mes = fecnac.getMonth() + 1;
+                        if(fecnac.getMonth()<9){
+                            mes = "0"+ mes;
+                        }
+                        var dia =fecnac.getDate() + 2;
+                        if(dia<10){
+                            dia = "0"+ dia;
+                        }
+                        fecnac = fecnac.getFullYear()+"-"+mes+"-"+dia;
+                        registrarCiudadano.fec_nacimiento = fecnac;
+                        registrarCiudadano.lugar_nacimiento = document.getElementById(consultas[5]).value;
+                        registrarCiudadano.pais_origen = " ";
+                        registrarCiudadano.sexo = document.getElementById(consultas[7]).value;
+                        registrarCiudadano.id_estado_civil = "S";
+                        registrarCiudadano.profesion = "50";
+                        registrarCiudadano.otra_profesion = " ";
+                        registrarCiudadano.telefono = document.getElementById(consultas[11]).value;
+                        registrarCiudadano.movil = document.getElementById(consultas[12]).value;
+                        registrarCiudadano.correo = " ";
+                        registrarCiudadano.direccion = document.getElementById(consultas[10]).value;
+                        registrarCiudadano.usr_id = "0";
+						registrarCiudadano.activacionf = "SI";
+                        registrarCiudadano.activaciond = "SI";
+                        registrarCiudadano.crearNatural(function(resultado){
+                            resultadoApi = JSON.parse(resultado);
+                            if( typeof(resultadoApi.success) != 'undefined')
+                            {
+                                console.log("REGISTRO CORRECTO");
+                            }
+                            else
+                            {                            
+                                console.log(resultadoApi.error.message);
+                            }
+                        });
+                    }
+                }
+                $("#myModalMary").modal('hide');
+            }else{
+                sweetAlert('','Complete Todos Los Datos','error');                    
+            }
+        }
+        addBtn.setAttribute("type", "button");
+        addBtn.className = 'btn btn-primary btn-inverse';
+        addBtn.innerText = 'Guardar';
+        footer.appendChild(addBtn);
+        var closeBtn = document.createElement('button');
+        closeBtn.setAttribute("data-dismiss", "modal");
+        closeBtn.setAttribute("type", "button");
+        closeBtn.className = 'btn btn-primary btn-inverse';
+        closeBtn.innerText = 'Cerrar';
+        footer.appendChild(closeBtn);
+        $("#myModalMary").modal('show');
+    }
+    function eliminarTabla(id, campo,cadena){
+        var eliminarcalc = 0; 
+        var cantidad = 0;
+        datos = JSON.parse(document.getElementById(campo).value);
+        if(cadena != undefined){
+        var matriz = cadena.split(',');
+        angular.forEach(datos[id], function(value, key) {
+            cantidad++;
+            for(var i = 0 ; i <= matriz.length-7 ;i=i+7){  
+                var componente = matriz[i+2].split(':');
+                if(componente[0] == 'SUM' ){   
+                    eliminarcalc = 1; 
+                }else if( componente[0] == 'PROM'){ 
+                    eliminarcalc = 1; 
+                }
+            }
+        }, log);
+        }
+        if(eliminarcalc != 0){
+            var sum = document.getElementById(campo+'_CAL').value.split(",").map(parseFloat);
+            var count = parseInt(document.getElementById(campo+'_CONT').value);
+            count--;
+            document.getElementById(campo+'_CONT').value = count;
+            var table = document.getElementById('tabla_'+campo);
+            var rowCount = table.rows.length - 1;    
+            angular.forEach(datos[id], function(value, key) {
+                var j = cantidad;
+                for(var i = 0 ; i <= matriz.length-7 ;i=i+7){  
+                    j = j - 1;         
+                    if(matriz[i+1] == key){
+                        var componente = matriz[i+2].split(':');
+                        if(componente[0] == 'SUM' ){ 
+                            sum[j] = sum[j] - value;  
+                        }else if( componente[0] == 'PROM'){                 
+                            sum[j] = sum[j] - value;
+                        }
+                    }
+                }
+            }, log);
+            document.getElementById(campo+'_CAL').value = sum;
+            delete datos[id];
+            delete datos[rowCount];
+            var nuevosDatos=[];
+            nuevosDatos = JSON.stringify(datos);
+            document.getElementById(campo).value = nuevosDatos;
+            cambiarDisplay(campo+'_row'+ id);
+            cambiarDisplay(campo+'_row'+ rowCount);
+
+            var rowCount1 = table.rows.length;
+            var row1 = table.insertRow(rowCount1);
+            row1.id=campo+"_row"+(rowCount1);
+            var newdiv = document.createElement('td');
+            var jsonSting="{";
+            var j = 0;
+            for(var i = matriz.length-7; i >=0 ;i=i-7){
+                cell2 = row1.insertCell(0);
+                cell2.id="c_"+matriz[i+1]+(rowCount1);
+                var componente = matriz[i+2].split(':');               
+                if(componente[0] == 'PROM'){
+                    var currenttext = document.createElement("input"); 
+                    currenttext.id = matriz[i+1]+(rowCount1);
+                    currenttext.type = "text";
+                    currenttext.disabled = "true";
+                    currenttext.readonly = "readonly";
+                    currenttext.className = "form-control";
+                    var prom = sum[j]/count;
+                    jsonSting=jsonSting+'"'+matriz[i+1]+'":"'+prom+'",';
+                    currenttext.value = prom; 
+                }else if(componente[0] == 'SUM'){
+                    var currenttext = document.createElement("input"); 
+                    currenttext.id = matriz[i+1]+(rowCount);
+                    currenttext.type = "text";
+                    currenttext.disabled = "true";
+                    currenttext.readonly = "readonly";
+                    currenttext.className = "form-control";
+                    jsonSting=jsonSting+'"'+matriz[i+1]+'":"'+sum[j]+'",';
+                    currenttext.value = sum[j]; 
+                }
+                else {
+                    jsonSting=jsonSting+'"'+matriz[i+1]+'":" ",';
+                    var currenttext = document.createElement("input"); 
+                    currenttext.id = matriz[i+1]+(rowCount);
+                    currenttext.type = "text";
+                    currenttext.disabled = "true";
+                    currenttext.readonly = "readonly";
+                    currenttext.className = "form-control";
+                    currenttext.value = " ";          
+                }
+                cell2.appendChild(currenttext);
+                j++;
+            }
+            newdiv.innerHTML = '<div></div></td>';
+            newdiv.id="c_btn_"+row1.id;
+            cell2 = row1.insertCell(0);
+            cell2.appendChild(newdiv);
+            jsonSting = jsonSting.substring(0,jsonSting.length-1);
+            jsonSting = jsonSting + "}";
+            addRowJson(jsonSting,campo);
+
+        } else{
+            datos = JSON.parse(document.getElementById(campo).value);
+            delete datos[id];
+            var nuevosDatos=[];
+            nuevosDatos = JSON.stringify(datos);
+            document.getElementById(campo).value = nuevosDatos;
+            cambiarDisplay(campo+'_row'+ id);
+        }
+    }
+    function updRowJson(fila, campo,id){
+        nuevaFila= JSON.parse(fila);
+        datos = JSON.parse(document.getElementById(campo).value);
+        var nuevosDatos=[];
+        var snuevosDatos="";
+        for(var i=0;i<datos.length;i++){
+            if(i==id) nuevosDatos.push(nuevaFila);
+            else        nuevosDatos.push(datos[i]);
+        }
+        snuevosDatos = JSON.stringify(nuevosDatos,null);
+        document.getElementById(campo).value = snuevosDatos;
+    }
+    function addRowJson(fila, campo){ 
+        nuevaFila= JSON.parse(fila);
+        datos = JSON.parse(document.getElementById(campo).value);
+        datos.push(nuevaFila);
+        var nuevosDatos=[];
+        nuevosDatos = JSON.stringify(datos,null);
+        document.getElementById(campo).value = nuevosDatos;
+    }
+    
+    function cambiarDisplay(id) {
+      if (!document.getElementById) return false;
+      fila = document.getElementById(id);
+      if (fila.style.display != "none") {
+        fila.style.display = "none";
+      } else {
+        fila.style.display = "";
+      }
+    }
+
+    
+    function guardarArchivo(fArchivo)
+    {
+        angular.element(document.getElementById("renderFormulario")).scope().guardaArchivo(fArchivo);
+    }
+    function datosComboRenderAtm(sIdCboOrigen, sIdCbo, sqlData){
+        var valorDependencia = document.getElementById(sIdCboOrigen).value;                             
+        var mValorDependencia = valorDependencia.split('-');                               
+        var sqlData = sqlData.replace("xId", mValorDependencia[0]);     
+        sqlData = sqlData.replace('.',','); 
+        angular.element(document.getElementById("renderFormulario")).scope().datosComboRender(sIdCbo, sqlData); 
+    };      
+    function renderController($scope,$timeout,DreamFactory,CONFIG,$window,$rootScope,sessionService,ngTableParams,$filter,$route,sweet,$http,FileUploader,$sce,fileUpload, $q, Data, LogGuardarInfo, $element, registroLog, filterFilter){
+        $scope.idFormActual = sessionService.get("IDFORMULARIO");
+        $scope.registro = {};
+        $scope.tablaReporte = null;
+        $scope.get_pre = function(x){
+            return $sce.trustAsHtml(x);
+        };
+        $scope.cambiarFile = function(a,b){
+            console.log(a,b,"HOLAAAa")
+        }
+        $scope.capturarImagen= function(urlant,a,lat,lng,imga){
+             var sDirTramite = $scope.datos.AE_NRO_CASO;
+             $scope.url = "RC_CLI/" + sDirTramite;
+             $scope.archivo1 = "/"+imga+".jpg";
+             $scope.datos.INT_AC_direccionImagenmapa = CONFIG.APIURL+"/files/"+$scope.url + "/"+ $scope.archivo1 + "?app_name=todoangular";
+             var final = CONFIG.APIURL+"/files/"+$scope.url + "/"+ $scope.archivo1 + "?app_name=todoangular";
+             document.getElementById(a).value = final;            
+             document.getElementById(imga).value = '[{"lat":"'+lat+'","lng":"'+lng+'","url":"'+final+'"}]';
+             $scope.convertToDataURLviaCanvas(urlant, function(base64Img){
+                 var Imagen = base64Img.replace(/data:image\/png;base64,/i,'');
+                 $scope.Imagenb = Imagen;
+                 $scope.subirImgBase64($scope.Imagenb, $scope.url, $scope.archivo1);
+             });  
+        }
+        $scope.convertToDataURLviaCanvas = function (url, callback, outputFormat){
+             var img = new Image();
+             img.crossOrigin = 'Anonymous';
+             img.onload = function(){
+                 var canvas = document.createElement('CANVAS');
+                 var ctx = canvas.getContext('2d');
+                 var dataURL;
+                 canvas.height = this.height;
+                 canvas.width = this.width;
+                 ctx.drawImage(this, 0, 0);
+                 dataURL = canvas.toDataURL(outputFormat);
+                 callback(dataURL);
+                 canvas = null; 
+             };
+             img.src = url;
+        };
+        $scope.subirImgBase64= function(imagen,url,nombre){
+             var contentType = 'image/png';
+             var b64Data = imagen;
+             var blob = b64toBlob(b64Data, contentType);
+             var blobUrl = URL.createObjectURL(blob);
+             function b64toBlob(b64Data, contentType, sliceSize) {
+                 contentType = contentType || '';
+                 sliceSize = sliceSize || 512;
+                 var byteCharacters = atob(b64Data);
+                 var byteArrays = [];
+                 for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+                     var slice = byteCharacters.slice(offset, offset + sliceSize);
+                     var byteNumbers = new Array(slice.length);
+                     for (var i = 0; i < slice.length; i++) {
+                         byteNumbers[i] = slice.charCodeAt(i);
+                     }
+                     var byteArray = new Uint8Array(byteNumbers);
+                     byteArrays.push(byteArray);
+                 }
+                 var blob = new Blob(byteArrays, {type: contentType});
+                 return blob;
+             }
+             var resFormulario = {  
+                 container:url,
+                 file_path:nombre,
+                 body:blob
+             };
+             DreamFactory.api[CONFIG.SERVICE_ARCHIVO].createFile(resFormulario).success(function (response){
+             }).error(function(results){
+                 console.log("ERROR");
+             });
+        };
+        $scope.generarVista = function(idformulario){
+            setTimeout(function(){
+                var arregloDatos = $scope.graficarVistaComponentes(idformulario);
+                arregloDatos.then(function(respuesta) {
+                    $scope.get_pre(respuesta);
+                }, function(reason) {
+                    alert('Failed: ' + reason);
+                });
+            }, 500);
+        };
+
+        /*DEPENDENCIA DE COMBOS*/
+        $scope.datosComboRender =   function(sIdCbo, sqlData){
+            $.blockUI();
+            exp = new RegExp("&", "g");
+            sqlData = sqlData.replace(exp,"$$$");
+            try {
+                var rData = new renderData();
+                rData.sql = sqlData;
+                rData.renderSqlDinamic(function(response){
+                    try{
+                        x = JSON.parse(response);
+                        if (x.success.data[0].sp_reporte_dinamico123) {
+                            dpc_guardarDatos(x.success.data[0].sp_reporte_dinamico123);
+                            dpc_dependencia(sIdCbo);
+                            $.unblockUI();
+                        } else {
+                            var mensajeExito = "No se encontro ninguna coincidencia";
+                            sweet.show('', mensajeExito, 'warning');            
+                            dpc_guardarDatos("");
+                            dpc_dependencia(sIdCbo);
+                            $.unblockUI();
+                        }
+                    }catch(e){};
+                });
+            } catch(error) {
+                var mensajeExito = "Vuelva a seleccionar el combo";
+                sweet.show('', mensajeExito, 'success');
+                $.unblockUI();
+            }
+
+            /*
+            var resQuery = {
+                "procedure_name":"sp_reporte_dinamico123",
+                "body":{
+                    "params": [
+                        {
+                            "name": "sql",
+                            "value": sqlData
+                        }
+                    ]
+                }
+            };
+            $.blockUI();
+            console.log("Estamos aca...");
+            DreamFactory.api[CONFIG.SERVICE].callStoredProcWithParams(resQuery).success(function (response){
+                try{
+                    console.log(response);
+                    dpc_guardarDatos(JSON.parse(response[0].sp_reporte_dinamico123));
+                    dpc_dependencia(sIdCbo);
+                }catch(e){};
+                $.unblockUI();
+            }).error(function(results){
+                    var mensajeExito = "Vuelva a seleccionar el combo";
+                    sweet.show('', mensajeExito, 'success');
+                    $.unblockUI();
+            });
+            */
+        };
+        $scope.bucarProhibido = function(ci,tipodoc){
+            $.blockUI();
+            var resQuery = {
+                "procedure_name":"semdes.prohibicionebsq",
+                "body":{
+                    "params": [
+                        {
+                            "name": "busq",
+                            "value": '1'
+                        },
+                        {
+                            "name": "ci",
+                            "value": ci
+                        },
+                        {
+                            "name": "tipo",
+                            "value": tipodoc
+                        },
+                        {
+                            "name": "nombre",
+                            "value": ''
+                        },
+                        {
+                            "name": "appat",
+                            "value": ''
+                        },
+                        {
+                            "name": "apmat",
+                            "value": ''
+                        }
+                    ]
+                }
+            };
+            $.blockUI();
+            DreamFactory.api[CONFIG.SERVICE].callStoredProcWithParams(resQuery).success(function (response){
+                if(response.length>0){
+                    sweetAlert("PROHIBICIÓN","Menor de edad prohibido de viaje verificar Registros","error");
+                }
+                $.unblockUI();
+            }).error(function(results){
+                $.unblockUI();
+            });
+        }
+        $scope.bucarProhibidoNombre = function(nombre,appat,apmat){
+            $.blockUI();
+            var resQuery = {
+                "procedure_name":"semdes.prohibicionebsq",
+                "body":{
+                    "params": [
+                        {
+                            "name": "busq",
+                            "value": '2'
+                        },
+                        {
+                            "name": "ci",
+                            "value": ''
+                        },
+                        {
+                            "name": "tipo",
+                            "value": ''
+                        },
+                        {
+                            "name": "nombre",
+                            "value": nombre
+                        },
+                        {
+                            "name": "appat",
+                            "value": appat
+                        },
+                        {
+                            "name": "apmat",
+                            "value": apmat
+                        }
+                    ]
+                }
+            };
+            $.blockUI();
+            DreamFactory.api[CONFIG.SERVICE].callStoredProcWithParams(resQuery).success(function (response){
+                if(response.length>0){
+                    sweetAlert("ADVERTENCIA","El menor "+nombre+" "+appat+" "+apmat+" esta con prohibicion de viaje, verifique los datos","warning");
+                }
+                $.unblockUI();
+            }).error(function(results){
+                $.unblockUI();
+            });
+        }
+        //GUARDAMOS LOS DATOS DEL INSPERCTOR Y DISTRITO
+        function dpc_guardarDatos(sArray) {
+            dpc_sDatos_inspector    =   new Array();
+            dpc_k = 0;
+            dpc_sDatos_inspector[dpc_k] = new Array('-- Seleccione --', '-1');
+            dpc_k = dpc_k + 1;
+            $.each(sArray, function(i, item) {
+                dpc_sDatos_inspector[dpc_k] = new Array(item.dato, item.valor);
+                dpc_k = dpc_k + 1;
+            });
+        }
+        function dpc_dependencia(sIdCbo) {
+            dpc_i = 0;
+            $("#"+sIdCbo).empty();
+            for (dpc_i = 0; dpc_i < dpc_sDatos_inspector.length; dpc_i++) {
+                dpc_miClave = dpc_sDatos_inspector[dpc_i][0];
+                dpc_miValor = dpc_sDatos_inspector[dpc_i][1];
+                $("#"+sIdCbo).append('<option value='+dpc_miValor+'>'+dpc_miClave+'</option>');
+            }
+        } 
+        $scope.guardarArchivo = function (fArchivo) {
+            nombreCampo = fArchivo.id;
+            valorCampo = fArchivo.value;
+            tipo = fArchivo.type;
+         data = '"{';
+            if(fArchivo.files === undefined){
+                $scope.direccionvirtual= CONFIG.APIURL +"/files/" + $scope.sIdProcesoActual + "/" + $scope.sIdCaso + "/";
+                data = data+ '"'+nombreCampo +'":"'+$scope.direccionvirtual+fArchivo.name+'?app_name=todoangular",';
+            }
+            else{
+               $scope.direccionvirtual= CONFIG.APIURL +"/files/" + $scope.sIdProcesoActual + "/" + $scope.sIdCaso + "/";
+                var direccion = fileUpload.uploadFileToUrl(fArchivo.files[0], $scope.direccionvirtual);
+                var z=valorCampo.split('\\');
+                if (z[2] === undefined){
+                    data = data+ '"'+nombreCampo +'":"'+$scope.direccionvirtual+valorCampo+'?app_name=todoangular",'; 
+                }
+                else{
+                     data = data+ '"'+nombreCampo +'":"'+$scope.direccionvirtual+z[2]+'?app_name=todoangular",';                                    
+                }
+            }
+            return data;
+        }
+        //RECORREMOS EL MACRODISTRITO
+        $scope.datosTextosRender =   function(sIdCbo, sqlData){
+            exp = new RegExp("&", "g");
+            sqlData = sqlData.replace(exp,"$$$");
+            var a = sIdCbo.replace(/#/g,'"');
+            a = a.replace(/%/g,':');
+            var datos = JSON.parse(a);
+            try {
+                var rData = new renderData();
+                rData.sql = sqlData;
+                rData.renderSqlDinamic(function(response){
+                    try {
+                        x = JSON.parse(response);
+                        if (x.success.data[0].sp_reporte_dinamico123) {
+                            var b = x.success.data[0].sp_reporte_dinamico123;
+                            b = JSON.stringify(b);
+                            b = b.split(':');
+                            var titulo = '';
+                            var campo = '';
+                            var i = 1
+                            try{
+                                for(var j = 0; datos.length > j; j++){
+                                    campo = datos[j].campo;
+                                    titulo = b[i].split(',');
+                                    titulo=titulo[0].replace('"','');
+                                    titulo=titulo.replace('"','');
+                                    titulo=titulo.replace('}]','');
+                                    document.getElementById(campo).value = titulo;
+                                    i=i+1;
+                                }
+                                $.unblockUI();
+                            }catch(e){
+                                $.unblockUI();
+                            };
+                        } else {
+                            var mensajeExito = "No se encontro ninguna coincidencia";
+                            sweet.show('', mensajeExito, 'warning');            
+                            dpc_guardarDatos("");
+                            dpc_dependencia(sIdCbo);
+                            $.unblockUI();
+                        }
+                    }catch(e){};
+                });
+            } catch(error) {
+                var mensajeExito = "Vuelva a seleccionar el combo";
+                sweet.show('', mensajeExito, 'success');
+                $.unblockUI();
+            }
+        };
+        
+        var idNamef = "";
+        var map = 0;
+        var xmap = [];
+        $scope.graficarVistaComponentes = function(formulario) {
+            window.scrollTo(0, 0)
+            $scope[name] = 'Running';
+            var deferred = $q.defer();
+                $.blockUI();
+                $scope.loadScriptEdt = "";
+                $scope.html = "";
+                var rData = new renderData();
+                rData.id_form = formulario;
+                rData.obtenerDataRender(function(res){
+                    r = JSON.parse(res);
+                    response = r.success.data;
+                    $scope.obtProcesosX=response;
+                    resultado = response[0].campo_descripcion;
+                    $scope.datadocumentos = response[0].campo_descripcion;
+                    var i = 0;
+                    datadocumentos = $scope.datadocumentos;
+                    posicion = 1;
+                    while(i<datadocumentos.length) {
+                        idName = datadocumentos[i].campo;
+                        dominio = datadocumentos[i].tipo;
+                        estado = datadocumentos[i].estado;
+                        switch(dominio)
+                        {
+                            case "TXT":
+                                titulo = datadocumentos[i].titulo;
+                                idName = datadocumentos[i].campo;
+                                estado = datadocumentos[i].estado;
+                                valorComponente = "";
+                                angular.forEach($scope.datos, function(value, key) {
+                                    if (idName==key) {
+                                        if (value)
+                                            valorComponente = value.toUpperCase();
+                                        else
+                                            valorComponente = value;
+                                    }
+                                }, log);
+                                comportamientos = datadocumentos[i].comportamientos;
+                                var x="";
+                                var y="";
+                                var eventos="";
+                                var accion="";
+                                angular.forEach(comportamientos, function(value, key) {
+                                x = JSON.stringify(value);
+                                quitarComillas = new RegExp('"', "g");
+                                x = x.replace(quitarComillas,"");
+                                x = x.substring(1, x.length -1);
+                                y = x.split(":");
+                                eventos = eventos + y[0] + '="' + y[1]+ '" ';
+                                }, log);
+                                if (estado=="LECTURA") {
+                                    read = 'readonly="readonly"';
+                                } else if(estado=="ESCRITURA") {
+                                    read = '';
+                                } else {
+                                    read = ' required ';
+                                    valoresOC[posicion] = idName;
+                                    valoresOM[posicion] = titulo;
+                                    posicion++;
+                                }
+                                $scope.html = $scope.html + '<div id="div_' + idName + '" name="componentes"><div class="form-group"><label class="col-sm-2 control-label">' + titulo + ':</label>';
+                                $scope.html = $scope.html + '<div class="col-sm-10">';
+                                $scope.html = $scope.html + '<input ' + eventos + ' type="text" placeholder="' + titulo + '" class="form-control ng-dirty ng-invalid ng-invalid-required" ng-disabled="only" id="'+idName+'" name="registro[]" onkeyUp="return conMayusculas(this)" value="'+valorComponente+'" ng-model="datos.'+idName+'"' + read + '>';
+                                $scope.html = $scope.html + '</div></div></div>';
+                                break;
+                            case "MAP":
+                                titulo = datadocumentos[i].titulo;
+                                idNamef = datadocumentos[i].campo;
+                                estado = datadocumentos[i].estado;
+                                if (estado=="LECTURA") {
+                                    read = 'readonly="readonly"';
+                                } else if(estado=="ESCRITURA") {
+                                    read = '';
+                                } else {
+                                    read = ' required ';
+                                    valoresOC[posicion] = idNamef+'_IMG';
+                                    valoresOM[posicion] = titulo;
+                                    posicion++;
+                                }
+                                xmap[map]= "{lat: -16.495833, lng: -68.133749}";
+                                var y="";
+                                var url = " ";
+                                valorComponente = "";
+                                var valor = "";
+                                angular.forEach($scope.datos, function(value, key) {
+                                    if (idNamef==key) {
+                                        valorComponente = value;
+                                    }
+                                }, log);
+                                valor = JSON.stringify(valorComponente);
+                                if(valorComponente[0]!= undefined){
+                                    xmap[map] = "{lat: parseFloat("+valorComponente[0].lat+"), lng: parseFloat("+valorComponente[0].lng+")}";
+                                    url = JSON.stringify(valorComponente[0].url) ;
+                                } else {
+                                    valorComponente = "[]";
+                                }
+                                $scope.html = $scope.html + '<div id="div_' + idNamef + '" name="componentes"><div class="form-group"><label class="col-sm-2 control-label">' + titulo + ':</label>';
+                                $scope.html = $scope.html + '<div >';
+                                $scope.html = $scope.html + '<td><div id="map_'+idNamef+'"  style="width:60%;height:350px" ng-model="datos.'+idNamef+'" ></div> </td>';
+                                $scope.html = $scope.html + '</div></div>';
+                                $scope.html = $scope.html + '<textarea rows="4"  cols="50" style="visibility:hidden" id="'+idNamef+'" name="registro[]"> '+valor+'</textarea>';
+                                 $scope.html = $scope.html + '<input id="'+idNamef+'_IMG" type = "hidden" placeholder="' + titulo + '" class="form-control"   name="registro[]"  ng-model="datos.'+idNamef+'_IMG" value = '+url+'></div>';
+    
+                                 $scope.html = $scope.html + '<script> var map'+idNamef+'; var markers'+idNamef+' = []; map'+idNamef+' = new google.maps.Map(document.getElementById("map_'+idNamef+'"), {zoom: 16, center: '+xmap[map]+' }); map'+idNamef+'.addListener("click", function(event) {addMarker'+idNamef+'(event.latLng); }); addMarkers'+idNamef+'('+xmap[map]+'); function addMarker'+idNamef+'(latLng) {setMapOnAll'+idNamef+'(); markers'+idNamef+' = []; var a = latLng.lat(); var b =latLng.lng(); imagenmap'+idNamef+'(a,b); var marker = new google.maps.Marker({position: latLng, map: map'+idNamef+' }); markers'+idNamef+'.push(marker); } function addMarkers'+idNamef+'(latLng) {var marker = new google.maps.Marker({position: latLng, map: map'+idNamef+' }); markers'+idNamef+'.push(marker); } function setMapOnAll'+idNamef+'() {for (var i = 0; i < markers'+idNamef+'.length; i++) { markers'+idNamef+'[i].setMap(null); } } function imagenmap'+idNamef+'(a,b){var url = "https://maps.googleapis.com/maps/api/staticmap?center="+a+","+b+"&zoom=16&size=600x300&maptype=roadmap&markers=color:red|label:S|"+a+","+b+"&key=AIzaSyD_c3VUlclgLDhXQ_UHkGZ8uQiSeNHQHgw"; guardargps(a, b,url, "'+idNamef+'"); }<\/script>';
+                                map++;
+                                  
+                                 
+                                break;
+                            case "CBO":
+                                var cboval = "-1"; 
+                                if (datadocumentos[i].tipo_llenado=="datos") {
+                                    titulo = datadocumentos[i].titulo;
+                                    idName = datadocumentos[i].campo;
+                                    estado = datadocumentos[i].estado;
+                                    comportamientos = datadocumentos[i].comportamientos;
+                                    var x="";
+                                    var y="";
+                                    var eventos="";
+                                    var accion="";
+                                    angular.forEach(comportamientos, function(value, key) {
+                                        x = JSON.stringify(value);
+                                        quitarComillas = new RegExp('"', "g");
+                                        x = x.replace(quitarComillas,"");
+                                        x = x.substring(1, x.length -1);
+                                        y = x.split(":");
+                                        eventos = eventos + y[0] + '="' + y[1]+ '" ';
+                                    }, log);
+                                    if (estado=="LECTURA") {
+                                        read = 'readonly="readonly"  disabled="true"';
+                                    } else if (estado=="ESCRITURA"){
+                                        read = '';
+                                    } else {
+                                        cboval = "";
+                                        read = ' required ';
+                                        valoresOC[posicion] = idName;
+                                        valoresOM[posicion] = titulo;
+                                        posicion++;
+                                    }
+                                    $scope.html = $scope.html + '<div id="div_' + idName + '" name="componentes"><div class="form-group"><label class="col-sm-2 control-label">' + titulo + ':</label>';
+                                    $scope.html = $scope.html + '<div class="col-sm-10">';
+                                    $scope.html = $scope.html + '<select ' + eventos + ' id="'+idName+'" name="registro[]" class="form-control" ng-model="datos.'+idName+'"  ' + read + ' onchange="f_obtener_texto(\''+idName+'\')">';
+                                    $scope.html = $scope.html + '<option value= '+cboval+'> -- Seleccione -- </option>';
+                                    try {
+                                        var arrayDatos = $rootScope.array[idName];
+                                        valorComponenteO = arrayDatos[1].dato;
+                                        valorComponenteOculto = "";
+                                        for(j=0; j<arrayDatos.length; j++) {
+                                            valorComponente = "";
+                                            angular.forEach($scope.datos, function(value, key) {
+
+                                                if (idName==key) {
+                                                    if (arrayDatos[j].valor== value) {
+                                                        valorComponente = "SELECTED";
+                                                        valorComponenteO = arrayDatos[j].dato;
+                                                    } else {
+                                                        valorComponente = "";
+                                                    }
+                                                }
+                                            }, log);
+                                            $scope.html = $scope.html + '<option value="'+arrayDatos[j].valor+'" ' + valorComponente + ' >'+arrayDatos[j].dato+'</option>';
+                                        }
+                                    } catch(e) {
+                                            console.log("Error de base de datos:", id);
+                                    }
+                                    $scope.html = $scope.html + '</select>';
+                                    valorComponenteOculto = $scope.datos[idName+'_VALOR'];
+                                    $scope.html = $scope.html + '<input type="hidden" placeholder="' + titulo + '" class="form-control" id="'+idName+'_VALOR" name="registro[]" value="'+valorComponenteOculto+'" ng-model="datos.'+idName+'_VALOR">';
+                                    $scope.html = $scope.html + '</div></div></div>';
+                                } else {
+                                    titulo = datadocumentos[i].titulo;
+                                    idName = datadocumentos[i].campo;
+                                    estado = datadocumentos[i].estado;
+                                    comportamientos = datadocumentos[i].comportamientos;
+                                     if (estado=="LECTURA") {
+                                        read = 'readonly="readonly"  disabled="true"';
+                                    } else if (estado=="ESCRITURA"){
+                                        read = '';
+                                    } else {
+                                        cboval = "";
+                                        read = ' required ';
+                                        valoresOC[posicion] = idName;
+                                        valoresOM[posicion] = titulo;
+                                    }
+                                    var x="";
+                                    var y="";
+                                    var eventos="";
+                                    var accion="";
+                                    angular.forEach(comportamientos, function(value, key) {
+                                        x = JSON.stringify(value);
+                                        quitarComillas = new RegExp('"', "g");
+                                        x = x.replace(quitarComillas,"");
+                                        x = x.substring(1, x.length -1);
+                                        y = x.split(":");
+                                        eventos = eventos + y[0] + '="' + y[1]+ '" ';
+                                    }, log);
+                                    if (estado=="LECTURA") {
+                                        read = 'readonly="readonly"  disabled="true"';
+                                    } else if (estado=="ESCRITURA"){
+                                        read = '';
+                                    } else {
+                                        valoresOC[posicion] = idName;
+                                        valoresOM[posicion] = titulo;
+                                        posicion++;
+                                    }
+                                    $scope.html = $scope.html + '<div id="div_' + idName + '" name="componentes"><div class="form-group"><label class="col-sm-2 control-label">' + titulo + ':</label>';
+                                    $scope.html = $scope.html + '<div class="col-sm-10">';
+                                    $scope.html = $scope.html + '<select '+ eventos +' id="'+idName+'" name="registro[]" class="form-control" ng-model="datos.'+idName+'" ' + read + ' onchange="f_obtener_texto(\''+idName+'\')" >';
+                                    $scope.html = $scope.html + '<option value= '+cboval+' > -- Seleccione -- </option>';
+                                    try {
+                                        var arrayDatos = $rootScope.array[idName];
+                                        console.log(arrayDatos.length);
+                                        if (arrayDatos.length>0) {
+                                            for(j=0; j<arrayDatos.length; j++)
+                                            {
+                                                valorComponente = "";
+                                                angular.forEach($scope.datos, function(value, key) {
+                                                    if (idName==key) {
+                                                        if (arrayDatos[j].valor== value) {
+                                                            valorComponente = "SELECTED";
+                                                            valorComponenteO = arrayDatos[j].dato;
+                                                        } else {
+                                                            valorComponente = "";
+                                                        }
+                                                    }
+                                                }, log);
+                                                $scope.html = $scope.html + '<option value="'+arrayDatos[j].valor+'" ' + valorComponente + '>'+arrayDatos[j].dato+'</option>';
+                                            }
+                                        } 
+                                        /*else {
+                                            var mensajeExito = "El componente '" + titulo + "' no tiene consulta SQL";
+                                            sweet.show('Error de cargado de datos', mensajeExito, 'warning');
+                                        }*/
+                                    } catch(e){
+                                        console.log("Error de base de datos:", id);
+                                    }
+                                    $scope.html = $scope.html + '</select>';
+                                    valorComponenteOculto = $scope.datos[idName+'_VALOR'];
+                                    $scope.html = $scope.html + '<input type="hidden" placeholder="' + titulo + '" class="form-control" id="'+idName+'_VALOR" name="registro[]" value="'+valorComponenteOculto+'" ng-model="datos.'+idName+'_VALOR">';
+                                    $scope.html = $scope.html + '</div></div></div>';
+                                }
+                                break;
+                            case "AUTO":
+                                titulo = datadocumentos[i].titulo;
+                                idName = datadocumentos[i].campo;
+                                estado = datadocumentos[i].estado;
+                                valorComponente = "";
+                                angular.forEach($scope.datos, function(value, key) {
+                                    if (idName==key) {
+                                        valorComponente = value;
+                                    }
+                                }, log);
+                                comportamientos = datadocumentos[i].comportamientos;
+                                var x="";
+                                var y="";
+                                var eventos="";
+                                var accion="";
+                                angular.forEach(comportamientos, function(value, key) {
+                                    x = JSON.stringify(value);
+                                    quitarComillas = new RegExp('"', "g");
+                                    x = x.replace(quitarComillas,"");
+                                    x = x.substring(1, x.length -1);
+                                    y = x.split(":");
+                                    eventos = eventos + y[0] + '="' + y[1]+ '" ';
+                                }, log);
+                                if (estado=="LECTURA") {
+                                    read = 'readonly="readonly"';
+                                } else if(estado=="ESCRITURA") {
+                                    read = '';
+                                } else {
+                                    read = ' required ';
+                                    valoresOC[posicion] = idName;
+                                    valoresOM[posicion] = titulo;
+                                    posicion++;
+                                }
+                                $scope.html = $scope.html + '<div id="div_' + idName + '" name="componentes"><div class="form-group"><label class="col-sm-2 control-label">' + titulo + ':</label>';
+                                $scope.html = $scope.html + '<div class="col-sm-10">';
+                                $scope.html = $scope.html + '<input ' + eventos + ' type="text" placeholder="' + titulo + '" class="form-control ng-dirty ng-invalid ng-invalid-required" ng-disabled="only" id="'+idName+'" name="registro[]" onkeyUp="return conMayusculas(this)" value="'+valorComponente+'" ng-model="datos.'+idName+'"' + read + '>';
+                                $scope.html = $scope.html + '</div></div></div>';
+                                break;
+                            case "SCRIPT":
+                                titulo = datadocumentos[i].titulo;
+                                idName = datadocumentos[i].campo;
+                                comportamientos = datadocumentos[i].comportamientos;
+                                quitarEnter = new RegExp('\n', "g");
+                                comportamientos = comportamientos.replace(quitarEnter,"");
+                                quitarTab = new RegExp('\t', "g");
+                                comportamientos = comportamientos.replace(quitarTab,"");
+                                $scope.html = $scope.html + '<script> try{ ' + comportamientos + '}catch(e){jsonError = jsonError + "<br>SCRIPT:<br>" + e.toString() + "<br>";}<\/script>';
+                                break;
+                            case "SPAN":
+                                titulo = datadocumentos[i].titulo;
+                                idName = datadocumentos[i].campo;
+                                columnas = datadocumentos[i].columnas;
+                                $scope.html = $scope.html + '<div id="div_' + idName + '" name="componentes"><div class="col-sm-' + columnas + '" align="center">';
+                                $scope.html = $scope.html + '<br><br><span> ' + titulo + ' </span><br><br>';
+                                $scope.html = $scope.html + '</div></div></div>';
+                                break;
+                            case "TIT":
+                                titulo = datadocumentos[i].titulo;
+                                idName = datadocumentos[i].campo;
+                                $scope.html = $scope.html + '<div class="ibox-title_2" id="div_' + idName + '">';
+                                $scope.html = $scope.html + '<h5>' + titulo + ':</h5>';
+                                $scope.html = $scope.html + '</div>';
+                                break;
+                            case "TAR":
+                                titulo = datadocumentos[i].titulo;
+                                idName = datadocumentos[i].campo;
+                                estado = datadocumentos[i].estado;
+                                columnas = datadocumentos[i].columnas;
+                                valorComponente = "";
+                                angular.forEach($scope.datos, function(value, key) {
+                                    if (idName==key) {
+                                        if (value)
+                                            valorComponente = value.toUpperCase();
+                                        else
+                                            valorComponente = value;
+                                    }
+                                }, log);
+                                comportamientos = datadocumentos[i].comportamientos;
+                                    var x="";
+                                    var y="";
+                                    var eventos="";
+                                    var accion="";
+                                    angular.forEach(comportamientos, function(value, key) {
+                                        x = JSON.stringify(value);
+                                        quitarComillas = new RegExp('"', "g");
+                                        x = x.replace(quitarComillas,"");
+                                        x = x.substring(1, x.length -1);
+                                        y = x.split(":");
+                                        eventos = eventos + y[0] + '="' + y[1]+ '" ';
+                                    }, log);
+                                if (estado=="LECTURA") {
+                                    read = 'readonly="readonly"';
+                                } else {
+                                    read = '';
+                                }
+                                valorComponente = valorComponente.replace(/<br>/g, '\n');
+                                $scope.html = $scope.html + '<div id="div_' + idName + '" name="componentes"><div class="form-group"><label class="col-sm-2 control-label">' + titulo + ':</label>';
+                                $scope.html = $scope.html + '<div class="col-sm-' + columnas + '">';
+                                $scope.html = $scope.html + '<textarea ' + eventos + ' cols="45" rows="5" placeholder="' + titulo + '" class="form-control" id="'+idName+'" name="registro[]" ng-model="datos.'+idName+'" ' + read + '>'+ valorComponente +'</textarea>';
+                                $scope.html = $scope.html + '</div></div></div>';
+                                break;
+                            case "EDT":
+                                titulo = datadocumentos[i].titulo;
+                                idName = datadocumentos[i].campo;
+                                estado = datadocumentos[i].estado;
+                                valorComponente = "";
+                                angular.forEach($scope.datos, function(value, key) {
+                                    if (idName==key) {
+                                        if (value)
+                                            valorComponente = value.toUpperCase();
+                                        else
+                                            valorComponente = value;
+                                    }
+                                }, log);
+                                comportamientos = datadocumentos[i].comportamientos;
+                                    var x="";
+                                    var y="";
+                                    var eventos="";
+                                    var accion="";
+                                    angular.forEach(comportamientos, function(value, key) {
+                                        x = JSON.stringify(value);
+                                        quitarComillas = new RegExp('"', "g");
+                                        x = x.replace(quitarComillas,"");
+                                        x = x.substring(1, x.length -1);
+                                        y = x.split(":");
+                                        eventos = eventos + y[0] + '="' + y[1]+ '" ';
+                                    }, log);
+                                $scope.html = $scope.html + '<div id="div_' + idName + '" name="componentes"><div class="form-group"><label class="col-sm-2 control-label">' + titulo + ':</label>';
+                                $scope.html = $scope.html + '<div class="col-sm-10">';
+                                if (estado=="LECTURA") {
+                                    read = 'readonly="readonly"';
+                                    $scope.html = $scope.html + valorComponente ;
+                                } else {
+                                    if(estado=="ESCRITURA") {
+                                        read = '';
+                                    }else {
+                                        read = ' required ';
+                                    }
+                                    $scope.html = $scope.html + '<textarea ' + eventos + ' rows="5" cols="70" class="mceEditorT"' + titulo + ' id="'+idName+'" name="registro[]"  ng-model="datos.'+idName+'"' + read + '>' + valorComponente + '<\/textarea>' ;
+                                    $scope.loadScriptEdt = '<script type="text/javascript">tinymce.remove("textarea");tinymce.init({  mode : "specific_textareas", language : "es", editor_selector : /(mceEditorT)/,  height: 120,  theme: "modern",plugins: ["advlist autolink lists link image charmap print preview hr anchor pagebreak","searchreplace wordcount visualblocks visualchars code fullscreen","insertdatetime media nonbreaking save table contextmenu directionality","emoticons template paste textcolor colorpicker textpattern imagetools"  ]});' + '<\/script>';
+                                }
+                                $scope.html = $scope.html + '</div></div></div>';
+                                break;
+                            case "FEC":
+                                titulo = datadocumentos[i].titulo;
+                                idName = datadocumentos[i].campo;
+                                estado = datadocumentos[i].estado;
+                                valorComponente = "";
+                                angular.forEach($scope.datos, function(value, key) {
+                                    if (idName==key) {
+                                        valorComponente = value;
+                                    }
+                                }, log);
+                                read = 'readonly="readonly"';
+                                if (estado=="LECTURA") {
+                                    $scope.html = $scope.html + '<div id="div_' + idName + '" name="componentes"><div class="form-group"><label class="col-sm-2 control-label">' + titulo + ':</label>';
+                                    $scope.html = $scope.html + '<div class="col-sm-10">';
+                                    $scope.html = $scope.html + '<input type="text" placeholder="' + titulo + '" class="form-control" id="'+idName+'" name="registro[]" onkeyUp="return conMayusculas(this)" value="'+valorComponente+'" ng-model="datos.'+idName+'"' + read + '>';
+                                    $scope.html = $scope.html + '</div></div></div>';
+                                } else {
+                                    $scope.html = $scope.html + '<div id="div_' + idName + '" name="componentes"><div class="form-group"><label class="col-sm-2 control-label">' + titulo + ':</label>';
+                                    $scope.html = $scope.html + '<div class="col-sm-10">';
+                                    $scope.html = $scope.html + '<input type="text" class="form-control" data-date-format="yyyy-mm-dd" id="' + idName + '" name="registro[]" placeholder="' + titulo + '" value="'+valorComponente+'" ng-model="datos.'+idName+'"' + read + '>';
+                                    $scope.html = $scope.html + ' <script> $(function () {$(\'#' + idName + '\').fdatepicker({closeButton: true });});'
+                                    $scope.html = $scope.html + '<\/script>';
+                                    $scope.html = $scope.html + '</div></div></div>';
+                                }
+                                break;
+                            case "FECLOCK":
+                                titulo = datadocumentos[i].titulo;
+                                idName = datadocumentos[i].campo;
+                                estado = datadocumentos[i].estado;
+                                valorComponente = "";
+                                angular.forEach($scope.datos, function(value, key) {
+                                    if (idName==key) {
+                                        valorComponente = value;
+                                    }
+                                }, log);
+                                read = 'readonly="readonly"';
+                                if (estado=="LECTURA") {
+                                    $scope.html = $scope.html + '<div id="div_' + idName + '" name="componentes"><div class="form-group"><label class="col-sm-2 control-label">' + titulo + ':</label>';
+                                    $scope.html = $scope.html + '<div class="col-sm-10">';
+                                    $scope.html = $scope.html + '<input type="text" placeholder="' + titulo + '" class="form-control" id="'+idName+'" name="registro[]" onkeyUp="return conMayusculas(this)" value="'+valorComponente+'" ng-model="datos.'+idName+'"' + read + '>';
+                                    $scope.html = $scope.html + '</div></div></div>';
+                                } else {
+                                    $scope.html = $scope.html + '<div id="div_' + idName + '" name="componentes"><div class="form-group"><label class="col-sm-2 control-label">' + titulo + ':</label>';
+                                    $scope.html = $scope.html + '<div class="col-sm-10">';
+                                    $scope.html = $scope.html + '<input type="text" class="form-control" data-date-format="yyyy-mm-dd" id="' + idName + '" name="registro[]" placeholder="' + titulo + '" value="'+valorComponente+'" ng-model="datos.'+idName+'"' + read + '>';
+                                    $scope.html = $scope.html + ' <script>';
+                                    $scope.html = $scope.html + ' $(function () {';
+                                    $scope.html = $scope.html + ' var nowTemp = new Date();';
+                                    $scope.html = $scope.html + ' var now = new Date(nowTemp.getFullYear(), nowTemp.getMonth(), nowTemp.getDate()-1, 0, 0, 0, 0);';
+                                    $scope.html = $scope.html + ' var checkin = $(\'#' + idName + '\').fdatepicker({';
+                                    $scope.html = $scope.html + ' onRender: function (date) {';
+                                    $scope.html = $scope.html + ' return date.valueOf() < now.valueOf() ? \'disabled\' : \'\';';
+                                    $scope.html = $scope.html + ' }';
+                                    $scope.html = $scope.html + ' }).data(\'datepicker\');';
+                                    $scope.html = $scope.html + ' });';
+                                    $scope.html = $scope.html + '<\/script>';
+                                    $scope.html = $scope.html + '</div></div></div>';
+                                }
+                                break;
+                            case "HRS":
+                                titulo = datadocumentos[i].titulo;
+                                idName = datadocumentos[i].campo;
+                                estado = datadocumentos[i].estado;
+                                valorComponente = "";
+                                angular.forEach($scope.datos, function(value, key) {
+                                    if (idName==key) {
+                                        valorComponente = value;
+                                    }
+                                }, log);
+                                read = 'readonly="readonly"';
+                                if (estado=="LECTURA") {
+                                    $scope.html = $scope.html + '<div id="div_' + idName + '" name="componentes"><div class="form-group"><label class="col-sm-2 control-label">' + titulo + ':</label>';
+                                    $scope.html = $scope.html + '<div class="col-sm-10">';
+                                    $scope.html = $scope.html + '<input type="text" placeholder="' + titulo + '" class="form-control" id="'+idName+'" name="registro[]" onkeyUp="return conMayusculas(this)" value="'+valorComponente+'" ng-model="datos.'+idName+'"' + read + '>';
+                                    $scope.html = $scope.html + '</div></div></div>';
+                                } else {
+                                    $scope.html = $scope.html + '<div id="div_' + idName + '" name="componentes"><div class="form-group"><label class="col-sm-2 control-label">' + titulo + ':</label>';
+                                    $scope.html = $scope.html + '<div class="col-sm-9">';
+                                    $scope.html = $scope.html + '<input type="text" class="form-control" data-date-format="yyyy-mm-dd" id="' + idName + '" name="registro[]" placeholder="' + titulo + '" value="'+valorComponente+'" ng-model="datos.'+idName+'"' + read + '>';
+                                    $scope.html = $scope.html + '<script type="text/javascript">';
+                                    $scope.html = $scope.html + 'ng.ready( function() { var tp = new ng.TimePicker({ input: \'' + idName + '\', top_hour: 12  }); });'
+                                    $scope.html = $scope.html + '<\/script>';
+                                    $scope.html = $scope.html + '</div></div></div>';
+                                }
+                                break;
+                            case "HID":
+                                titulo = datadocumentos[i].titulo;
+                                idName = datadocumentos[i].campo;
+                                estado = datadocumentos[i].estado;
+                                valorComponente = "";
+                                angular.forEach($scope.datos, function(value, key) {
+                                    if (idName==key) {
+                                        valorComponente = value;
+                                    }
+                                }, log);
+                                if (estado=="LECTURA") {
+                                    read = 'readonly="readonly"';
+                                } else {
+                                    read = '';
+                                }
+                                $scope.html = $scope.html + '<div id="div_' + idName + '" name="componentes" style="display: none;"><div class="form-group"><label class="col-sm-2 control-label">' + titulo + ':</label>';
+                                $scope.html = $scope.html + '<div class="col-sm-10">';
+                                $scope.html = $scope.html + '<input type="text" placeholder="' + titulo + '" class="form-control" id="'+idName+'" name="registro[]" onkeyUp="return conMayusculas(this)" value="'+valorComponente+'" ng-model="datos.'+idName+'"' + read + '>';
+                                $scope.html = $scope.html + '</div></div></div>';
+                                break;
+                            case "CHK":
+                                titulo = datadocumentos[i].titulo;
+                                idName = datadocumentos[i].campo;
+                                estado = datadocumentos[i].estado;
+                                comportamientos = datadocumentos[i].comportamientos;
+                                var x="";
+                                var y="";
+                                var eventos="";
+                                var accion="";
+                                angular.forEach(comportamientos, function(value, key) {
+                                    x = JSON.stringify(value);
+                                    quitarComillas = new RegExp('"', "g");
+                                    x = x.replace(quitarComillas,"");
+                                    x = x.substring(1, x.length -1);
+                                    y = x.split(":");
+                                    eventos = eventos + y[0] + '="' + y[1]+ '" ';
+                                }, log);
+                                valorComponente = "";
+                                valorComponenteT = "";
+                                if (estado=="LECTURA") {
+                                    read = ' disabled="disabled"';
+                                } else {
+                                    read = '';
+                                }
+                                angular.forEach($scope.datos, function(value, key) {
+                                    if (idName==key) {
+                                        if (value[1].valor=="true"){
+                                            valorComponente = 'checked="checked"';
+                                            valorComponenteT = true ;
+                                        } else {
+                                            valorComponente = '';
+                                            valorComponenteT = false ;
+                                        }
+                                    }
+                                }, log);
+                                $scope.html = $scope.html + '<div id="div_' + idName + '" name="componentes"> <div class="form-group"><label class="col-sm-6 control-label">' + titulo + ':</label>';
+                                $scope.html = $scope.html + '<div class="col-sm-6">';
+                                $scope.html = $scope.html + '<input ' + eventos + 'type="checkbox" class="form-control" id="'+idName+'" name="registro[]" value="' + valorComponenteT + '" ' + valorComponente + ' ng-model="datos.'+idName+'" ' + read + '>';
+                                $scope.html = $scope.html + '</div></div></div>';
+                                break;
+                            case "CHKM":
+                                if (datadocumentos[i].tipo_llenado=="datos") {
+                                    titulo = datadocumentos[i].titulo;
+                                    idName = datadocumentos[i].campo;
+                                    estado = datadocumentos[i].estado;
+                                    if (estado=="LECTURA") {
+                                        read = 'disabled ';
+                                    } else {
+                                        read = '';
+                                    }
+                                    $scope.html = $scope.html + '<div id="div_' + idName + '" name="componentes"> <div class="form-group"><label class="col-sm-2 control-label">' + titulo + '</label>';
+                                    $scope.html = $scope.html + '<div class="col-sm-10">';
+                                    $scope.html = $scope.html + '<table class="table table-striped "><tbody>';
+                                    var arrayDatos = $rootScope.array[idName];
+                                    console.log(arrayDatos);
+                                    for(j=0; j<arrayDatos.length; j++)
+                                    {
+                                            $scope.html = $scope.html + '<tr>';
+                                            $scope.html = $scope.html + '<td><div class="ngSelectionCell">';
+                                            valorComponenteInterno = '';
+                                            valorComponenteTInterno = false ;
+                                            indice=0;
+                                            angular.forEach($scope.datos[idName], function(value, key) {
+                                                if(indice!=0) {
+                                                    if (value.resid == arrayDatos[j].resid && value.estado==true){
+                                                        valorComponenteInterno = 'checked="checked"';
+                                                        valorComponenteTInterno = true ;
+                                                    }
+                                                } else {
+                                                    indice = 1;
+                                                }
+                                            }, log);
+                                            $scope.html = $scope.html + '<input '+ read +' id="'+idName+'" name="registro[]" class="ngSelectionCheckbox" type="checkbox" ' + valorComponenteInterno +'value="' + arrayDatos[j].resid + '_' + arrayDatos[j].resvalor+'"/>';
+                                            $scope.html = $scope.html + '</div></td>';
+                                            $scope.html = $scope.html + '<td>' + arrayDatos[j].resvalor + '</td>';
+                                            $scope.html = $scope.html + '</tr>';
+                                    }
+                                    $scope.datos[idName] = arrayDatos;
+                                    $scope.html = $scope.html + '</tbody></table></div></div></div>';
+                                } else {
+                                    titulo = datadocumentos[i].titulo;
+                                    idName = datadocumentos[i].campo;
+                                    estado = datadocumentos[i].estado;
+                                    if (estado=="LECTURA") {
+                                        read = 'disabled ';
+                                    } else {
+                                        read = '';
+                                    }
+                                    $scope.html = $scope.html + '<div id="div_' + idName + '" name="componentes"> <div class="form-group"><label class="col-sm-2 control-label">' + titulo + '</label>';
+                                    $scope.html = $scope.html + '<div class="col-sm-10">';
+                                    $scope.html = $scope.html + '<table class="table table-striped "><tbody>';
+                                    console.log("asdasdas",$rootScope.array[idName]);
+                                    var arrayDatos = $rootScope.array[idName];
+                                    if(datadocumentos[i].tipo_llenado=="SQL2") {
+                                            if(arrayDatos[0][idName]){
+                                            arrayDatos = JSON.parse(arrayDatos[0][idName]);
+                                        }
+                                    }
+                                    for(j=0; j<arrayDatos.length; j++) {
+                                        if (!arrayDatos[j].tipo) {
+                                            $scope.html = $scope.html + '<tr>';
+                                            $scope.html = $scope.html + '<td><div class="ngSelectionCell">';
+                                            valorComponenteInterno = '';
+                                            valorComponenteTInterno = false ;
+                                            angular.forEach($scope.datos[idName], function(value, key) {
+                                                if (value.resid == arrayDatos[j].resid && value.estado==true){
+                                                    valorComponenteInterno = 'checked="checked"';
+                                                    valorComponenteTInterno = true ;
+                                                }
+                                            }, log);
+                                            $scope.html = $scope.html + '<input ' + read + 'id="'+idName+'" name="registro[]" class="ngSelectionCheckbox" type="checkbox" ' + valorComponenteInterno +'value="' + arrayDatos[j].resid + '_' + arrayDatos[j].resvalor+'"/>';
+                                            $scope.html = $scope.html + '</div></td>';
+                                            $scope.html = $scope.html + '<td>' + arrayDatos[j].resvalor + '</td>';
+                                            $scope.html = $scope.html + '</tr>';
+                                        }
+                                    }
+                                    $scope.datos[idName] = arrayDatos;
+                                    $scope.html = $scope.html + '</tbody></table></div></div></div>';
+                                }
+                                break;
+                            case "RAD":
+                                if (datadocumentos[i].tipo_llenado=="datos") {
+                                    titulo = datadocumentos[i].titulo;
+                                    idName = datadocumentos[i].campo;
+                                    estado = datadocumentos[i].estado;
+                                    if (estado=="LECTURA") {
+                                        read = 'readonly="readonly"';
+                                    } else {
+                                        read = '';
+                                    }
+                                    $scope.html = $scope.html + '<div id="div_' + idName + '" name="componentes"> <div class="form-group"><label class="col-sm-2 control-label">' + titulo + '</label>';
+                                    $scope.html = $scope.html + '<div class="col-sm-10">';
+                                    $scope.html = $scope.html + '<table class="table table-striped "><tbody>';
+                                    var arrayDatos = $rootScope.array[idName];
+                                    for(j=0; j<arrayDatos.length; j++)
+                                    {
+                                        $scope.html = $scope.html + '<tr>';
+                                        $scope.html = $scope.html + '<td><div class="ngSelectionCell">';
+                                        valorComponenteInterno = '';
+                                        valorComponenteTInterno = false ;
+                                        if ($scope.datos[idName] == arrayDatos[j].valor){
+                                                valorComponenteInterno = 'checked="checked"';
+                                                valorComponenteTInterno = true ;
+                                            }
+                                        $scope.html = $scope.html + '<input id="'+idName+'" name="registro_'+idName+'[]" type="radio" ' + valorComponenteInterno +'value="' + arrayDatos[j].valor + '"/>';
+                                        $scope.html = $scope.html + '</div></td>';
+                                        $scope.html = $scope.html + '<td>' + arrayDatos[j].resvalor + '</td>';
+                                        $scope.html = $scope.html + '</tr>';
+                                    }
+                                    $scope.datos[idName] = arrayDatos;
+                                    $scope.html = $scope.html + '</tbody></table></div></div></div>';
+                                } else {
+                                }
+                                break;
+                            case "NRO":
+                                titulo = datadocumentos[i].titulo;
+                                idName = datadocumentos[i].campo;
+                                estado = datadocumentos[i].estado;
+                                comportamientos = datadocumentos[i].comportamientos;
+                                var x="";
+                                var y="";
+                                var z="";
+                                var accion="";
+                                angular.forEach(comportamientos, function(value, key) {
+                                    x = JSON.stringify(value);
+                                    x=x.replace("{"," ");
+                                    x=x.replace("}"," ");
+                                    x=x.replace("$","'");
+                                    x=x.replace("$","'");
+                                    y = x.split(":");
+                                    if( y[0] = "onchange")  {z = z + ' onchange = '+ y[1]; }
+                                    if( y[0] = "onclick")   {z = z + ' onclick = '+ y[1]; }
+                                }, log);
+                                valorComponente = "";
+                                angular.forEach($scope.datos, function(value, key) {
+                                    if (idName==key) {
+                                        valorComponente = value;
+                                    }
+                                }, log);
+                                if (estado=="LECTURA") {
+                                    read = 'readonly="readonly"';
+                                } else if(estado=="ESCRITURA") {
+                                    read = '';
+                                } else {
+                                    read = ' required ';
+                                    valoresOC[posicion] = idName;
+                                    valoresOM[posicion] = titulo;
+                                    posicion++;
+                                }
+                                $scope.html = $scope.html + '<div id="div_' + idName + '" name="componentes"> <div class="form-group"><label class="col-sm-2 control-label">' + titulo + ':</label>';
+                                $scope.html = $scope.html + '<div class="col-sm-10">';
+                                $scope.html = $scope.html + '<input ' + z + ' type="number" placeholder="' + titulo + '" class="form-control" id="'+idName+'" name="registro[]" onkeyUp="return conMayusculas(this)" value="'+valorComponente+'" ng-model="datos.'+idName+'"' + read + ' ' + x + '>';
+                                $scope.html = $scope.html + '</div></div></div>';
+                                break;
+                            case "ARC":
+                                titulo = datadocumentos[i].titulo;
+                                idNamef = datadocumentos[i].campo;
+                                estado = datadocumentos[i].estado;
+                                tamanio = datadocumentos[i].comportamientos.size;
+                                comportamientos = datadocumentos[i].comportamientos;
+                                var x="";
+                                var y="";
+                                var z="";
+                                var accion="";
+                                valorComponente = "";
+                                angular.forEach($scope.datos, function(value, key) {
+                                    if (idNamef==key) {
+                                        valorComponente = value;
+                                    }
+                                }, log);
+                                var x=valorComponente.split("?");
+                                var z=x[0].split("/");
+                               if (estado=="LECTURA") {
+                                    read = 'readonly="readonly"';
+                                } else {
+                                    read = '';
+                                }
+                                $scope.html = $scope.html + '<div id="div_' + idNamef + '" name="componentes"> <div class="form-group" ><label class="col-sm-2 control-label">' + titulo + ':</label>';
+                                $scope.html = $scope.html + ' <table class="table"><tr>';
+                                if(estado=="ESCRITURA"){
+                                    $scope.html = $scope.html + '<td><input type="file" name="'+z[7]+'" id="'+idNamef+'" onchange="hola(this)"/></td>';
+                                }
+                                $scope.html = $scope.html + '<td><img id="img_'+idNamef+'" width="'+tamanio+'" ng-model="datos.'+idNamef+'"  src="'+valorComponente+'" /></td>';
+                                $scope.html = $scope.html + '</tr></table></div></div>';
+                                $scope.html = $scope.html + '<script>function imageIsLoaded(e) {  var a = "#img_"+img;  $(a).attr("src", e.target.result); };<\/script>';
+                                $scope.html = $scope.html + '<script> var img = "hola"; function hola(idNamef) { if (idNamef.files && idNamef.files[0]) {var reader = new FileReader();reader.onload = imageIsLoaded;reader.readAsDataURL(idNamef.files[0]); } img = idNamef.id; };<\/script>';
+                                break;
+                            case "GRD": 
+                                titulo = datadocumentos[i].titulo;
+                                idName = datadocumentos[i].campo;
+                                estado = datadocumentos[i].estado;
+                                dominio = datadocumentos[i].tipo;
+                                valorComponente = "";
+                                tabla="mitabla";
+                                $scope.html = $scope.html + '<div id="div_' + idName + '" name="componentes"> <div class="ibox-content">';
+                                $scope.html = $scope.html + '<div class="table-responsive">';
+                                $scope.html = $scope.html + '<label class="col-sm-12 control-label"><center>' + titulo + '</center></label>';
+                                $scope.html = $scope.html + '<table class="table table-striped" id="tabla_' + idName + '">';
+                                var arrayDatos = datadocumentos[i].data;
+                                $scope.html = $scope.html + '<tr>';
+                                var items = [], colums = [];
+                                titulos="";
+                                campos="";
+                                impresiones="";
+                                var numerico = 0;
+                                var numero = [];
+                                for(j=0; j<arrayDatos.length; j++) {
+                                    titulos = titulos + arrayDatos[j].titulo+'|';
+                                    campos = campos + arrayDatos[j].campo+'|';
+                                    impresiones = impresiones + arrayDatos[j].impresiones+'|';
+                                    colums.push(arrayDatos[j].titulo);
+                                    colums.push(arrayDatos[j].campo);
+                                    if(arrayDatos[j].tipo=="CBO"){
+                                        sum[j]=0;
+                                        var data = arrayDatos[j].data;
+                                        var sdata = "";
+                                        for(h=0; h<data.length; h++)
+                                        {
+                                            sdata = sdata + data[h].valor + "|" + data[h].dato + "#";
+                                        }
+                                        sdata = sdata.substring(0,sdata.length-1);
+                                        sdata = arrayDatos[j].tipo + ":" + sdata;
+                                        colums.push(sdata);
+                                    }else if(arrayDatos[j].tipo=="SPAN"){
+                                        sum[j]=0;
+                                        var sdata = arrayDatos[j].texto; 
+                                        sdata = arrayDatos[j].tipo + ":" + sdata;
+                                        colums.push(sdata);
+                                    }else if(arrayDatos[j].tipo=="NRO"){
+                                        sum[j]=0;
+                                        colums.push(arrayDatos[j].tipo);
+                                    }else if(arrayDatos[j].tipo=="SUM"){
+                                        numerico = 1;
+                                        sum[j]=0;
+                                        colums.push(arrayDatos[j].tipo);
+                                    }else if(arrayDatos[j].tipo=="PROM"){
+                                        numerico = 1;
+                                        sum[j]=0;
+                                        colums.push(arrayDatos[j].tipo);
+                                    }
+                                    else{
+                                        sum[j]=0;
+                                        colums.push(arrayDatos[j].tipo);
+                                    }                                   
+                                    colums.push(arrayDatos[j].size);
+                                    colums.push(arrayDatos[j].estado);
+                                    if(arrayDatos[j].dependencia){  
+                                        colums.push(arrayDatos[j].dependencia);
+                                        var sql = arrayDatos[j].sql;
+                                        sql = sql.replace(',','.');
+                                        colums.push(sql);                               
+                                    }
+                                    else { 
+                                        colums.push([]);
+                                        colums.push([]);
+                                    }      
+                                    items.push(colums);
+                                    colums = [];
+                                }
+                                titulos = titulos.substring(0, titulos.length - 1);
+                                campos = campos.substring(0, campos.length - 1);  
+                                if (estado=="LECTURA") {
+                                } else  {
+                                    $scope.html = $scope.html + '<td> <button class="btn btn-primary" onclick="javascript:addRow(\'' + items +'\',\''+idName+'\');"><i class="glyphicon glyphicon-plus-sign">Nuevo</i></button></td>';
+                                }
+                                for(j=0; j<arrayDatos.length; j++) {
+                                    $scope.html = $scope.html + '<th>'+ arrayDatos[j].titulo+'</td>';
+                                }
+                                $scope.html = $scope.html + '</tr>';
+                                k = 0;
+                                if($scope.datos[idName] == undefined && numerico != 0){
+                                    k = 1;
+                                    $scope.html = $scope.html + '<tr id="' + idName + '_row' + k + '">';
+                                    $scope.html = $scope.html + '<td> </td>';
+                                    var jsoncal = "{";
+                                    for(j=0; j<arrayDatos.length; j++) {
+                                        tituloCol = arrayDatos[j].titulo;
+                                        campoCol = arrayDatos[j].campo;
+                                        columnas = arrayDatos[j].columnas;
+                                        tipo = arrayDatos[j].tipo;
+                                        size = arrayDatos[j].size;
+                                        switch(tipo)
+                                        {
+                                            case "SUM":
+                                            jsoncal = jsoncal + '"'+tituloCol+'":"0"';
+                                            $scope.html = $scope.html + '<td >';
+                                            $scope.html = $scope.html + '<input id="' + campoCol + k + '" type="text" class="form-control" id="' + campoCol + k + '_sum" value="0"  readonly="readonly"  disabled="true">';
+                                            $scope.html = $scope.html + '</td>';
+                                            break;
+                                            case "PROM":
+                                            jsoncal = jsoncal + '"'+tituloCol+'":"0"';
+                                            $scope.html = $scope.html + '<td>';
+                                            $scope.html = $scope.html + '<input id="' + campoCol + k + '" type="text" class="form-control" id="' + campoCol + k + '_prom" value="0"  readonly="readonly"  disabled="true">';
+                                            $scope.html = $scope.html + '</td>';
+                                            break;  
+                                            default:
+                                            jsoncal = jsoncal + '"'+tituloCol+'":" "';
+                                            $scope.html = $scope.html + '<td >';
+                                            $scope.html = $scope.html + '<input id="' + campoCol + k + '" type="text"  class="form-control"  value=" " readonly="readonly" disabled="true">';
+                                            $scope.html = $scope.html + '</td>';
+                                            break;
+                                        }
+                                        if(j != arrayDatos.length - 1){
+                                        jsoncal = jsoncal + ',';
+                                        }
+                                    }
+
+                                    jsoncal = jsoncal + '}';
+                                    $scope.html = $scope.html + '</tr>';
+                                }
+                                 if ($scope.datos[idName]) {
+                                     tabla = JSON.stringify($scope.datos[idName]);
+                                } else if(numerico != 0){
+
+                                    tabla = '[{"tipo":"GRD","titulos":"'+titulos+'","campos":"'+campos+'","impresiones":"'+impresiones+'"},'+jsoncal+']';
+                                }else {
+                                     tabla = '[{"tipo":"GRD","titulos":"'+titulos+'","campos":"'+campos+'","impresiones":"'+impresiones+'"}]';
+                                }
+                                angular.forEach($scope.datos[idName], function(value, key) {
+                                    if (key!=0) {
+                                        $scope.html = $scope.html + '<tr id="' + idName + '_row' + k + '">';
+                                        if (estado=="LECTURA") {
+                                        } else {
+                                            if(k == $scope.datos[idName].length - 1 && numerico != 0){
+                                                $scope.html = $scope.html + '<td> </td>';
+                                            }else{
+                                                $scope.html = $scope.html + '<td> <button class="btn btn-default btn-circle" onclick="eliminarTabla(' + k + ',\'' + idName + '\',\'' + items + '\');"><i class="fa fa-trash-o" style="color:#249FE6"></i></button>';
+                                                $scope.html = $scope.html + '<button class="btn btn-default btn-circle" onclick="editarGrilla(' + k + ',\'' + items + '\',\'' + idName + '\');"><i class="fa fa-pencil" style="color:#249FE6"></i></button></td>';
+                                            }
+                                        }
+                                        if(k == $scope.datos[idName].length - 1 && numerico != 0){
+                                            for(j=0; j<arrayDatos.length; j++) {
+                                                tituloCol = arrayDatos[j].titulo;
+                                                campoCol = arrayDatos[j].campo;
+                                                columnas = arrayDatos[j].columnas;
+                                                tipo = arrayDatos[j].tipo;
+                                                size = arrayDatos[j].size;
+                                                var valor=""+value[campoCol];                                                       
+                                                if(valor=='undefined') valor="-";
+                                                switch(tipo)
+                                                {
+                                                    case "SUM":
+                                                    $scope.html = $scope.html + '<td id="c_' + campoCol + k + '" width="'+size+'">';
+                                                    $scope.html = $scope.html + '<input type="text" size = "'+size+'"  id="' + campoCol + k + '" value="'+sum[arrayDatos.length-1-j]  +'" ng-model="datos.'+campoCol+'" readonly="readonly"  disabled="true">';
+                                                    $scope.html = $scope.html + '</td>';
+                                                    break;
+                                                    case "PROM":
+                                                    var prom = sum[arrayDatos.length-1-j]/(k-1);
+                                                    $scope.html = $scope.html + '<td id="c_' + campoCol + k + '" width="'+size+'">';
+                                                    $scope.html = $scope.html + '<input type="text" size = "'+size+'"  id="' + campoCol + k + '" value="'+prom +'" ng-model="datos.'+campoCol+'" readonly="readonly"  disabled="true">';
+                                                    $scope.html = $scope.html + '</td>';
+                                                    break;
+
+                                                    default:
+                                                    $scope.html = $scope.html + '<td id="c_' + campoCol + k + '" width="'+size+'">';
+                                                    $scope.html = $scope.html + '<input type="text" size = "'+size+'"  id="' + campoCol + k + '" value="'+valor +'" ng-model="datos.'+campoCol+'" readonly="readonly"  disabled="true">';
+                                                    $scope.html = $scope.html + '</td>';
+                                                    break;
+                                                }
+                                            }
+                                        }else{
+                                            for(j=0; j<arrayDatos.length; j++) {
+                                                tituloCol = arrayDatos[j].titulo;
+                                                campoCol = arrayDatos[j].campo;
+                                                columnas = arrayDatos[j].columnas;
+                                                tipo = arrayDatos[j].tipo;
+                                                size = arrayDatos[j].size;
+                                                var valor=""+value[campoCol];                                                       
+                                                if(valor=='undefined') valor="-";
+                                                switch(tipo)
+                                                {
+                                                    case "ARC": 
+                                                    if(valor == "-" || valor == "0"|| valor == "" ||valor == " "){
+                                                        $scope.html = $scope.html + '<td id="c_' + campoCol + k + '" width="'+size*10+'">';
+                                                        $scope.html = $scope.html +'<div class = "col-md-12"><button  value="0"  id="' + campoCol + k + '" class="btn btn-default btn-circle" onclick="verImagen(0);"><i class="fa fa-eye" style="color:#249FE6"></i></button><input style="border: none;" id="l_'+ campoCol +k+'" value="0" readonly="readonly"></div>'; 
+                                                        $scope.html = $scope.html + '</td>';
+                                                    }else{
+                                                        var a=valor.split("/");
+                                                        a = a[7].split("?");
+                                                        $scope.html = $scope.html + '<td id="c_' + campoCol + k + '" width="'+size*10+'">';
+                                                        $scope.html = $scope.html +'<div class = "col-md-12"><button  value="'+valor+'"  id="' + campoCol + k + '" class="btn btn-default btn-circle" onclick="verImagen(\'' + valor +'\');"><i class="fa fa-eye" style="color:#249FE6"></i></button><input style="border: none;" id="l_'+ campoCol +k+'" value="'+a[0]+'" readonly="readonly"></div>'; 
+                                                        $scope.html = $scope.html + '</td>';
+                                                    }
+                                                    break;  
+                                                    case "NRO":
+                                                    $scope.html = $scope.html + '<td id="c_' + campoCol + k + '" width="'+size+'">';
+                                                    $scope.html = $scope.html + '<input type="text" size = "'+size+'" class="form-control" id="' + campoCol + k + '" value="'+valor +'" ng-model="datos.'+campoCol+'" readonly="readonly"  disabled="true">';
+                                                    $scope.html = $scope.html + '</td>';
+                                                    break;  
+                                                    case "SUM":
+                                                    sum[arrayDatos.length-1-j] = sum[arrayDatos.length-1-j] + parseFloat(valor);
+                                                    $scope.html = $scope.html + '<td id="c_' + campoCol + k + '" width="'+size+'">';
+                                                    $scope.html = $scope.html + '<input type="text" size = "'+size+'" class="form-control" id="' + campoCol + k + '" value="'+valor +'" ng-model="datos.'+campoCol+'" readonly="readonly"  disabled="true">';
+                                                    $scope.html = $scope.html + '</td>';
+                                                    break;
+                                                    case "PROM":
+                                                    sum[arrayDatos.length-1-j] = sum[arrayDatos.length-1-j] + parseFloat(valor);
+                                                    $scope.html = $scope.html + '<td id="c_' + campoCol + k + '" width="'+size+'">';
+                                                    $scope.html = $scope.html + '<input type="text" size = "'+size+'" class="form-control" id="' + campoCol + k + '" value="'+valor +'" ng-model="datos.'+campoCol+'" readonly="readonly"  disabled="true">';
+                                                    $scope.html = $scope.html + '</td>';
+                                                    break;  
+                                                    case "CBO":
+                                                    campoCol = arrayDatos[j].campo;
+                                                    valores = ""+value[campoCol+'_valor'];
+                                                    if(valores == 'undefined' || valores == "")
+                                                        valores = valor;
+                                                    $scope.html = $scope.html + '<td id="c_' + campoCol + k + '" width="'+size+'">';
+                                                    $scope.html = $scope.html + '<input type="text" size = "'+size+'"  id="' + campoCol + k + '" value="'+valor +'" ng-model="datos.'+campoCol+'" readonly="readonly"  disabled="true">';
+                                                    $scope.html = $scope.html + '<input type="hidden" size = "'+size+'" id="' + campoCol + k + '_valor" value="'+valores +'" ng-model="datos.'+campoCol+'" readonly="readonly"  disabled="true">';
+                                                    $scope.html = $scope.html + '</td>';
+                                                    break;                                                       
+                                                    default:
+                                                    $scope.html = $scope.html + '<td id="c_' + campoCol + k + '" width="'+size+'">';
+                                                    $scope.html = $scope.html + '<input type="text" size = "'+size+'"  id="' + campoCol + k + '" value="'+valor +'" ng-model="datos.'+campoCol+'" readonly="readonly"  disabled="true">';
+                                                    $scope.html = $scope.html + '</td>';
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        $scope.html = $scope.html + '</tr>';
+                                    }
+                                    k = k + 1;
+                                }, log);
+                                $scope.html = $scope.html + '</table>';
+                                $scope.html = $scope.html + '</div>';
+                                $scope.html = $scope.html + '</div>';
+                                var enviar = k - 2;
+                                if (numerico != 0) {
+                                    $scope.html = $scope.html + '<input id="'+idName+'_CAL" type = "hidden"  class="form-control"    value = '+sum+'></div>';
+                                    $scope.html = $scope.html + '<input id="'+idName+'_CONT" type = "hidden"  class="form-control"    value = '+ enviar +'></div>';
+                                }
+                                $scope.html = $scope.html + '<textarea rows="4" cols="50" style="visibility:hidden" id="'+idName+'" name="registro[]">' + tabla + '</textarea></div>';
+                                break;
+                            case "GRDRC": 
+                                titulo = datadocumentos[i].titulo;
+                                idName = datadocumentos[i].campo;
+                                estado = datadocumentos[i].estado;
+                                var arrayDatos = datadocumentos[i].data;
+                                valorComponente = "";
+                                $scope.html = $scope.html + '<div id="div_' + idName + '" name="componentes"> <div class="ibox-content">';
+                                $scope.html = $scope.html + '<div class="table-responsive">';
+                                $scope.html = $scope.html + '<div class="ibox-title"><center style="color: #1AB394;font-size: 18px">' + titulo + '</center></div>';
+                                $scope.html = $scope.html + '<table class="table table-bordered" id="tabla_' + idName + '">';
+                                $scope.html = $scope.html + '<tr>';
+                                var items = [], colums = []
+                                titulos="";
+                                campos="";
+                                impresiones="";
+                                for(j=0; j<arrayDatos.length; j++) {
+                                    $scope.html = $scope.html + '<th style="background-color:#1ab394; color:white">'+ arrayDatos[j].titulo+'</th>';
+                                    colums.push(arrayDatos[j].titulo);
+                                    colums.push(arrayDatos[j].campo);
+                                    titulos = titulos + arrayDatos[j].titulo+'|';
+                                    campos = campos + arrayDatos[j].campo+'|';
+                                    impresiones = impresiones + arrayDatos[j].impresiones+'|';
+                                    if(arrayDatos[j].tipo=="CBO") {
+                                        var data = arrayDatos[j].data;
+                                        var sdata = "";
+                                        for(h=0; h<data.length; h++) {
+                                            sdata = sdata + data[h].valor + "|" + data[h].dato + "#";
+                                        }
+                                        sdata = sdata.substring(0,sdata.length-1);
+                                        sdata = arrayDatos[j].tipo + ":" + sdata;
+                                        colums.push(sdata);
+                                    } else if(arrayDatos[j].tipo=="SPAN") {
+                                        var sdata = arrayDatos[j].texto; 
+                                        sdata = arrayDatos[j].tipo + ":" + sdata;
+                                        colums.push(sdata);
+                                    } else {
+                                        colums.push(arrayDatos[j].tipo);
+                                    }
+                                    items.push(colums);
+                                    colums = [];
+                                }
+                                $scope.html = $scope.html + '<td> <a onclick="javascript:mostrarVentana(\'' + items +'\',\'' + idName +'\',\'\',-1);" class="btn btn-primary">Nuevo</a> </td>';
+                                $scope.html = $scope.html + '</tr>';
+                                titulos = titulos.substring(0, titulos.length - 1);
+                                campos = campos.substring(0, campos.length - 1);
+                                if ($scope.datos[idName]) {
+                                    tabla = JSON.stringify($scope.datos[idName]);
+                                } else {
+                                   tabla = '[{"tipo":"GRD","titulos":"'+titulos+'","campos":"'+campos+'","impresiones":"'+impresiones+'"}]';
+                                }
+                                k = 0;
+                                angular.forEach($scope.datos[idName], function(value, key) {
+                                    if(k>0){
+                                        $scope.html = $scope.html + '<tr id="' + idName + '_row' + k + '">';
+                                        var valores = [];
+                                        for(j=0; j<arrayDatos.length; j++)
+                                        {
+                                            var valor="";
+                                            val = arrayDatos[j].campo;
+                                            if(value[val])  valor=value[val];
+                                            $scope.html = $scope.html + '<td id="' + idName + '_'+ val + '_' + k + '">'+ valor +'</td>';
+                                            valores.push(value[val]);
+                                        }
+                                        $scope.html = $scope.html + '<td id="'+idName+'_cell_btn_'+k+'" > <a onclick="eliminarTabla(' + k + ',\'' + idName + '\');" id="' + idName +'_del_btn_' + k +'">Eliminar </a>';
+                                        $scope.html = $scope.html + '<a onclick="mostrarVentana(\'' + items + '\',\'' + idName + '\',\'' + valores + '\',\'' + k + '\');" id="' + idName +'_rc_btn_' + k +'">Validar RC </a></td>';
+                                        $scope.html = $scope.html + '</tr>';
+                                    }
+                                    k = k + 1;
+                                }, log);
+                                $scope.html = $scope.html + '</table></div></div></div>';
+                                $scope.html = $scope.html + '<div id="v'+idName+'" style="display:block position: fixed; width: 700px; height: "'+arrayDatos.length*20+'"px; top: center; left: 0; font-family:Verdana, Arial, Helvetica, sans-serif; font-size: 12px; font-weight: normal; border: #333333 3px solid; background-color: #FAFAFC; color: #000000; display:none;">';
+                                $scope.html = $scope.html +'</div>';
+                                $scope.html = $scope.html + '<textarea rows="4" cols="50" style="visibility:hidden" id="'+idName+'" name="registro[]" value="GRD" >' + tabla + '</textarea>';
+                                //$scope.html = $scope.html + '<div class="hr-line-dashed"></div>';
+                                $scope.html = $scope.html + '<script type="text/javascript">function handleFiles(files) { $("#f01_NNA_G_ARCH").val(files[0].name);}function mostrarUpload(){$("#imagenSemdesRc").click();};$(function(){$("#subirDocsSemdes").click(function(){$("#imagenSemdesRc").click();});});<\/script><script type="text/javascript">function mostrarImagenRC(sIdCampo){document.getElementById("imgRegistroCiudadano").src = document.getElementById(sIdCampo.id).value;}<\/script>';
+                                break;
+                                //************************** FIN GRILLA DINAMICA CON REGISTRO CIUDADANO
+                            default:
+                                titulo = datadocumentos[i].titulo;
+                                idName = datadocumentos[i].campo;
+                                $scope.html = $scope.html + '<div class="col-md-3"> ';
+                                $scope.html = $scope.html + '<div class="form-group" > ' ;
+                                $scope.html = $scope.html + '<label for="url" >' + titulo + ':</label> ' ;
+                                $scope.html = $scope.html + '<div class="controls"> ' ;
+                                $scope.html = $scope.html + '<input id="registro[]" name="registro[]" onkeyUp="return conMayusculas(this)" type="text" class="form-control" placeholder="' + titulo + 'PRUEBA' + '" ng-model="datos.' + idName + '">' ;
+                                $scope.html = $scope.html + '</div></div></div> ';
+                                break;
+                        }
+                        i=i+1;
+                    }
+                    $scope.sErrorRender =   '<div class="modal" id="myModal" style="z-index: 2045 !important;" tabindex="10" role="dialog" aria-labelledby="myModalLabel">  <div class="modal-dialog" role="document"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title" id="myModalLabel"><div class="alert alert-warning"><strong>Advertencia!</strong>&nbsp;&nbsp;&nbsp;Verifique los campos del modelado .</div></h4></div><div class="modal-body">        <div id="idErrorComponte"></div>      </div>      <div class="modal-footer">        <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>           </div>    </div>  </div></div><script>$(document).ready(function(){ if(jsonError.length > 0){ $("#myModal").modal("toggle");$("#myModal").modal();$("#myModal").modal({ keyboard: false });$("#myModal").modal("show");$("#myModal").on("shown.bs.modal", function () {  $("#myInput").focus()});$(".modal-backdrop").css("position", "static");$("#idErrorComponte").html(jsonError); }  } );  <\/script>';
+                    $scope.html = $scope.html + $scope.loadScriptEdt;
+                    $scope.html = $scope.html + $scope.sErrorRender;
+                    $.unblockUI();
+                    deferred.resolve($scope.html);
+                });
+            return deferred.promise;
+        };
+        $scope.$on('api:ready',function(){
+        });
+        $scope.inicioActuaciones = function () {
+            if(DreamFactory.isReady()){
+                $scope.generarVista($scope.miPropioFormulario);
+            }
+        };
+    }
+</script>
+<div class="animated fadeInRight">
+    <form class="form-horizontal" name="renderForm" id="renderForm">
+        <div id="renderFormulario" class="wrap" ng-controller="renderController" data-ng-init="inicioActuaciones()">
+            <div  ng-bind-html="get_pre(html)"></div>
+            <button type="button" class="btn btn-primary" ng-disabled="false" ng-click="volver()"> <i class="glyphicon fa fa-times"></i> Cancelar </button>
+            <button type="button" class="btn btn-primary" onclick="validarFormularioRender()" ng-disabled="desabilitado"> <i class="glyphicon fa fa-save"></i> Guardar / Continuar..</button>
+        </div>
+    </form>
+</div>

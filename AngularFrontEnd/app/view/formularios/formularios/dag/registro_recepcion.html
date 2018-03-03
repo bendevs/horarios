@@ -1,0 +1,320 @@
+<script type="text/javascript">
+  function soloNumerico(variable){
+          Numer=parseInt(variable);
+      if (isNaN(Numer)){
+              return "";
+      }
+      return Numer;
+  }
+
+  function valNumero(Control){
+    Control.value=soloNumerico(Control.value);
+  }
+</script>
+<div class="animated fadeInRight">
+    <form class="form-horizontal" name="formulario" novalidate>
+        <div class="wrap" ng-controller="registroRecepcionController" data-ng-init="inicioCasos()">
+            <div class="ibox-title_2">
+                <h5>REGISTRO DE RECEPCIÓN - ADQUISICION:</h5>
+            </div>
+
+            <div class="form-group" >
+                <label align="center" class="col-sm-2 control-label no-padding-right" for="url" >Nro. Orden de Compra: <font color="#FF0000" size="5px"> </font></label>
+                <div class="col-sm-5" align="left" class="form-group">
+                    <input id="nrocompra"  ng-model ="datos.nrocompra" type="text"><a class="btn btn-primary" ng-click="prueba1();"  data-toggle="modal" data-target="#registroReporte"><i class="glyphicon glyphicon-search"></i> Buscar</a></input>
+                </div>
+            </div>
+            <div class="hr-line-dashed"></div>
+           <div class="form-group" >
+              <label class="col-sm-2 control-label no-padding-right" for="url" >Fecha de Registro: <font color="#FF0000" size="5px"> </font></label>
+              <div class="col-sm-4" class="caracteristica.ARCHIVOS_MULTIPLES" align="left">
+                  <input  data-date-format="yyyy-mm-dd" ng-model="datos.g_fecha" id="g_fecha" readonly="readonly" name="fecharegistro" class="form-control" type="text" placeholder="Ingrese Fecha de Registro" onkeyUp="return conMayusculas(this);">
+              </div>
+              <label class="col-sm-2 control-label no-padding-right" for="url" >Objeto de Compra:  <font color="#FF0000" size="5px"> </font></label>
+                <div class="col-sm-4" align="left">
+                    <input  ng-model="datos.UBM_OBJETO_COMPRA" id="UBM_OBJETO_COMPRA" name="UBM_OBJETO_COMPRA" readonly="readonly" class="form-control" type="text" placeholder="Ingrese Objeto de Compra" onkeyUp="return conMayusculas(this);" >
+                </div>
+           </div>
+
+            <div class="hr-line-dashed"></div>
+            <div class="form-group" >
+                <label class="col-sm-2 control-label no-padding-right" for="url" >Forma de Adquisición: <font color="#FF0000" size="5px"> </font></label>
+                <div class="col-sm-4" align="left">
+                    <input   ng-model="datos.UBM_FORMA_ADQUISICION" id="UBM_FORMA_ADQUISICION" name="objetocompra"  readonly="readonly" class="form-control" type="text" placeholder="Ingrese Forma de Adquisición" onkeyUp="return conMayusculas(this);"  >
+                </div>
+                <label class="col-sm-2 control-label no-padding-right" for="url" >Nro. de Contrato / Orden de Compra: <font color="#FF0000" size="5px"> </font></label>
+                <div class="col-sm-4" align="left">
+                    <input ng-model="datos.nrocontrato " id="nrocontrato" name="nrocontrato" class="form-control" readonly="readonly" type="text" placeholder="Ingrese Nro. de Contrato/Orden de Compra" onkeyUp="return conMayusculas(this);"  >
+                </div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="form-group" >
+                <label class="col-sm-2 control-label no-padding-right" for="url" >Nro. de Carpeta: <font color="#FF0000" size="5px"> </font></label>
+                <div class="col-sm-4" align="left">
+                    <input onkeyUp="return valNumero(this);" ng-model="datos.nrocarpeta" id="nrocarpeta" readonly="readonly" name="nrocarpeta" class="form-control" type="text" placeholder="Ingrese Nro. de Carpeta" onkeyUp="return conMayusculas(this);"  >
+                </div>
+                <label class="col-sm-2 control-label no-padding-right" for="url" >CUCE(Si corresponde): <font color="#FF0000" size="5px"> </font></label>
+                <div class="col-sm-4" align="left">
+                    <input  ng-model="datos.cuce" id="cuce" name="cuce" class="form-control" type="text" readonly="readonly" placeholder="Ingrese CUCE" onkeyUp="return conMayusculas(this);"  >
+                </div>
+            </div>
+
+            <div class="hr-line-dashed"></div>
+
+            <div class="form-group" >
+              <label class="col-sm-2 control-label no-padding-right" for="url" >C-31 (Comprometido): <font color="#FF0000" size="5px"> </font></label>
+              <div class="col-sm-4" align="left">
+                  <input  ng-model="datos.UBM_C31" id="UBM_C31" name="UBM_C31" class="form-control" type="text" readonly="readonly" placeholder="Ingrese C-31(Comprometido)" onkeyUp="return conMayusculas(this);"  >
+              </div>
+                <label class="col-sm-2 control-label no-padding-right" for="url" >Fecha de Firma de Contrato: <font color="#FF0000" size="5px"> </font></label>
+              <div class="col-sm-4" align="left">
+                  <input  ng-model="datos.UBM_FEC_VER_TECNICA" id="UBM_FEC_VER_TECNICA" name="UBM_FEC_VER_TECNICA" readonly="readonly" class="form-control" type="text" placeholder="Ingrese Fecha de Finalización" onkeyUp="return conMayusculas(this);"  >
+              </div>
+          </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="form-group" >
+              <label class="col-sm-2 control-label no-padding-right" for="url" >Monto de Adjudicaci&oacute;n (Bs.): <font color="#FF0000" size="5px"> </font></label>
+              <div class="col-sm-4" align="left">
+                  <input  ng-model="datos.UBM_MONTO_ADJUDICACION" id="UBM_MONTO_ADJUDICACION" name="UBM_MONTO_ADJUDICACION" readonly="readonly" class="form-control" type="text" placeholder="Ingrese Monto de Adjudicación" onkeyUp="return conMayusculas(this);">
+                <br>
+              </div>
+              <label class="col-sm-2 control-label no-padding-right" for="url" >Sector: <font color="#FF0000" size="5px"> </font></label>
+                <div class="col-sm-4" align="left">
+                   <input type="text" readonly="readonly" ng-model="datos.UBM_SECTOR_VALOR" onkeyup="return conMayusculas(this)" name="registro[]" id="UBM_SECTOR_VALOR" ng-disabled="only" class="form-control ng-dirty ng-invalid ng-invalid-required" placeholder="Sector" >
+                  <br>
+                </div>
+          </div>
+          <div class="hr-line-dashed"></div>
+
+           <div class="form-group" >
+                <label class="col-sm-2 control-label no-padding-right" for="url" >Direcci&oacute;n Administrativa: <font color="#FF0000" size="5px"> </font></label>
+                <div class="col-sm-4" align="left">
+                    <input type="text" readonly="readonly" ng-model="datos.UBM_CENTRO_ADMINISTRATIVO_VALOR"  onkeyup="return conMayusculas(this)" name="registro[]" id="UBM_CENTRO_ADMINISTRATIVO_VALOR" ng-disabled="only" class="form-control ng-dirty ng-invalid ng-invalid-required" placeholder="Dirección Administrativa" >
+                  <br>
+                </div>
+                 <label class="col-sm-2 control-label no-padding-right" for="url" >Unidad Ejecutora: <font color="#FF0000" size="5px"> </font></label>
+                <div class="col-sm-4" align="left">
+                    <input type="text" readonly="readonly" ng-model="datos.UBM_UNIDAD_EJECUTORA_VALOR" onkeyup="return conMayusculas(this)" name="registro[]" id="UBM_UNIDAD_EJECUTORA_VALOR" ng-disabled="only" class="form-control ng-dirty ng-invalid ng-invalid-required" placeholder="Unidad Ejecutora" >
+                  <br>
+                </div>
+            </div>
+            <div class="hr-line-dashed"></div>
+            <div class="form-group" >
+                 <label class="col-sm-2 control-label no-padding-right" for="url" >Programa: <font color="#FF0000" size="5px"> </font></label>
+                 <div class="col-sm-4" align="left">
+                     <input type="text" readonly="readonly" ng-model="datos.programa"  onkeyup="return conMayusculas(this)" name="registro[]" id="programa" ng-disabled="only" class="form-control ng-dirty ng-invalid ng-invalid-required"  >
+                   <br>
+                 </div>
+                  <label class="col-sm-2 control-label no-padding-right" for="url" >Proyecto: <font color="#FF0000" size="5px"> </font></label>
+                 <div class="col-sm-4" align="left">
+                     <input type="text" readonly="readonly" ng-model="datos.proyecto" onkeyup="return conMayusculas(this)" name="registro[]" id="proyecto" ng-disabled="only" class="form-control ng-dirty ng-invalid ng-invalid-required" >
+                   <br>
+                 </div>
+             </div>
+             <div class="hr-line-dashed"></div>
+             <div class="form-group" >
+                  <label class="col-sm-2 control-label no-padding-right" for="url" >Actividad/Obra: <font color="#FF0000" size="5px"> </font></label>
+                  <div class="col-sm-4" align="left">
+                      <input type="text" readonly="readonly" ng-model="datos.actividad"  onkeyup="return conMayusculas(this)" name="registro[]" id="actividad" ng-disabled="only" class="form-control ng-dirty ng-invalid ng-invalid-required" >
+                    <br>
+                  </div>
+                   <label class="col-sm-2 control-label no-padding-right" for="url" >Entidad de Transferencia: <font color="#FF0000" size="5px"> </font></label>
+                  <div class="col-sm-4" align="left">
+                      <input type="text" readonly="readonly" ng-model="datos.entidad" onkeyup="return conMayusculas(this)" name="registro[]" id="entidad" ng-disabled="only" class="form-control ng-dirty ng-invalid ng-invalid-required" >
+                    <br>
+                  </div>
+              </div>
+              <div class="hr-line-dashed"></div>
+
+           <div class="form-group" >
+             <div class="form-group" >
+                  <label class="col-sm-2 control-label no-padding-right" for="url" >Empresa Adjudicada: <font color="#FF0000" size="5px"> </font></label>
+                  <div class="col-sm-4" align="left">
+                      <input type="text" readonly="readonly" ng-model="datos.UBM_ADJUDICADA"  onkeyup="return conMayusculas(this)" name="registro[]" id="UBM_ADJUDICADA" ng-disabled="only" class="form-control ng-dirty ng-invalid ng-invalid-required" >
+                    <br>
+                  </div>
+              </div>
+              <div class="hr-line-dashed"></div>
+                <!--label class="col-sm-2 control-label no-padding-right" for="url" >Unidada Organizacional: <font color="#FF0000" size="5px"> </font></label>
+                <div class="col-sm-4" align="left">
+                    <input type="text"  ng-model="datos.UBM_UNIDAD_SOLICITANTE_VALOR" value="" onkeyup="return conMayusculas(this)" name="registro[]" id="UBM_UNIDAD_SOLICITANTE_VALOR" ng-disabled="only" class="form-control ng-dirty ng-invalid ng-invalid-required" placeholder="Unidad Solicitante">
+                  <br>
+                </div-->
+                <!--div class="form-group"><label class="col-sm-2 control-label" style="red">Unidada Organizacional: <small class="m-l-sm" style="color: red"></small></label>
+                <div class="col-sm-4">
+                   <select
+                        id="UBM_UNIDAD_SOLICITANTE_VALOR"
+                        name="UBM_UNIDAD_SOLICITANTE_VALOR"
+                        placeholder="-- Seleccione --"
+                        ng-model="datos.UBM_UNIDAD_SOLICITANTE_VALOR"
+                        class="form-control"
+                        ng-options='datoP.sp_dag_uo as datoP. for datoP in ListUnidadSolicitante'>
+                    </select>
+                </div-->
+
+       <!--div class="col-sm-12">
+                                   <div class="form-group" >
+                                       <label for="category">Estado</label>
+                                       <select id="estado" name="estado" ng-model="datosCampo.estado" class="form-control" ng-disabled="desabilitado">
+                                           <option value="">-- Seleccione Tipo --</option>
+                                           <option ng-repeat="option in codigo" value="{{option.cat_cod1}}" ng-selected="{{option.cat_cod1==datosCampo.estado}}">{{option.cat_des1}}</option>
+                                       </select>
+                                       <span style="color:red" ng-show="formularioCampo.estado.$invalid">
+                                       <span ng-show="formularioCampo.estado.$error.required">El campo es requerido.</span></span>
+                                   </div>
+                               </div-->
+                  <!--div class="form-group">
+                        <label class="col-sm-2 control-label">Unidad Organizacional</label>
+                          <div class="col-sm-4">
+                              <select name="UBM_UNIDAD_SOLICITANTE_VALOR" id="UBM_UNIDAD_SOLICITANTE_VALOR" ng-model="datos.UBM_UNIDAD_SOLICITANTE_VALOR" class="form-control">
+                                 <option ng-repeat="unidad in unidades" value="{{unidad.codigo}}" ng-selected="{{unidad.codigo==datos.UBM_UNIDAD_SOLICITANTE_VALOR}}">{{unidad.codigo}} - {{unidad.descripcion}}</option>
+                              </select>
+
+                          </div>
+
+
+                  <label class="col-sm-2 control-label" style="red">Técnico Asignado: <small class="m-l-sm" style="color: red"></small></label>
+                <div class="col-sm-4">
+                   <select
+                        id="ListTecnicoAsig"
+                        name="ListTecnicoAsig"
+                        placeholder="-- Seleccione --"
+                        ng-model="datos.TECNICO_ASIGNADO"
+                        class="form-control"
+                        ng-options='datoP.tec_id as (datoP.prs_paterno + " " + datoP.prs_materno + ", " +  datoP.prs_nombres) for datoP in Tecnicos'>
+                    </select>
+                </div>
+            </div-->
+
+
+                 <div class="form-group">
+                        <label class="col-sm-2 control-label">Unidad Organizacional</label>
+                          <div class="col-sm-4">
+                              <select name="UBM_UNIDAD_SOLICITANTE" id="UBM_UNIDAD_SOLICITANTE" ng-model="datos.UBM_UNIDAD_SOLICITANTE" class="form-control" ng-change="asignar()">
+                                 <option ng-repeat="unidad in unidades" value="{{unidad.codigo}}-{{unidad.descripcion}}" ng-selected="{{unidad.codigo==datos.UBM_UNIDAD_SOLICITANTE}}">{{unidad.codigo}} - {{unidad.descripcion}}</option>
+                              </select>
+                          <!--select
+                           class="form-control"
+                           id="UO_Sel"
+                           name="UO_Sel"
+                           ng-model="datos.UO_Sel"
+                           ng-options="datoUE.dag_uo_uo as (datoUE.dag_uo_uo + '-' + datoUE.dag_uo_descripcion) for datoUE in datosUniOrg | filter:{dag_uo_s:1,dag_uo_da:2,dag_uo_ue:5}:true"
+                           ng-change="guardarvalor(datos.UO_Sel)">
+                           <option value="{{datoUE.dag_uo_uo}}"> {{datoUE.dag_uo_descripcion}}</option>
+                       </select-->
+                          </div>
+
+
+
+                  <label class="col-sm-2 control-label" style="red">Técnico Asignado: <small class="m-l-sm" style="color: red"></small></label>
+                <div class="col-sm-4">
+                   <select
+                        id="UBM_TECNICO_UBM"
+                        name="UBM_TECNICO_UBM"
+                        placeholder="-- Seleccione --"
+                        ng-model="datos.UBM_TECNICO_UBM"
+                        class="form-control"
+                        >
+                         <option ng-repeat="tecnico in tecnicos" value="{{tecnico.tec_id}}" ng-selected="{{tecnico.tec_id==datos.UBM_TECNICO_UBM}}" >{{tecnico.prs_nombres}} {{tecnico.prs_paterno}} {{tecnico.prs_materno}}  </option>
+                    </select>
+                </div>
+            </div>
+            <input style="visibility:hidden" ng-model="datos.UBM_UNIDAD_SOLICITANTE_VALOR" id="UBM_UNIDAD_SOLICITANTE_VALOR"name="UBM_UNIDAD_SOLICITANTE_VALOR" class="form-control" type="text">
+            <input style="visibility:hidden" ng-model="datos.UBM_UNIDAD_EJECUTORA" id="UBM_UNIDAD_EJECUTORA"name="UBM_UNIDAD_EJECUTORA" class="form-control" type="text">
+            <input style="visibility:hidden" ng-model="datos.UBM_CENTRO_ADMINISTRATIVO" id="UBM_CENTRO_ADMINISTRATIVO"name="UBM_CENTRO_ADMINISTRATIVO" class="form-control" type="text">
+            <!--div class="form-group">
+                   <label class="col-sm-2 control-label">UNIDAD ORGANIZACIONAL:</label>
+                   <div class="col-sm-10">
+                       <select
+                           class="form-control"
+                           id="selUO"
+                           name="selUO"
+                           ng-model="datos.UO_Sel"
+                           ng-options="datoUE.dag_uo_uo as (datoUE.dag_uo_uo + ' ' + datoUE.dag_uo_descripcion) for datoUE in datosUniOrg | filter:{dag_uo_s:s_sel,dag_uo_da:4,dag_uo_ue:18}:true">
+                           <option value=""></option>
+                       </select>
+                   </div>
+               </div-->
+
+            <div class="hr-line-dashed"></div>
+
+              <div id="div_UBM_DATOS_RECEPCION" class="ibox-title_2">
+                <h5>Datos para Recepción:</h5>
+              </div>
+            <div class="hr-line-dashed"></div>
+             <div id="div_UBM_AYUDA" name="componentes">
+              <div class="col-sm-20" align="center">
+                    <span> Nota: Las fechas de Inicio y Fin de Recepción, es el periodo planificado para realizar la Recepción </span>
+              </div>
+            </div>
+
+            <div class="hr-line-dashed"></div>
+
+            <!--div id="div_UBM_FEC_INICIO_RECEPCION" name="componentes">
+              <div class="form-group">
+                  <label class="col-sm-2 control-label">Fecha Inicio de Recepción:</label>
+
+                  <input class=" col-sm-4 input-group" name="UBM_FEC_INICIO_RECEPCION" id="UBM_FEC_INICIO_RECEPCION" type="text" class="form-control" datepicker-popup="" ng-model="datos.UBM_FEC_INICIO_RECEPCION" is-open="startDateOpened" ng-required="true" close-text="Close" placeholder="aaaa/dd/mm" ng-disabled="desabilitado"/>
+                  <span class="input-group-btn">
+                  <button type="button" class="btn btn-default" ng-click="startDateOpen($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+                  </span>
+                 <label class="col-sm-2 control-label">Fecha Fin de Recepción:</label>
+                 <input class=" col-sm-4 input-group" name="UBM_FEC_FIN_RECEPCION" id="UBM_FEC_FIN_RECEPCION" type="text" class="form-control" datepicker-popup="" ng-model="datos.UBM_FEC_FIN_RECEPCION" is-open="startDateOpened1" ng-required="true" close-text="Close" placeholder="aaaa/dd/mm" ng-disabled="desabilitado"/>
+                  <span class="input-group-btn">
+                  <button type="button" class="btn btn-default" ng-click="startDateOpen1($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+                  </span>
+              </div>
+
+            </div-->
+            <div class="form-group">
+                 <label class="col-sm-2 control-label">Fecha Inicio de Recepción:</label>
+                 <div class="col-sm-4">
+                      <p class="input-group">
+                        <input name="UBM_FEC_INICIO_RECEPCION" id="UBM_FEC_INICIO_RECEPCION" type="text" class="form-control" datepicker-popup="" ng-model="datos.UBM_FEC_INICIO_RECEPCION" is-open="startDateOpened" required close-text="Close" ng-disabled="desabilitado" min-date="modelFecha.endDate"/>
+                          <!--input name="UBM_FEC_INICIO_RECEPCION" id="UBM_FEC_INICIO_RECEPCION" type="text" placeholder="{{datos.fechactual}}"   class="form-control" datepicker-popup="" ng-model="datos.UBM_FEC_INICIO_RECEPCION" is-open="startDateOpened" close-text="Close" ng-disabled="true" min-date="modelFecha.endDate" /-->
+                          <span class="input-group-btn">
+                              <button type="button" class="btn btn-default" ng-click="startDateOpen($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+                          </span>
+                      </p>
+                 </div>
+                 <label class="col-sm-2 control-label">Fecha Fin de Recepción:</label>
+                 <div class="col-sm-4">
+                      <p class="input-group">
+                        <input name="UBM_FEC_FIN_RECEPCION" id="UBM_FEC_FIN_RECEPCION" type="text" class="form-control" datepicker-popup="" ng-model="datos.UBM_FEC_FIN_RECEPCION" is-open="startDateOpened2" required close-text="Close" ng-disabled="desabilitado" min-date="modelFecha.endDate"/>
+                          <!--input name="UBM_FEC_FIN_RECEPCION" id="UBM_FEC_FIN_RECEPCION" type="text" placeholder="{{datos.fechactual}}"   class="form-control" datepicker-popup="" ng-model="datos.UBM_FEC_FIN_RECEPCION" is-open="startDateOpened2" close-text="Close" ng-disabled="true" min-date="modelFecha.endDate"/-->
+                          <span class="input-group-btn">
+                              <button type="button" class="btn btn-default" ng-click="startDateOpen2($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+                          </span>
+                      </p>
+                 </div>
+            </div>
+            <div class="hr-line-dashed"></div>
+            <div id="div_UBM_PLAZO_ENTREGA" name="componentes">
+              <div class="form-group">
+                  <label class="col-sm-2 control-label">Plazo de Entrega (Dias):</label>
+                  <div class="col-sm-4">
+                  <input  id="UBM_PLAZO_ENTREGA" class="form-control ng-dirty ng-invalid ng-invalid-required" type="text" ng-model="datos.UBM_PLAZO_ENTREGA" value="" onkeyUp="return valNumero(this);" name="registro[]" ng-disabled="only" placeholder="Plazo de Entrega (Dias)"><br>
+                  <input name="dias" type="radio" value="dias habiles" ng-model="datos.dias"/><label>Días Habiles</label>
+                  <input name="dias" type="radio" value="dias calendario" ng-model="datos.dias"/><label>Días Calendario</label>
+                  </div>
+                  <label class="col-sm-2 control-label">Observacion:</label>
+                    <div class="col-sm-4">
+                    <textarea  id="UBM_OBS_REGISTRO_ADJUDICACION" class="form-control" ng-model="datos.UBM_OBS_REGISTRO_ADJUDICACION" name="registro[]" placeholder="Observacion" rows="5" cols="45"></textarea><br>
+                    </div>
+              </div>
+
+
+
+
+            <div class="hr-line-dashed"></div>
+
+            <button type="button" class="btn btn-primary" ng-disabled="false" ng-click="volver()"> <i class="glyphicon fa fa-times"></i> Cancelar </button>
+
+           <button type="button" class="btn btn-primary" ng-click="modificarfec()" <i class="glyphicon fa fa-save"></i> Guardar / Continuar </button>
+
+
+        </div>
+    </form>
+</div>

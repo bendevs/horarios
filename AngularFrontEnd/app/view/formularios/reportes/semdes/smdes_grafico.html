@@ -1,0 +1,321 @@
+
+<div class="col-md-12" ng-controller="controllerGralsemdes">
+    <form  name="reportForm" id="reportForm" class="form-horizontal" role="form"
+        novalidate data-ng-init="inicioActuaciones()" >
+        <div>
+           <!--    <div class="col-md-12 col-sm-12 col-xs-12"   >
+                <div class="form-group">
+                    <label for="category">REPORTES GRAFICOS:</label>
+                    <div class="controls">
+                        <select ng-model="datosCarga.area" id="area" name="area" class="form-control"  ng-required="true">
+                            <option style="display:none" value="">-- Elegir--</option>
+                            <option value = 1>REPORTE GENERAL</option>
+                            <option value = 2 >BIENES INMUEBLES </option>
+                            <option value = 3 >PATRIMONIO INMATERIAL </option>
+                            <option value = 4 >PATRIMONIO ARQUEOLOGICO</option>                           
+                        </select>                        
+                    </div>
+                </div>
+            </div> -->
+            <div class="col-md-12" >
+              <div class="col-md-4"> 
+                <div class="form-group" >
+                  <label for="url" >Fecha de inicio:</label>
+                  <div class="controls">
+                    <p class="input-group"><input name="fechaIni" id="fechaIni" type="text" class="form-control" datepicker-popup="" ng-model="fechaIni" is-open="startDateOpened1" ng-required="true" close-text="Close" placeholder="aaaa/dd/mm" ng-disabled="true"/>
+                      <span class="input-group-btn">
+                      <button type="button" class="btn btn-default" ng-click="startDateOpen1($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+                      </span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-1"> 
+              </div>
+              <div class="col-md-4"> 
+                <div class="form-group" >
+                  <label for="url" >Fecha de fin:</label>
+                  <div class="controls">
+                    <p class="input-group"><input name="fechafin" id="fechafin" type="text" class="form-control" datepicker-popup="" ng-model="fechafin" is-open="startDateOpened2" ng-required="true" close-text="Close" placeholder="aaaa/dd/mm" ng-disabled="true"/>
+                      <span class="input-group-btn">
+                      <button type="button" class="btn btn-default" ng-click="startDateOpen2($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+                      </span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <br>              
+            <div>
+              <a class="btn btn-primary" ng-click="generarReporteSemdes()" >
+                <i class="glyphicon fa fa-eye"></i>
+                       Generar Reporte
+              </a>
+              <a class="btn btn-primary" ng-click="limpiar()" >
+                <i class="glyphicon fa fa-eye"></i>
+                       Limpiar             
+                </a>
+            <!-- <a class="btn btn-primary" ng-click="categoria(datosCarga.area)" >
+              <i class="glyphicon fa fa-eye"></i>
+                       Generar Grafica
+            </a> -->
+                <!--   <a class="btn btn-primary" ng-click="cargarDatos()" >
+                      <i class="glyphicon fa fa-print"></i>
+                       Imprimir
+                  </a> -->
+            </div>              
+          <div>
+    </form>
+
+    <div ng-show = "graficaP">
+      <div class="row"  id="grafica1" >
+          <table  width="100%">
+            <td>
+            </br>
+              <center><h3>REPORTE POR PARENTESCO </h3></center>
+            </td>
+          </table>
+          <br/>
+      </div >
+      <!-- **************** PARENTESCO ********************************* -->
+      <div class="col-md-12">
+        <div class="col-md-6">
+          <div class="row panel panel-default" >
+          <div class="table-responsive" >
+              <table class="table table-hover">
+                  <thead>
+                  <tr>
+                      <th class="text-center"><br>PARENTESCOS</th>
+                  </tr>
+                  </thead>
+                  <tbody  id="parentesco">
+                  <tr>
+                      <td><div class="col-sm-1"><b>#</b></div></td>
+                      <td><div class="col-sm-12"><b>DESCRIPCIOqqN</b></div></td>
+                      <td><div class="col-sm-3"><b>CANTIDAD</b></div></td>
+                      <td><div class="col-sm-2"><b>%</b></div></td>
+                  </tr>
+                  <tr ng-repeat="datoP in dataParentesco">
+                      <td><div class="col-sm-1">{{$index+1}}</div></td>
+                      <td><div class="col-sm-12">{{datoP.parentesco}}</div></td>
+                      <td><div class="col-sm-3">{{datoP.nino}}</div></td>
+                      <td><div class="col-sm-2">{{datoP.porcentaje}} </div></td>
+                  </tr>
+                  <td>
+                          <div class="col-sm-3"><b>Total</b></div></td>
+                          <td><div class="col-sm-12"><b>=</b></div></td>
+                          <td><div class="col-sm-7"><b>{{cantidadppc}} </b></div></td>
+                          <!--td><div class="col-sm-3"><b>{{cantidadpp | number:0}}</b></div></td-->
+                  </tbody>
+              </table>
+              </br>
+            </div>
+          </div>
+        </div>        
+        <div class="col-md-6">
+          <div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>          
+        </div>
+      </div>
+      <BR>
+      <BR>
+      <div class="row"  id="grafica1" >
+          <table  width="100%">
+            <td>
+            </br>
+              <center><h3>REPORTE POR GENERO </h3></center>
+            </td>
+          </table>
+          <br/>
+      </div >
+
+      <!-- **************** PARENTESCO ********************************* -->
+      <div class="col-md-12">
+        <div class="col-md-6">
+          <div class="row panel panel-default" >
+          <div class="table-responsive" >
+              <table class="table table-hover">
+                  <thead>
+                  <tr>
+                      <th class="text-center"><br>GENERO</th>
+                  </tr>
+                  </thead>
+                  <tbody  id="parentesco">
+                  <tr>
+                      <td><div class="col-sm-1"><b>#</b></div></td>
+                      <td><div class="col-sm-12"><b>DESCRIPCION</b></div></td>
+                      <td><div class="col-sm-3"><b>CANTIDAD</b></div></td>
+                      <td><div class="col-sm-2"><b>%</b></div></td>
+                  </tr>
+                  <tr ng-repeat="datoP in dataGenero">
+                      <td><div class="col-sm-1">{{$index+1}}</div></td>
+                      <td><div class="col-sm-12">{{datoP.gen}}</div></td>
+                      <td><div class="col-sm-3">{{datoP.nino}}</div></td>
+                      <td><div class="col-sm-2">{{datoP.porcentaje}} </div></td>
+                  </tr>
+                  <td>
+                          <div class="col-sm-3"><b>Total</b></div></td>
+                          <td><div class="col-sm-12"><b>=</b></div></td>
+                          <td><div class="col-sm-7"><b> {{cantidadgc}}</b></div></td>
+                          <!--td><div class="col-sm-3"><b>{{cantidadg| number:0}}</b></div></td-->
+                  </tbody>
+              </table>
+              </br>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div id="containerG" style="min-width: 310px; height: 400px; margin: 0 auto"></div>          
+        </div>        
+      </div>
+      <BR>
+      <BR>
+      <div class="row"  id="grafica1" >
+          <table  width="100%">
+            <td>
+            </br>
+              <center><h3>REPORTE POR RANGOS DE EDADES </h3></center>
+            </td>
+          </table>
+          <br/>
+      </div >
+      <!-- **************** PARENTESCO ********************************* -->
+      <div class="col-md-12">
+        <div class="col-md-6">
+          <div class="row panel panel-default" >
+          <div class="table-responsive" >
+              <table class="table table-hover">
+                  <thead>
+                  <tr>
+                      <th class="text-center"><br>RANGO</th>
+                  </tr>
+                  </thead>
+                  <tbody  id="parentesco">
+                  <tr>
+                      <td><div class="col-sm-1"><b>#</b></div></td>
+                      <td><div class="col-sm-12"><b>DESCRIPCION</b></div></td>
+                      <td><div class="col-sm-3"><b>CANTIDAD</b></div></td>
+                      <td><div class="col-sm-2"><b>%</b></div></td>
+                  </tr>
+                  <tr ng-repeat="datoP in dataRango">
+                      <td><div class="col-sm-1">{{$index+1}}</div></td>
+                      <td><div class="col-sm-12">{{datoP.grupo_etario}}</div></td>
+                      <td><div class="col-sm-3">{{datoP.cantidad}}</div></td>
+                      <td><div class="col-sm-2">{{datoP.round}} </div></td>
+                  </tr>
+                  <td>
+                          <div class="col-sm-3"><b>Total</b></div></td>
+                          <td><div class="col-sm-12"><b>=</b></div></td>
+                          <td><div class="col-sm-7"><b> {{cantidadr}}</b></div></td>
+                          <!--td><div class="col-sm-3"><b>{{cantidadrc| number:0}}</b></div></td-->
+                  </tbody>
+              </table>
+              </br>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div id="containerR" style="min-width: 310px; height: 400px; margin: 0 auto"></div>          
+        </div>         
+      </div>
+      <BR>
+      <BR>
+      <div class="row"  id="grafica1" >
+          <table  width="100%">
+            <td>
+            </br>
+              <center><h3>REPORTE POR DESTINOS</h3></center>
+            </td>
+          </table>
+          <br/>
+      </div >
+      <!-- **************** PARENTESCO ********************************* -->
+      <div class="col-md-12" >
+        <div class="col-md-6">
+          <div class="row panel panel-default" >
+          <div class="table-responsive" >
+              <table class="table table-hover">
+                  <thead>
+                  <tr>
+                      <th class="text-center"><br>DESTINO</th>
+                  </tr>
+                  </thead>
+                  <tbody  id="parentesco">
+                  <tr>
+                      <td><div class="col-sm-1"><b>#</b></div></td>
+                      <td><div class="col-sm-12"><b>DESCRIPCION</b></div></td>
+                      <td><div class="col-sm-3"><b>CANTIDAD</b></div></td>
+                      <td><div class="col-sm-2"><b>%</b></div></td>
+                  </tr>
+                  <tr ng-repeat="datoP in dataDestino">
+                      <td><div class="col-sm-1">{{$index+1}}</div></td>
+                      <td><div class="col-sm-12">{{datoP.destino}}</div></td>
+                      <td><div class="col-sm-3">{{datoP.nino}}</div></td>
+                      <td><div class="col-sm-2">{{datoP.porcentaje}} </div></td>
+                  </tr>
+                  <td>
+                          <div class="col-sm-3"><b>Total</b></div></td>
+                          <td><div class="col-sm-12"><b>=</b></div></td>
+                          <td><div class="col-sm-7"><b>{{cantidaddc}} </b></div></td>
+                          <!--td><div class="col-sm-3"><b>{{cantidadd| number:0}}</b></div></td-->
+                  </tbody>
+              </table>
+              </br>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div id="containerD" style="min-width: 310px; height: 400px; margin: 0 auto"></div>          
+        </div>         
+      </div>
+      <BR>
+      <BR>
+      <!-- ************************************FIN DE LA GRAFICA********************* -->
+
+      <!-- <div class="row"  id="grafica" >
+          <table  width="100%">
+            <td>
+            </br>
+              <center><h3>REPORTE DE LOS TRAMITES - GRAFICA </h3></center>
+            </td>
+          </table>
+          <br/>
+      </div> -->
+      
+       <!--  <div class="col-md-12" >
+        <div class="row panel panel-default" >
+          <div class="table-responsive" >
+              <table class="table table-hover">
+                  <thead>
+                  <tr>
+                      <th class="text-center"><br>TRAMITES</th>
+                  </tr>
+                  </thead>
+                  <tbody  id="Tramite">
+                  <tr>
+                      <td><div class="col-sm-1"><b>#</b></div></td>
+                      <td><div class="col-sm-12"><b>TRAMITES</b></div></td>
+                      <td><div class="col-sm-3"><b>ABREVIACION</b></div></td>
+                      <td><div class="col-sm-2"><b>CANTIDAD</b></div></td>
+                  </tr>
+                  <tr ng-repeat="dato in datatramite">
+                      <td><div class="col-sm-1">{{$index+1}}</div></td>
+                      <td><div class="col-sm-12">{{dato.nombre}}</div></td>
+                      <td><div class="col-sm-3">{{dato.tipo}}</div></td>
+                      <td><div class="col-sm-2">{{dato.suma}}</div></td>
+                  </tr>
+                  <td>
+                          <div class="col-sm-3"><b>Total</b></div></td>
+                          <td><div class="col-sm-12"><b>=</b></div></td>
+                          <td><div class="col-sm-7"><b> </b></div></td>
+                          <td><div class="col-sm-3"><b>{{cantidad}}</b></div></td>
+                  </tbody>
+              </table>
+              </br>
+            </div>
+          </div>
+        </div> -->
+        <!-- <div class="col-md-12" id="graficass">
+            <div id="containerdato" style="width: 1200px; height:600px; margin: 0 auto"></div>
+        </div> -->
+      
+  </div>

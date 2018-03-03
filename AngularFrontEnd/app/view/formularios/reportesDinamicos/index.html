@@ -1,0 +1,96 @@
+<div class="col-md-12" ng-controller="reporteDinamicoController">
+    <form  name="reportForm" id="reportForm" class="form-horizontal" role="form"
+        novalidate data-ng-init="inicioActuaciones()" >
+        <div>
+              <div class="col-md-12">
+                  <legend><center> {{nombReporte}} </center></legend>
+                  <input type= "hidden" id="registro[]" name="oculto">
+              </div>
+              <br>
+              <div class="col-md-12">
+                <div class="col-md-3">
+                <!--  <label for="category">ESPACIO DE TRABAJO</label>-->
+                  <select id="workspaceid" name="workspaceid" class="form-control" ng-model="datos.wsid" ng-onchange="" ng-options=" espacio.wsid as espacio.wsnombre for espacio in obtEspacioT">
+                      <option style="display:none" value="">--Seleccione Espacio de Trabajo</option>
+                  </select>
+                </br>
+                </div>
+                  <div class="col-md-9">
+                      <div  ng-bind-html="get_pre(html)"></div>
+                  </div>
+            </div>
+              <div>
+                <!--<input type= "text" id="registro[]" name="FECHA2" class="form-control"  data-date-format="yyyy-mm-dd" placeholder="FECHA FINAL" ng-model="registro.FECHA2"> <script> $(function () {$('#FECHA2').fdatepicker({closeButton: true });});</script>-->
+                  <a class="btn btn-primary" ng-click="cargarDatos()" >
+                      <i class="glyphicon fa fa-eye"></i>
+                       Generar Reporte
+                  </a>
+                  <a class="btn btn-primary" ng-csv="obtRegistroReporte" csv-header="tituloColumnas" ng-href="{{ csv.link() }}" download="tramites.csv" ng-disabled="habilitado">
+                      <i class="glyphicon fa fa-download"></i>
+                       Exportar a Excel
+                  </a>
+                  <a class="btn btn-primary" ng-click="getReportesGrafica(datos)" >
+                      <i class="glyphicon fa fa-eye"></i>
+                       Generar Grafica
+                  </a>
+              </div>
+              <div class="col-md-12" ng-show = "tablatramite">
+                  <br>
+                  <div  ng-bind-html="get_pre2(html2)"></div>
+              </div>
+          <div>
+    </form>
+
+    <div ng-show = "graficaP">
+      <div class="row"  id="grafica" >
+          <table  width="100%">
+            <td>
+            </br>
+              <center><h3>REPORTE DE LOS TRAMITES - GRAFICA </h3></center>
+            </td>
+          </table>
+          <br/>
+      </div>
+      <div class="col-md-12" >
+          <div class="col-md-4" >
+        <div class="row panel panel-default" >
+          <div class="table-responsive">
+              <table class="table table-hover">
+                  <thead>
+                  <tr>
+                      <th class="text-center"><br>TRAMITES</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr>
+                      <td><div class="col-sm-3"><b>#</b></div></td>
+                      <td><div class="col-sm-7"><b>TRAMITES</b></div></td>
+                      <td><div class="col-sm-3"><b>CANTIDAD</b></div></td>
+                  </tr>
+                  <tr ng-repeat="dato in datatramite">
+                      <td><div class="col-sm-3">{{$index+1}}</div></td>
+                      <td><div class="col-sm-7">{{dato.tipomotivo}}</div></td>
+                      <td><div class="col-sm-3">{{dato.contador}}</div></td>
+                  </tr>
+                  <td>
+                          <div class="col-sm-3"><b>Total</b></div></td>
+                          <td><div class="col-sm-7"><b>=</b></div></td>
+                          <td><div class="col-sm-3"><b>{{cantidad}}</b></div></td>
+                  </tbody>
+              </table>
+              </br>
+            </div>
+          </div>
+      </div>
+        <div class="col-md-8">
+            <div id="containerdato" style="width: 1200px; height:600px; margin: 0 auto"></div>
+        </div>
+      </br>
+        <div class="col-md-4">
+          </br>
+          <div id="container" style="width: 1120px; height:600px; margin: 0 auto"></div>
+        </div>
+
+
+      </div>
+  </div>

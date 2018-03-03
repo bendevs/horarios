@@ -1,0 +1,263 @@
+
+ <script type="text/javascript">
+     function conMayusculas(field) {
+             field.value = field.value.toUpperCase()
+     }
+ </script>
+<div ng-controller="asignacionController" data-ng-init="inicioTecnicos()" class="row">
+ <div class="col-lg-12">
+         <div class="ibox float-e-margins">
+             <div class="ibox-title">
+                 <h5> Asignación de Técnicos</h5>
+                 <div ibox-tools></div>
+                     <div class="botones_inspinia_lmc">
+                         <a class="btn btn-primary" ng-click="limpiar()" data-toggle="modal" data-target="#registro"><i class="glyphicon glyphicon-plus-sign" ng-disabled="desabilitado"></i> Nuevo Técnico</a>
+                     </div>
+             </div>
+             <div class="ibox-content">
+               <table ng-table="tablaTecnicos"  format-fn="colorCellFormat"  show-filter="true"  class="table table-striped"  >
+                 <tr ng-repeat="tecnicos in $data" ng-class="{'colorInactivo': sectores.sec_estado == 'I', 'colorBloqueado': sectores.sec_estado == 'BLOQUEADO'}" >
+                   <td align="center" data-title="'Opciones'" style="width: 80px;">
+                     <a ng-click="modificardata(tecnicos)" class="btn btn-info btn-circle" data-toggle="modal" data-target="#registro"><i class="fa   fa-pencil "></i> </a>
+                     <a ng-click="eliminarGrupoCargar(tecnicos)"  class="btn btn-info btn-circle"  data-toggle="modal" data-target="#registro"><i class="fa  fa-trash-o "></i></a>
+                   </td>
+                   <td data-title="'Id'" sortable="'asig_id'" filter="{'asig_id':'text'}">{{tecnicos.asig_id}}</td>
+                   <td data-title="'Gestión'" sortable="'asig_gestion'" filter="{'asig_gestion':'text'}">{{tecnicos.asig_gestion}}</td>
+                   <td data-title="'Sector'" sortable="'dag_uo_s'" filter="{'dag_uo_s':'text'}" >{{tecnicos.dag_uo_s}}</td>
+                   <td data-title="'Dirección Administrativa'" sortable="'dag_uo_da'" filter="{'dag_uo_da':'text'}" >{{tecnicos.dag_uo_da}}</td>
+                   <td data-title="'Unidad Ejecutora'"   sortable="'dag_uo_ue'" filter="{'dag_uo_ue':'text'}" >{{tecnicos.dag_uo_ue}}</td>
+                   <td data-title="'Unidad Organizacional'" sortable="'dag_uo_uo'" filter="{'dag_uo_uo':'text'}">{{tecnicos.dag_uo_uo}}</td>
+                   <td data-title="'Técnico Asignado'" sortable="'nombre'" filter="{'nombre':'text'}">{{tecnicos.nombre}}</td>
+                 </tr>
+               </table>
+             </div>
+         </div>
+ </div>
+<!-- modal -->
+<div class="modal fade" id="registro" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+     <div class="modal-content">
+       <div class="modal-header">
+       <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Cerrar</span></button>
+       <h4 class="modal-title" id="myModalLabel">{{titulo}}  </h4>
+       </div>
+       <div class="modal-body" >
+         <form name="formularioGrupos"  readOnly="true" novalidate >
+           <div class="row">
+             <div class="col-md-13">
+               <div class="form-group">
+                 <div class="controls">
+                   <div class="form-group"><label class="col-sm-3 control-label">Sector: <font size="5px" color="#FF0000"> </font></label>
+                     <div class="col-sm-8">
+                       <select id="sector"
+                            name="sector"
+                            ng-disabled="desabilitado"
+                            ng-model="datos.sector"
+                            ng-change ="getDireccionesAdministrativas(datos.sector)"
+                            class="form-control">
+                            <option style="display:none" value="">--Seleccione--</option>
+                           <option ng-repeat="obj in sector" value="{{obj.dag_s_s}}"
+                           ng-selected="{{obj.dag_s_s == datos.sector}}" >
+                           {{obj.dag_s_descripcion}}
+                         </option>
+                       </select>
+                     </div>
+                   </div>
+                 </div>
+               </div>
+             </div>
+           </div>
+           <div class="row">
+             <div class="col-md-13">
+               <div class="form-group">
+                 <div class="controls">
+                   <div class="form-group"><label class="col-sm-3 control-label">Direcciones Administrativas: <font size="5px" color="#FF0000"> </font></label>
+                     <div class="col-sm-8">
+                       <select id="da"
+                            name="da"
+                            ng-disabled="desabilitado"
+                            placeholder="-- Seleccione --"
+                            ng-model="datos.da"
+                            ng-change = "getUnidadEjecutora(datos.sector,datos.da)"
+                            class="form-control ng-pristine ng-invalid ng-invalid-required"
+                             required>
+                             <option style="display:none" value="">--Seleccione--</option>
+                           <option ng-repeat="obj in direcciones" value="{{obj.dag_da_da}}"
+                           ng-selected="{{obj.dag_da_da == datos.da}}" >
+                           {{ obj.dag_da_descripcion}}
+                         </option>
+                       </select>
+                     </div>
+                   </div>
+                 </div>
+               </div>
+             </div>
+           </div>
+           <div class="row">
+             <div class="col-md-13">
+               <div class="form-group">
+                 <div class="controls">
+                   <div class="form-group"><label class="col-sm-3 control-label">Unidad Ejecutora: <font size="5px" color="#FF0000"> </font></label>
+                     <div class="col-sm-8">
+                       <select id="ue"
+                            name="ue"
+                            ng-disabled="desabilitado"
+                            placeholder="-- Seleccione --"
+                            ng-model="datos.ue"
+                            ng-change = "getUnidadOrganizacional(datos.sector,datos.da,datos.ue)"
+                            class="form-control ng-pristine ng-invalid ng-invalid-required"
+                             required>
+                             <option style="display:none" value="">--Seleccione--</option>
+                           <option ng-repeat="obj in ejecutoras" value="{{obj.dag_ue_ue}}"
+                           ng-selected="{{obj.dag_ue_ue == datos.ue}}" >
+                           {{ obj.dag_ue_descripcion}}
+                         </option>
+                       </select>
+                     </div>
+                   </div>
+                 </div>
+               </div>
+             </div>
+           </div>
+           <div class="row">
+             <div class="col-md-13">
+               <div class="form-group">
+                 <div class="controls">
+                   <div class="form-group"><label class="col-sm-3 control-label">Unidad Organizacional: <font size="5px" color="#FF0000"> </font></label>
+                     <div class="col-sm-8">
+                       <select id="uo"
+                            name="uo"
+                            ng-disabled="desabilitado"
+                            placeholder="-- Seleccione --"
+                            ng-model="datos.uo"
+                            class="form-control ng-pristine ng-invalid ng-invalid-required"
+                             required>
+                             <option style="display:none" value="">--Seleccione--</option>
+                           <option ng-repeat="obj in unidades" value="{{obj.dag_uo_uo}}"
+                           ng-selected="{{obj.dag_uo_uo == datos.uo}}" >
+                           {{obj.dag_uo_descripcion}}
+                         </option>
+                       </select>
+                     </div>
+                   </div>
+                 </div>
+               </div>
+             </div>
+           </div>
+           <div class="row">
+             <div class="col-md-13">
+               <div class="form-group">
+                 <div class="controls">
+                   <div class="form-group"><label class="col-sm-3 control-label">Tipo: <font size="5px" color="#FF0000"> </font></label>
+                     <div class="col-sm-8">
+                       <select id="tipo"
+                            name="tipo"
+                            ng-disabled="desabilitado"
+                            placeholder="-- Seleccione --"
+                            ng-model="datos.tipo"
+                            class="form-control ng-pristine ng-invalid ng-invalid-required"
+                            ng-change = "cargarTecnicos(datos.tipo)"
+                             required>
+                             <option  style="display:none"  value="">--Seleccione--</option>
+                             <option  value="1">TECNICO UBM</option>
+                             <option  value="2">SAF o RPC</option>
+                             <option  value="3">ANALISTA PRESUPUESTARIO</option>
+                             <option  value="4">ALCALDE</option>
+                       </select>
+                     </div>
+                   </div>
+                 </div>
+               </div>
+             </div>
+           </div>
+           <div class="row">
+             <div class="col-md-13">
+               <div class="form-group">
+                 <div class="controls">
+                   <div class="form-group"><label class="col-sm-3 control-label">Tecnicos: <font size="5px" color="#FF0000"> </font></label>
+                     <div class="col-sm-8">
+                       <select id="tecnicoasignado"
+                            name="tecnicoasignado"
+                            placeholder="-- Seleccione --"
+                            ng-model="datos.tecnicoasignado"
+                            ng-change="datosTecnicos(Tecnicosasignados)"
+                            class="form-control ng-pristine ng-invalid ng-invalid-required"
+                            ng-disabled="desabilitado"
+                             required>
+                             <option style="display:none" value="">--Seleccione--</option>
+                           <option ng-repeat="obj in Tecnicosasignados" value="{{obj.tec_id}}"
+                           ng-selected="{{obj.tec_id == datos.tecnicoasignado}}">
+                           <!--input ng.show= "false" type = "text" ng-model = "datos.rpc"></input-->
+                           {{obj.nombres}}
+                         </option>
+                       </select>
+                     </div>
+                   </div>
+                 </div>
+               </div>
+             </div>
+           </div>
+           <div class="row">
+             <div class="col-md-13">
+               <div class="form-group">
+                 <div class="controls" ng-show="valor">
+                   <div class="form-group"><label class="col-sm-3 control-label">Analista Presupuestario: <font size="5px" color="#FF0000"> </font></label>
+                     <div class="col-sm-8">
+                       <select id="analista"
+                            name="analista"
+                            placeholder="-- Seleccione --"
+                            ng-model="datos.analista"
+                            class="form-control ng-pristine ng-invalid ng-invalid-required"
+                            ng-disabled="desabilitado"
+                             required>
+                             <option style="display:none" value="">--Seleccione--</option>
+                           <option ng-repeat="obj in analistas" value="{{obj.nodo_id}}"
+                           ng-selected="{{obj.nodo_id == datos.analista}}" >
+                           {{obj.nodo_nombre}}
+                         </option>
+                       </select>
+                     </div>
+                   </div>
+                 </div>
+               </div>
+             </div>
+           </div>
+           <div class="row">
+             <div class="col-md-13">
+               <div class="form-group">
+                 <div class="form-group">
+                      <label class="col-sm-2 control-label">Fecha Inicio :</label>
+                      <div class="col-sm-4">
+                           <p class="input-group">
+                             <input name="fecha_inicio" id="fecha_inicio" type="text" class="form-control" datepicker-popup="" ng-model="datos.fecha_inicio" is-open="startDateOpened" required close-text="Close" ng-disabled="desabilitado" min-date="modelFecha.endDate"/>
+                               <!--input name="UBM_FEC_INICIO_RECEPCION" id="UBM_FEC_INICIO_RECEPCION" type="text" placeholder="{{datos.fechactual}}"   class="form-control" datepicker-popup="" ng-model="datos.UBM_FEC_INICIO_RECEPCION" is-open="startDateOpened" close-text="Close" ng-disabled="true" min-date="modelFecha.endDate" /-->
+                               <span class="input-group-btn">
+                                   <button type="button" class="btn btn-default" ng-click="startDateOpen($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+                               </span>
+                           </p>
+                      </div>
+                      <label class="col-sm-2 control-label">Fecha <br> Fin:</label>
+                      <div class="col-sm-4">
+                           <p class="input-group">
+                             <input name="fecha_fin" id="fecha_fin" type="text" class="form-control" datepicker-popup="" ng-model="datos.fecha_fin" is-open="startDateOpened2" required close-text="Close" ng-disabled="desabilitado" min-date="modelFecha.endDate"/>
+                               <!--input name="UBM_FEC_FIN_RECEPCION" id="UBM_FEC_FIN_RECEPCION" type="text" placeholder="{{datos.fechactual}}"   class="form-control" datepicker-popup="" ng-model="datos.UBM_FEC_FIN_RECEPCION" is-open="startDateOpened2" close-text="Close" ng-disabled="true" min-date="modelFecha.endDate"/-->
+                               <span class="input-group-btn">
+                                   <button type="button" class="btn btn-default" ng-click="startDateOpen2($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+                               </span>
+                           </p>
+                      </div>
+                 </div>
+               </div>
+             </div>
+           </div>
+         </form>
+       </div>
+       <div class="modal-footer">
+       <button type="button" class="btn btn-default" ng-click ="limpiardata()" data-dismiss="modal">Cerrar</button>
+       <button ng-click="adicionarAsignacion(datos)" data-dismiss="modal" type="button" class="btn btn-primary" ng-show="boton=='new'" ng-hide="boton=='upd' || boton=='del'"  ng-disabled="formularioGrupos.grpGrupo.$invalid ">Guardar</button>
+       <button ng-click="modificarAsignacion(datos)" data-dismiss="modal" type="button" class="btn btn-primary" ng-show="boton=='upd'" ng-hide="boton=='new' || boton=='del'" ng-disabled="formularioGrupos.grpGrupo.$invalid ">Modificar</button>
+       <button ng-click="eliminarTecnicos(datos)" data-dismiss="modal" type="button" class="btn btn-primary" ng-show="boton=='del'" ng-hide="boton=='new' || boton=='upd'"   >Eliminar</button>
+       </div>
+     </div>
+   </div>
+</div>

@@ -1,0 +1,94 @@
+<div class="col-md-12" class="row" ng-controller="catalogoController" data-ng-init="inicioMuebles()">
+  <table  width="100%">
+    <td><h3>CATÁLOGO DE BIENES MUEBLES</h3></td> 
+  </table>
+  <br/>
+   
+    <div class="col-md-7 col-sm-12 col-xs-12">
+      <div class="form-group">
+        <label >DESCRIPCION: </label>                        
+          <input  ng-model="datos.descripcion" name="descripcion" id="descripcion" class="form-control" type="text" placeholder="Ingrese Descripcion" ng-disabled="only" ng-required="true">
+      </div>
+    </div>
+  
+
+    <div class="col-md-7 col-sm-12 col-xs-12">
+      <div class="form-group">
+        <label >NOMBRE: </label>                        
+          <input  ng-model="datos.nombre" name="nombre" id="nombre" class="form-control" type="text" placeholder="Ingrese Nombre" ng-disabled="only" ng-required="true">
+      </div>
+    </div>
+ 
+
+    <div class="col-md-6">
+      <button ng-click="getMostrarTabla(datos);" data-dismiss="modal" type="button" class="btn btn-primary" >Buscar</button>
+    </div>
+     
+      <div class="col-md-12" ng-show = 'tablaMuebles'>
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                       <h5>Datos </h5> 
+                       
+                    </div>  
+                    <div class="ibox-content" >
+                      <div class="table-responsive"> 
+                        <table  class="table table-striped" ng-table="tablaDatos" show-filter="true" class="table table-striped table-bordered" >
+
+                          <tr ng-repeat="grupo in $data" >
+                            <td data-title="'Codigo'" >{{grupo.catid}}</td>
+                            <td data-title="'Nombre'" >{{grupo.nombre}}</td>
+                            <td data-title="'Partida'" >{{grupo.partida}}</td>
+                            <td data-title="'Observación'" >{{grupo.observacion}}</td> 
+                            <td data-title="'Descripción'" >{{grupo.descripcion}}</td>
+                            <td data-title="'Imagen'" style="width:170px"> 
+                              <div class="fixed-action-btn">
+                                <ul class="horizontal">                                                             
+                                  <li>
+                                    <a target="_blank" tooltip = "Ver" ng-click="imprimirArchivo(grupo.imagen)" class="btn btn-default btn-circle" data-toggle="modal" data-target="#divPopup4">
+                                      <i class="fa fa-eye" style="color:#249FE6">  
+                                      </i>
+                                    </a>
+                                  </li> 
+                                  <li><a tooltip = "Imprimir" class="btn btn-default btn-circle" ng-click="getreportemant(grupo)">
+                                    <i class="fa fa-print">
+
+                                    </i>
+                                  </a>
+                                </li>
+                              </ul>
+                            </div>
+                          </td>
+
+                        </tr>
+                      </table>
+                    </div>
+                  </div>
+        </div>
+         </div>
+        </div>
+            <div class="modal fade" id="divPopup4" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                   <div class="modal-dialog" style="width:700px">
+                       <div class="modal-content">
+                           <div class="modal-header">
+                               <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Cerrar</span></button>
+                           </div>
+                           <div class="modal-body">
+                               <!--pdf-->
+                               <div id="visorFum" ng-show="archpdf">
+                                   <object data="" type="application/pdf" width="650" height="500"></object>
+                               </div>
+                               <!--imagen-->
+                               <div ng-show="archotro">
+                                    <img id="imgSalida" ng-src="{{archivoP}}" width="100%" height="100%">
+                               </div>
+                           </div>
+                           <div class="modal-footer">
+                               <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                           </div>
+                       </div>
+                   </div>
+               </div>
+
+
+</div>

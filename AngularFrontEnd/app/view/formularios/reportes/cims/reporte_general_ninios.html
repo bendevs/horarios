@@ -1,0 +1,180 @@
+<div class="col-md-12" class="row" ng-controller="reporte_general_niniosController" data-ng-init="inicioCrear()">
+    <table  width="100%">
+        <td><h3>REPORTES NIÑOS </h3></td> 
+    </table>
+    <br/>
+
+   <div class="modal-body">    
+
+     <div class="col-md-12" >
+                <div class="form-group">
+                    <label for="category" >Tipo Reportes:</label>
+                    <div class="controls">
+
+                        <select ng-change="busquedareporte(datosCargar.campo)"ng-model="datosCargar.campo" id="campo" name="campo" class="form-control"  ng-required="true">
+                          <option style="display:none" value=" -1">-- Elegir Tipo de Reporte --</option>
+                                              
+                        <option value = '1'>REPORTE GENERAL NIÑOS</option>
+                       <option value = '2'>GRUPO ETARIO POR CIMS</option>
+                                                                                                
+                        </select>
+                        
+                    </div>
+                </div>
+      </div> 
+
+     <div class="col-md-3" >
+            <div class="form-group">
+                <label class="col-sm-3 control-label no-padding-right" for="url">FECHA DE:</label>
+                <div class="controls">
+                    <p class="input-group">
+                    <input name="FECHA1" id="registro1[]" type="text" placeholder="Ingrese Fecha"  class="form-control" datepicker-popup="" ng-model="registro.FECHA1" is-open="startDateOpened1" ng-required="true" close-text="Close" ng-disabled="desabilitado"/>
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-default" ng-click="startDateOpen1($event)"><i class="glyphicon glyphicon-calendar"></i>
+                        </button>
+                    </span>
+                </p>
+                </div>
+            </div>
+        </div> 
+        <div class="col-md-3">
+            <div class="form-group">
+                <label class="col-sm-3 control-label no-padding-right" for="url">FECHA AL:</label>
+                    <div class="controls">    
+                        <p class="input-group"><input name="FECHA2" id="registro2[]" type="text" placeholder="Ingrese Fecha" class="form-control" datepicker-popup="" ng-model="registro.FECHA2" is-open="startDateOpened" ng-required="true" close-text="Close" ng-disabled="desabilitado"/>
+                        <span class="input-group-btn">
+                            <button type="button" class="btn btn-default" ng-click="startDateOpen($event)"><i class="glyphicon glyphicon-calendar"></i>
+                            </button>
+                        </span></p>
+                    </div>
+                </div>
+            </div> 
+
+            <div class="col-md-6" ng-show="datosCargar.campo==1">
+                    <button ng-click="busqueda(registro,datosCargarInscritos.inscritoscims);" data-dismiss="modal" type="button" class="btn btn-primary" >Buscar</button>
+            </div>
+            <!--inicio tabla ng-show="tablareporte1"-->
+           
+                 <div class="col-md-12"  ng-show="datosCargar.campo==1">                
+                    <div class="col-lg-12">
+                        <div class="ibox float-e-margins">
+                                <div class="ibox-title">
+                                   <h5>Datos </h5> 
+                                   <div ibox-tools></div>
+                                   <div align="right">
+                                        <a class="btn btn-primary" ng-click="getreportecims(datosCargar.campo)" >
+                                            <i class="glyphicon fa fa-eye"></i>
+                                             Imprimir Listado
+                                        </a>
+                                    </div>
+                                </div>  
+                                <div class="ibox-content" >
+                                    <div class="table-responsive"> 
+                                         <table  class="table table-striped"  >
+                                            <thead>      
+                                                <th>#&nbsp;</th>                                
+                                                <th>Centro Infantil Municipal&nbsp;</th>
+                                                 <th>Cantidad de Lactantes&nbsp;</th>
+                                                  <th>Cantidad de Pre Infantes&nbsp;</th>
+                                                  <th>Cantidad de Infantes&nbsp;</th>
+                                                                                          
+                                                                               
+                                            </thead>
+                                    <tbody> 
+                                  <tr ng-repeat="grupo in grupos" >
+                                    <td>{{$index + 1}}</td>
+                                    <td>{{grupo.casnombre}}</td>
+                                    <td>{{grupo.total_lactantes}}</td>
+                                    <td>{{grupo.total_pre_infante }}</td> 
+                                    <td>{{grupo.total_infantes}}</td>                                 
+                                   </tr>
+
+                                         <td></td>
+                                            <td>Totales:</td>
+                                            <td>{{sum_total_lactantes}} </td>
+                                            <td>{{sum_total_pre_infante}} </td> 
+                                            <td>{{sum_total_infantes}} </td>
+                                  </tbody>
+                                </table>
+                              </div>
+                          </div>
+                        </div>
+                     </div>               
+                </div>           
+ 
+ <!--reporte 2--> 
+    <div ng-show="datosCargar.campo==2">            
+            <div class="col-md-7" ng-show="datosCargar.campo==2" >
+                <div class="form-group">
+                    <label for="category" >Busqueda por:</label>
+                    <div class="controls">
+                       <div class="col-md-10">
+                        <select ng-model="datosCargarInscritos.inscritoscims" id="inscritoscims" name="inscritoscims" class="form-control"  ng-required="true">
+                          <option style="display:none" value="-1">-- Elegir el CIMs a Buscar Inscritos --</option>
+                                              
+                       <option value = '1'>JUANCITO PINTO</option>
+                       <option value = '2'>LANZA</option>
+                       <option value = '3'>CAMACHO</option>
+                       <option value = '4'>MIRAFLORES</option>
+                       <option value = '5'>VIRGEN DE FÁTIMA</option>
+                       <option value = '6'>GENOVEVA RIOS</option>
+                       <option value = '7'>SARANTITO</option>                                                                             
+                        </select>
+                         </div>
+                         </div>
+                         <div class="col-md-2">
+                    <button ng-click="busqueda(registro,datosCargarInscritos.inscritoscims);" data-dismiss="modal" type="button" class="btn btn-primary" >Buscar</button>
+                     <br> 
+                     <br> 
+                    <br>
+                        
+                    </div>
+                </div>
+            </div> 
+         <!--inicio tabla    ng-show="tablareporte2"  RETURNS TABLE(casnombre text, total_infantes bigint, total_pre_infante bigint, total_lactantes bigint)-->
+      <div class="col-md-12"  >
+              <div class="col-lg-12">
+                  <div class="ibox float-e-margins">
+                          <div class="ibox-title">
+                             <h5>Datos </h5> 
+                             <div ibox-tools></div>
+                             <div align="right">
+                                  <a class="btn btn-primary" ng-click="getreportecims2(datosCargarInscritos.inscritoscims)" >
+                                      <i class="glyphicon fa fa-eye"></i>
+                                       Imprimir Listado
+                                  </a>
+                              </div>
+                          </div>  
+
+                      <div class="ibox-content" >
+                          <div class="table-responsive"> 
+                               <table  class="table table-striped"  >
+                                  <thead>      
+                                      <th>#&nbsp;</th>                                
+                                      <th>Centro Infantil Municipal &nbsp;</th>
+                                      <th>Cantidad de Lactantes &nbsp;</th>
+                                      <th>Cantidad de Pre Infantes &nbsp;</th>
+                                      <th>Cantidad de Infantes &nbsp;</th>
+                                                                 
+                                     
+                                  </thead>
+                                  <tbody> 
+                                        <tr ng-repeat="grupo in grupos" >
+                                          <td>{{$index + 1}}</td>
+                                          <td>{{grupo.casnombre}}</td>
+                                          <td>{{grupo.total_lactantes}}</td>
+                                          <td>{{grupo.total_pre_infante }}</td> 
+                                          <td>{{grupo.total_infantes}}</td>
+                                                                           
+                                        </tr>                                    
+                                             
+                                  </tbody>
+                               </table>
+                          </div>
+                      </div>
+                  </div>
+               </div>
+          </div>
+</div> 
+ <!--fin reporte2-->
+</div>

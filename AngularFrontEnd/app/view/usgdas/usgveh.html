@@ -1,0 +1,112 @@
+<style>
+    html, body {
+        height:100%;
+    }
+    #box {
+        height:80%;
+        background:#331266;
+    }
+    #container {
+        position:relative;
+        height:100%;
+    }
+</style>
+<div class="wrapper wrapper-content animated fadeInRight" ng-controller="usgvehController" data-ng-init="inicioGrafica()">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="col-md-2">
+                <div class="ibox float-e-margins" >
+                    <div class="ibox-title">                            
+                        <h3>Total Solicitudes Recibidas</h3>
+                    </div>
+                    <div class="ibox-content">
+                        <h1 class="no-margins">{{totalvehiculo}}</h1>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">                            
+                        <h3 >Total Diagnostico</h3>
+                    </div>
+                    <div class="ibox-content">
+                        <h1 class="no-margins" >{{diagnostico}}</h1>                        
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">                            
+                        <h3 >Total Diagnostico Mantenimiento</h3>
+                    </div>
+                    <div class="ibox-content">
+                        <h1 class="no-margins" >{{diagnosticomantenimiento}}</h1>                        
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">                            
+                        <h3 >Total Mantenimiento </h3>
+                    </div>
+                    <div class="ibox-content">
+                        <h1 class="no-margins" >{{mantenimiento}}</h1>                        
+                    </div>
+                </div>
+            </div>
+        </div> 
+    </div>   
+    <div class="col-md-6">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5> Solicitudes Vehicular
+                    <small> Hasta gestión 2016.</small>
+                </h5>
+                <div ibox-tools></div>
+            </div>
+            <div class="ibox-content">
+                <div>
+                    <canvas id="doughnutChart" height="100"></canvas>
+                </div>
+                <h3 class="no-margins">Total Diagnostico:{{diagnostico}} </h3>
+                <h3 class="no-margins">Total Diagnostico Mantenimiento:{{diagnosticomantenimiento}} </h3>
+                <h3 class="no-margins">Total Mantenimiento:{{mantenimiento}} </h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>Unidad Solicitante
+                    <small> Hasta gestión 2016.</small>
+                </h5>
+                <div ibox-tools></div>
+            </div>
+            <div class="ibox-content">
+                <div id="box">
+                    <div id="container">
+                    </div>
+                </div>     
+                <table ng-table="tabla1" class="table table-hover table-bordered">
+                    <tr ng-repeat="ser in leyendaser">
+                        <td data-title="'Unidad Solicitante'">{{ser.unidad}} </td>
+                        <td data-title="'Cantidad'" >{{ser.suma}} </td> 
+                    </tr>
+                </table>   
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Flot -->
+<script src="../../libs/js2/js/plugins/flot/jquery.flot.js"></script>
+<script src="../../libs/js2/js/plugins/flot/jquery.flot.tooltip.min.js"></script>
+<script src="../../libs/js2/js/plugins/flot/jquery.flot.resize.js"></script>
+<script src="../../libs/js2/js/plugins/flot/jquery.flot.pie.js"></script>
+
+<!-- Custom and plugin javascript -->
+<script src="../../libs/js2/js/inspinia.js"></script>
+<script src="../../libs/js2/js/plugins/pace/pace.min.js"></script>
+
+<!-- ChartJS-->
+<script src="../../libs/js2/js/plugins/chartJs/Chart.min.js"></script>
+<!--script src="../../libs/js2/js/demo/chartjs-demo.js"></script-->

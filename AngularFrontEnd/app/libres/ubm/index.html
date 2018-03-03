@@ -1,0 +1,21 @@
+<html  ng-app="moduloRouting">
+    <script src="../../libs/jss/angular.min.js"></script>
+    <script src="../../libs/jss/angular-route.min.js"></script>
+    <script src="../../libs/js_dashboard/bootstrap.js"></script>
+    <link rel="stylesheet" href="../../libs/components/bootstrap/dist/css/bootstrap.min.css"/>
+
+    <div id="contenedorPrincipal" class="slide-animation" ng-controller="mainController">    
+       <i class="icon-coffee green"></i>
+        <h3>Bienvenido</h3>
+        <h1>{{nombre}}</h1>
+        <br>
+        <br>
+        <input type="text" ng-model="nombre" class="form-control">
+    </div>
+    <script type="text/javascript">
+        var moduloRouting = angular.module('moduloRouting',['ngRoute']);
+        moduloRouting.controller('mainController', function($scope) {
+            $scope.nombre = "Jhon Gay";
+        });
+    </script>
+</html>

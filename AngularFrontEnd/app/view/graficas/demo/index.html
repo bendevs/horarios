@@ -1,0 +1,181 @@
+    <div class="wrapper wrapper-content animated fadeInRight" ng-controller="graficaDemoController" data-ng-init="inicioGrafica()">
+        <div class="row">
+            <div class="col-lg-12">
+
+                  <!--marcadores-->
+                <div class="col-md-2">
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-title">
+                            
+                            <h5>Total Inscritos</h5>
+                        </div>
+                        <div class="ibox-content">
+                            <h1 class="no-margins">{{acum}}</h1>
+                        </div>
+                    </div>
+                </div>
+
+                 <div class="col-md-2">
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-title">                            
+                            <h5>Total Aportantes</h5>
+                        </div>
+                        <div class="ibox-content">
+                            <h1 class="no-margins">{{aportante}}</h1>                        
+                        </div>
+                    </div>
+                </div>
+
+
+                 <div class="col-md-2">
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-title">                            
+                            <h5>Total Becados</h5>
+                        </div>
+                        <div class="ibox-content">
+                            <h1 class="no-margins">{{becado}}</h1>
+                        </div>
+                    </div>
+                </div>
+
+
+                 <div class="col-md-3">
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-title">
+                           
+                            <h5>Total Media Beca</h5>
+                        </div>
+                        <div class="ibox-content">
+                            <h1 class="no-margins">{{mediabeca}}</h1>
+                            
+                        </div>
+                    </div>
+                </div>
+
+
+                 <div class="col-md-3">
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-title">
+                           
+                            <h5>Total Beca Completa</h5>
+                        </div>
+                        <div class="ibox-content">
+                            <h1 class="no-margins">{{becacompleta}}</h1>
+                            
+                        </div>
+                    </div>
+                </div>
+                </div>
+                <!--fin marcadores-->
+                 <div class="col-lg-6">
+                        <div class="ibox float-e-margins">
+                            <div class="ibox-title">
+                                <h5>Inscritos en CIMS
+                                    <small> Hasta gestión 2016.</small>
+                                </h5>
+                                <div ibox-tools></div>
+                            </div>
+                            <div class="ibox-content">
+                                <div>
+                                    <canvas id="barChart" height="100"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+            <div class="col-lg-6">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>Grupos Etarios
+                            <small> Hasta gestión 2016.</small>
+                        </h5>
+
+                        <div ibox-tools></div>
+                    </div>
+                    <div class="ibox-content">
+                        <div>
+                            <canvas id="doughnutChart" height="100"></canvas>
+                        </div>
+                        <h4 class="no-margins">Total Lactante:{{lactante}} </h4>
+                        <h4 class="no-margins">Total Pre Infante:{{preinfante}} </h4>
+                        <h4 class="no-margins">Total Infante:{{infante}} </h4>
+                    </div>
+                </div>
+            </div>
+
+
+          <!--  <div class="row">
+                <div class="col-lg-6">
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-title">
+                            <h5>CENTROS PARA EL DESARROLLO INFANTIL
+                                <small>INSCRITOS</small>
+                            </h5>
+                            <div ibox-tools></div>
+                        </div>
+                        <div class="ibox-content">
+                            <div>
+                                <canvas id="lineChart" height="100"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>-->
+
+              
+
+                  <!--  <div class="row">
+                    <div class="col-lg-6">
+                        <div class="ibox float-e-margins">
+                            <div class="ibox-title">
+                                <h5>Radar Chart Example</h5>
+                                <div ibox-tools></div>
+                            </div>
+                            <div class="ibox-content">
+                                <div>
+                                    <canvas id="radarChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>-->
+
+
+
+            <div class="col-lg-6">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5> Genero
+                            <small> Hasta gestión 2016.</small>
+
+                        </h5>                          
+
+                        <div ibox-tools></div>
+                    </div>
+                    <div class="ibox-content">
+                        <div>
+                            <canvas id="doughnutChart2" height="100"></canvas>
+                            
+                        </div>
+                         <h4 class="no-margins">Total Femenino:{{femenino}} </h4>
+                         <h4 class="no-margins">Total Masculino:{{masculino}} </h4>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+    <!-- Flot -->
+    <script src="../../libs/js2/js/plugins/flot/jquery.flot.js"></script>
+    <script src="../../libs/js2/js/plugins/flot/jquery.flot.tooltip.min.js"></script>
+    <script src="../../libs/js2/js/plugins/flot/jquery.flot.resize.js"></script>
+    <script src="../../libs/js2/js/plugins/flot/jquery.flot.pie.js"></script>
+
+    <!-- Custom and plugin javascript -->
+    <script src="../../libs/js2/js/inspinia.js"></script>
+    <script src="../../libs/js2/js/plugins/pace/pace.min.js"></script>
+
+    <!-- ChartJS-->
+    <script src="../../libs/js2/js/plugins/chartJs/Chart.min.js"></script>
+    <!--script src="../../libs/js2/js/demo/chartjs-demo.js"></script-->
+

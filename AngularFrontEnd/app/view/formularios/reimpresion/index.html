@@ -1,0 +1,299 @@
+<script type="text/javascript">
+   // SKIN Select
+    $('.spin-icon').click(function (){
+        $(".theme-config-box_2").toggleClass("show");
+    });
+</script>
+<script type="text/javascript">
+   // SKIN Select
+    $('.spin-icon_3').click(function (){
+        $(".theme-config-box_3").toggleClass("show");
+    });
+</script>
+<!-- end script panel depurador -->
+<!-- begin script panel -->
+<script type="text/javascript">
+    $(function() {
+    $( "#accordion" ).accordion();
+  });
+</script>
+<div class="col-md-12" class="row" ng-controller="reimpresionController" data-ng-init="inicioCrear()">
+    <div class="ibox-content" ng-show="panelbuscador">
+      <div class="ibox-title">
+          <h5>Buscador</h5>
+      </div>
+      
+      <br/>
+      <div class="modal-body" >
+        <div >
+          <div class="ng-binding">
+                <div class="row"> 
+                <form name="formularioImpresion"  readOnly="true" novalidate>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label >Carnet de Identidad : </label>   
+                            <input  ng-value="&nbsp;"  name="valor" id="valor" ng-model="datos.valor" class="form-control" type="text" placeholder="Ingrese número de carnet" ng-required="true">
+                        </div>
+                    </div>
+                </form>
+                <div class="modal-footer">
+                <button data-dismiss="modal" ng-click="getcasos10(datos)" type="button" class="btn btn-primary" ng-disabled="formularioImpresion.$invalid">Buscar</button>
+                    
+                </div>
+                    
+            <!-- /////////////////////////////////////////////////////-->
+            <div ng-controller="misCasosController" class="ibox-content" ng-show="panelCasos" style="z-index: 999">
+            <div class="col-lg-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>Lista de trámites</h5>
+                        <div ibox-tools></div>
+                    </div>
+                    <div class="ibox-content" ng-show="conArchivo != null">
+                        <table ng-table="tablaBandeja" show-filter="true" class="table table-striped">
+                            <tr class="column" ng-repeat="caso in datos">
+                                <td data-title="'#'">{{$index+1}}</td>
+                                <td data-title="'Atender Caso'" style="width:120px">
+                                    <div class="fixed-action-btn">
+                                        <ul class="horizontal">
+                                            <li>
+                                                <a tooltip = "Atender Caso" class="btn-floating" ng-click="busquedaAtenderCaso(caso)"><i class="fa-sign-in"></i></a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                                <td data-title="'Reimprimir'" style="width:120px">
+                                    <div class="fixed-action-btn">
+                                        <ul class="horizontal">
+                                            <li>
+                                                <a  href="{{caso.docurllogica}}"  target="_blank" tooltip = "Reimprimir" class="btn-floating"><i class="fa fa-eye"></i></a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>                                
+                                <td data-title="'Nro Trámite &nbsp;'" sortable="'casnrocaso'" >{{caso.casnrocaso}}</td>
+                                <td data-title="'Código Trámite &nbsp;'" sortable="'casnombrecaso'" >{{caso.casnombrecaso}}</td>
+                                <td data-title="'Documento &nbsp;'" sortable="'doctipodocumento'" >{{caso.doctipodocumento}}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <!--<div class="ibox-content" ng-show="sinArchivo != null">
+                        <table ng-table="tablaBandeja" show-filter="true" class="table table-striped">
+                            <tr class="column" ng-repeat="caso in datos">
+                                <td data-title="'#'">{{$index+1}}</td>
+                                <td data-title="'Reimprimir'" style="width:120px">
+                                    <div class="fixed-action-btn">
+                                        <ul class="horizontal">
+                                            <li>
+                                                <a tooltip = "Reimprimir 123" class="btn-floating" ng-click="atender(caso)"><i class="fa fa-eye"></i></a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                                <td data-title="'Nro Trámite &nbsp;'" sortable="'cas_nro_caso'" >{{caso.cas_nro_caso}}</td>
+                                <td data-title="'Código Trámite &nbsp;'" sortable="'cas_nombre_caso'" >{{caso.cas_nombre_caso}}</td>
+                                <td data-title="'Documento &nbsp;'" sortable="'doctipodocumento'" >Sin Documento</td>
+                            </tr>
+                        </table>
+                    </div>-->
+                </div>
+            </div>
+            </div>
+   
+          </div>
+     </div>
+  </div>
+</div></div><br>
+
+<!--<div class="row" ng-show="panelFormularios" style="z-index: 999">
+        <div class="{{classCuerpo}}">
+            <div class="ibox-title" style="height: 65px; position: relative; top: 0px; left: 18%; background-color: #CDFBF2 !important;">
+                <h5>
+                    <div ng-show="seleccionado" style="font-size: 12px !important; position: relative;top: -10px">                
+                        <p style="line-height: 0.7">TR&Aacute;MITE: <b style="font-weight: normal; color: #676a6c">{{casoActual.casonombre}}</b></p>
+                        <p style="line-height: 0.7">PROCESO: <b style="font-weight: normal; color: #676a6c">{{casoActual.procnombre}}</b></p>
+                        <p style="line-height: 0.7">ACTIVIDAD: <b style="font-weight: normal; color: #676a6c">{{casoActual.actnombre}}</b></p>                       
+                    </div>
+                </h5>
+                <div class="botones_inspinia_lmc" style="top: -8px !important">
+                    <a ng-click="volver();" class="btn btn-info btn-circle" data-toggle="tooltip" tooltip = "Volver">
+                        <i class="fa fa-home"></i>
+                    </a>
+                    <a ng-click="volverFormulario();" class="btn btn-info btn-circle" data-toggle="tooltip" tooltip = "Volver" ng-show="contador-2>=0">
+                        <i class="fa fa-reply"></i>
+                    </a>
+                    <a ng-click="llamarHistorico();" class="btn btn-info btn-circle" data-toggle="modal" data-target="#formhistorico" tooltip = "Ver historico">
+                        <i class="fa fa-history"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="ibox-content" style="position: relative; top: 0px;left: 18%;  box-shadow: 0 2px 2px 0 rgba(0,0,0,.14),0 3px 1px -2px rgba(0,0,0,.2),0 1px 5px 0 rgba(0,0,0,.12);">
+                <div ng-include src="template"></div>
+            </div>
+        </div>
+
+        <div ng-show="mostrardepuracion">
+            <div class="theme-config">
+                <div class="theme-config-box_2">
+                    <div class="spin-icon">
+                        <i class="fa fa-cogs fa-spin"></i>
+                    </div>
+                    <div class="skin-setttings_2">
+                        <div class="title" style="text-align: left;">Depurador</div>
+                        <div class="setings-depurador" style="background: #f3f3f4 !important;"> 
+                            
+                                <div class="ibox float-e-margins">
+                                    <div class="ibox-title" style="border-color:#DEDEDE">
+                                       <h5>Formularios</h5>
+                                       <div ibox-tools></div>
+                                       <div class="botones_inspinia_lmc"></div>
+                                    </div>
+                                    <div class="ibox-content">
+                                        <table class="table table-striped">
+                                            <thead>
+                                                 <th>#&nbsp;</th>
+                                                 <th>Órden&nbsp;</th>
+                                                 <th>Descripci&oacute;n&nbsp;</th>
+                                            </thead>
+                                            <tbody>
+                                                 <tr class="column" ng-repeat="formulario in obtFormularios" ng-click="cargarFormulario(formulario,$index)" ng-style="formulario.formid==formularioSeleccionado && {'background-color':'#E1FFF9'}">
+                                                    <td>{{$index+1}}</td>
+                                                    <td>{{formulario.formorden}}</td>
+                                                    <td>{{formulario.formdescripcion}}</td>
+                                                   
+                                                 </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+           
+                            
+                                <div class="ibox float-e-margins">
+                                    <div class="ibox-title" style="border-color: #DEDEDE">
+                                        <h5>Campos Formulario  </h5>
+                                        <div ibox-tools></div>
+                                        <div class="botones_inspinia_lmc">
+                                        </div>
+                                    </div>
+                                    <div class="ibox-content">
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <th>Campo&nbsp;</th>
+                                                <th>Valor&nbsp;</th>
+                                            </thead>
+                                            <tbody>
+                                                <tr class="column" ng-repeat="(key, value) in trmFormulario">
+                                                 
+                                                   <td>{{key}}</td>
+                                                   <td>{{value}}</td>                       
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+           
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="theme-config_3">
+            <div class="theme-config-box_3">
+                <div class="spin-icon_3" ng-click="llamarHistorico();">
+                    <i class="fa fa-history fa-spin"></i>
+                </div>
+                <div class="skin-setttings_3">
+                    <div class="title" style="text-align: left;">Historico</div>
+                    <div class="setings-depurador" style="background: #f3f3f4 !important;"> 
+                        <form name="formularioHistorico"  readOnly="true" novalidate>
+                            <div class="ibox float-e-margins">
+                                <div class="ibox-content">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped ">
+                                            <thead>
+                                                <th>#&nbsp;</th>
+                                                <th>Caso&nbsp;</th>
+                                                <th>Actividad&nbsp;</th>
+                                                <th>Nodo&nbsp;</th>
+                                                <th>Usuario&nbsp;</th>
+                                                <th>Fecha Inicio&nbsp;</th>
+                                                <th>Fecha Limite&nbsp;</th>
+                                            </thead>
+                                            <tbody>
+                                                <tr class="column" ng-repeat="historico in obtHistorico">
+                                                    <td>{{$index+1}}</td>
+                                                    <td>{{historico.cadoid}}</td>
+                                                    <td>{{historico.actividad}}</td>
+                                                    <td>{{historico.nodonombre}}</td>
+                                                    <td>{{historico.usuario}}</td>
+                                                    <td>{{historico.fechaini}}</td>
+                                                    <td>{{historico.fechalim}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ibox float-e-margins">
+                                <div class="ibox-title">
+                                    <h5>{{procTitulo}}</h5>
+                                    <h5>{{casoTitulo}}</h5>
+                                </div>
+                                <div id="sample">
+                                  <div style="display: none; vertical-align: top; padding: 10px;" id="SVGArea"></div>
+                                  <div style="width:100%; white-space:nowrap;">
+                                    <span style="display: none; vertical-align: top; padding: 5px; width:100px">
+                                      <div id="myPaletteDiv" style="border: solid 1px gray; height: 500px;"></div>
+                                    </span>
+                                    <span style="display: inline-block; vertical-align: top; padding: 5px; width:80%">
+                                      <div id="myDiagramDiv" style="border: solid 1px gray; height: 300px;"></div>
+                                      <textarea ng-model="ImagenProceso" id="mySavedModel" style="width:100%;height:200px;display:none;">
+                                        {{ImagenProceso}}
+                                      </textarea>
+                                    </span>                                    
+                                  </div>
+                                  <div id="myInspector">
+                                        
+                                  </div>
+                                </div>                               
+                            </div>                            
+                            <div class="col-md-12" ng-show="panelReglaNegocioActividadMapa">
+                                <div class="col-lg-12">
+                                    <div class="ibox float-e-margins">
+                                        <div class="ibox-title">
+                                            <h5>{{tituloRNMapa}}</h5>
+                                        </div>
+                                        <div class="ibox-content">
+                                            <table class="table table-striped ">
+                                                <thead>
+                                                    <th>#&nbsp;</th>
+                                                    <th>Orden&nbsp;</th>
+                                                    <th>Actividad Siguiente&nbsp;</th>
+                                                    <th>Regla&nbsp;</th>
+                                                </thead>
+                                                <tbody>
+                                                   <tr class="column" ng-repeat="rnActividadMapa in obtNRactividadMapa" ng-style="rnActividad.rna_id==formularioSeleccionado && {'background-color':'#A2D5AE','font-color':'#A2D5AE'}">
+                                                        <td>{{$index+1}}</td>
+                                                        <td>{{rnActividadMapa.rna_orden}}</td>
+                                                        <td>{{rnActividadMapa.rna_actnombre}}</td>
+                                                        <td>{{rnActividadMapa.rna_regla}}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>-->
+ 
+</div>
+<!--/////////////////////////////////////////////////////-->
+
+<!--/////////////////////////////////////////////////////-->

@@ -1,0 +1,554 @@
+<script>
+    function frmCatalogoController($scope, $timeout, $route, $rootScope, $routeParams, $location, $http, Data, sessionService, CONFIG, LogGuardarInfo, DreamFactory, ngTableParams, $filter, sessionService, $filter, sweet, $sce, registroLog,FileUploader, wsContribuyenteNatural,wsLicencia, $window) {
+        $scope.getPartidas= function(){
+            var resPartida = {
+                table_name:"dag.ubm_partidas_presupuestarias",
+                order:"ptp_nivel ASC"
+            };
+            var obj=DreamFactory.api[CONFIG.SERVICE].getRecords(resPartida);
+            obj.success(function(response){
+                $scope.datosPartidas = response.record;
+                //console.log("partidas:",response.record);
+            })
+            .error(function(response){
+                sweet.show('', 'Error: ', 'error');
+            })
+        }
+        $scope.getDepre= function(){
+            var resDepre = {
+                table_name:"dag.ubm_factores_depreciaciones",
+                order:"ftd_id ASC"
+            };
+            var obj=DreamFactory.api[CONFIG.SERVICE].getRecords(resDepre);
+            obj.success(function(response){
+                $scope.datosDepreciacion = response.record;
+                //console.log("depreciacion:",response.record);
+            })
+            .error(function(response){
+                sweet.show('', 'Error: ', 'error');
+            })
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////// ARBOL DE CATALOGACION //////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        // llamada para convertir el arbol en un archivo
+        $scope.actualizarArbol=function(){
+            $.blockUI();
+            var resRoles = {
+                "procedure_name":"dag.sp_dag_catalogo"
+            };
+            //servicio listar roles 
+            var obj=DreamFactory.api[CONFIG.SERVICE].callStoredProcWithParams(resRoles);
+            obj.success(function (response) {
+                $scope.obtArbol = response;
+                var obtArbol=JSON.stringify($scope.obtArbol);
+                //console.log(obtArbol);
+                var parametros = {
+                    "NODOS" : obtArbol,
+                    "TARBOL" : "dataCatalogo.json"
+                };
+                $.ajax({
+                    data: parametros,
+                    //url: 'http://192.168.17.144:88/dreamfactory/dist/generaArbolAjaxDAG.php',
+                    url: 'http://192.168.5.248/dreamfactory/dist/dag/generaArbolAjaxDAG.php',
+                    //url: [CONFIG.DSP]+'192.168.17.144:88/dreamfactory/dist/generaArbolAjax.php',
+                    type: 'POST',
+                    error: function (response) {
+                    $.unblockUI();
+                    //sweet.show('Exito', 'Se realizó la actualización correctamente', 'success');
+                    }
+                });
+            })
+            obj.error(function(error) {
+                $.unblockUI();
+                sweet.show('', 'Actualización no realizada, intentelo nuevamente', 'warning');
+            });
+        }
+
+        // llamada archivo del arbol para cargar en pantalla
+        $scope.jsonArbol = "";
+        $scope.arbolNodos = function () {
+            $.ajax({ 
+                data:{ } ,            
+                //url: 'http://192.168.17.144:88/dreamfactory/dist/storeArbolAjaxDAG.php',
+                url: 'http://192.168.5.248/dreamfactory/dist/dag/storeArbolAjaxDAG.php',
+                type: 'post', 
+                dataType: "json",
+                success: function (response) { 
+                    $timeout(function () {
+                        var tempJsonArbol = JSON.stringify(response);
+                        $scope.jsonArbol = JSON.parse(tempJsonArbol);
+                        $('#tree1').tree({
+                            data:  $scope.jsonArbol,
+                            closedIcon: $('<i class="fa fa-plus-circle"/>'),
+                            openedIcon: $('<i class="fa fa-minus-circle"/>'),
+                            autoOpen: 0
+                        });
+                    }, 1000);
+                }
+            });
+        }
+        // ojo no borrar la funcion q no hace nada
+        $scope.alestra = function () {
+        };
+
+        $scope.nodoAr
+        $('#tree1').bind(
+            'tree.select',
+            function(event) {
+                if (event.node) {
+                    // node was selected
+                    var node = event.node;
+                    //alert(node.name);
+                    $scope.nodoAr = node;
+                    //console.log($scope.nodoAr, "aqui");
+                    //$scope.datos.UBI_IT = node.name;
+                }
+                else {
+                    // event.node is null
+                    // a node was deselected
+                    // e.previous_node contains the deselected node
+                }
+            }
+        );
+        
+        $scope.addNode = function() {
+            if ($scope.agregado == "false") {
+                var nameNode = $scope.datos.DAG_CAT_PRESUP_ITEM;
+                var idNode = parseInt($scope.nodoAr.children.length) + 1;
+                var padreNode = parseInt($scope.nodoAr.id);
+                //console.log(nameNode, " ", idNode);
+                $('#tree1').tree(
+                    'appendNode', 
+                    { 
+                        name: nameNode, 
+                        id: idNode,
+                        padre : padreNode
+                    }, 
+                    $scope.nodoAr
+                );
+                $scope.agregado = "true";
+                alert("Item agregado como hijo de: " + padreNode);
+            }
+            else{
+                alert("Solo se puede agregar una vez");
+            };
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////// ARBOL  //////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        ///////////////////////////////////// GUARDAR ////////////////////////////////////////////////////////////
+
+        $scope.guardarItem = function (){
+            console.log("aplica", $scope.datos.INT_APLICA);
+            if ($scope.datos.INT_APLICA == '1'){
+                var node = $('#tree1').tree('getSelectedNode');
+                if (node != false){
+                    //console.log(node);
+                    var nuevoItem = node.name;
+                    var nodo_nivel = parseInt(node.children.length) + 1;
+                    var nodo_padre = node.id;
+                    var nodo_nombre = $scope.datos.DAG_CAT_UBM_ITEM;
+                    var size = Object.keys($scope.caracteristicas).length;
+                    var nodo_carac = Array();
+                    var xi = 0;
+                    for(var j=0; j<size; j++){
+                        if ($scope.caracteristicas[j].name != ""){
+                            nodo_carac[xi] = $scope.caracteristicas[j].name
+                            xi++;
+                        }
+                    }
+                    var partida = 0;
+                    for (part in $scope.datosPartidas) {
+                        if ($scope.datos.DAG_CAT_UBM_PARTIDA == $scope.datosPartidas[part].ptp_id){
+                            partida = $scope.datosPartidas[part].ptp_codigo;
+                            //console.log("partidas:",datospartida[part].ptp_descripcion);
+                        }
+                        //console.log("Descripcion1: ", datospartida[part].ptp_id ," Descripcion2:", id);
+                    }
+                    //alert("guardar:" + nodo_nivel + ', ' + nodo_padre + ', ' + nodo_nombre + ', ' + $scope.datos.DAG_CAT_UBM_DESC_ITEM + ', ' + partida + ', ' + nodo_carac);
+                    var datosImpresion = {
+                        "procedure_name":"dag.sp_dag_inscatalogo",
+                        "body":{
+                            "params": [                                
+                                {
+                                    "name": "pdag_cat_nivel",
+                                    "value": nodo_nivel
+                                },
+                                {
+                                    "name": "pdag_cat_padre",
+                                    "value": nodo_padre
+                                },
+                                {
+                                    "name": "pdag_cat_nombre",
+                                    "value": nodo_nombre
+                                },
+                                {
+                                    "name": "pdag_cat_descripcion",
+                                    "value": $scope.datos.DAG_CAT_UBM_DESC_ITEM
+                                },
+                                {
+                                    "name": "pdag_cat_partida",
+                                    "value": partida
+                                },
+                                {
+                                    "name": "pdag_cat_fdepreciacion",
+                                    "value": $scope.datos.DAG_CAT_UBM_FACDEP
+                                },
+                                {
+                                    "name": "pdag_cat_caracteristicas",
+                                    "value": JSON.stringify(nodo_carac)
+                                },
+                                {
+                                    "name": "pdag_cat_imagen",
+                                    "value": $scope.datos.DAG_CAT_SOL_IMG
+                                },
+                                {
+                                    "name": "pae_nro_caso",
+                                    "value": $scope.datos.AE_NRO_CASO
+                                },
+                                {
+                                    "name": "pdag_cat_unimed",
+                                    "value": $scope.datos.DAG_CAT_UBM_UNIMED
+                                }
+                            ]
+                        }
+                    };
+                    DreamFactory.api[CONFIG.SERVICE].callStoredProcWithParams(datosImpresion).success(function (response){
+                        $scope.impresion = response;
+                        $scope.cargarDatos($scope.datos);
+                        $scope.guardarData($scope.datos);
+                        $scope.actualizarArbol();
+                    })
+                    .error(function(data){
+                        sweet.show('', 'Error al guardar la informacion: ', 'error');
+                    });
+                }
+                else {
+                    sweet.show('', 'Debe seleccionar nodo en el arbol para asignar', 'error');
+                }
+            }
+            else
+            {
+                $scope.cargarDatos($scope.datos);
+                $scope.guardarData($scope.datos);
+            }
+        }
+        
+        ////////////////////////////////// FIN GUARDAR ////////////////////////////////////////////////////////////
+
+        $scope.descPartUBMfn = function (id,datopartida) {
+            for (part in datopartida) {
+                if (id == datopartida[part].ptp_id){
+                    $scope.datos.DAG_CAT_UBM_DESC_PART = datopartida[part].ptp_descripcion;
+                    //console.log("partidas:",datospartida[part].ptp_descripcion);
+                }
+                //console.log("Descripcion1: ", datospartida[part].ptp_id ," Descripcion2:", id);
+            }
+        }
+        $scope.descCaractfn= function (caract) {
+            $scope.datos.DAG_CAT_UBM_CARACTERISTICAS = caract;
+            //console.log("caracteristicas: ", caract);
+        }
+        $scope.caracteristicas = [{name:"DETALLE"}];
+        $scope.elimCaracteristica = function () {
+            var size = Object.keys($scope.caracteristicas).length;
+            if(size >= 2 ){
+                $scope.caracteristicas.pop();
+            }
+            else
+            {
+                alert("No se puede eliminar la caracteristica DETALLE");
+                console.log("No se puede eliminar la caracteristica DETALLE");
+            }
+        }
+        $scope.addCaracteristica = function () {
+            $scope.caracteristicas.push({ 
+                name: ""
+            });
+            //console.log("Caracteristicas",$scope.caracteristicas);
+        }
+        $scope.$on('api:ready',function(){
+            $scope.getPartidas();
+            $scope.getDepre();
+            $scope.descPartUBMfn($scope.datos.DAG_CAT_UBM_PARTIDA, $scope.datosPartidas);
+            $scope.arbolNodos();
+            $scope.datos.DAG_CAT_PARTIDA4=parseInt($scope.datos.DAG_CAT_PARTIDA4);
+            $scope.datos.DAG_CAT_PRESUP_PARTIDA=parseInt($scope.datos.DAG_CAT_PRESUP_PARTIDA);
+            $scope.datos.DAG_CAT_UBM_PARTIDA=parseInt($scope.datos.DAG_CAT_PRESUP_PARTIDA);
+            $scope.datos.DAG_CAT_UBM_ITEM=$scope.datos.DAG_CAT_PRESUP_ITEM;
+            // $scope.datos.DAG_CAT_UBM_FACDEP=parseInt($scope.datos.DAG_CAT_PRESUP_FACDEP);
+            $scope.datos.DAG_CAT_UBM_DESC_ITEM=$scope.datos.DAG_CAT_PRESUP_DESC_ITEM;
+            $scope.datos.DAG_CAT_UBM_DESC_PART=$scope.datos.DAG_CAT_PRESUP_DESC_PART;
+            $scope.datos.INT_APLICA = '2';
+            $scope.agregado = "false";
+            if ($scope.datos.DAG_CAT_PRESUP_APLI=='2'){$scope.datos.INT_APLICA = '3';}
+            //console.log("RAEV ", jsonVar);
+        });
+        $scope.inicioCatalogo = function () {
+            if(DreamFactory.api[CONFIG.SERVICE]){
+                $scope.getPartidas();
+                $scope.getDepre();
+                $scope.descPartUBMfn($scope.datos.DAG_CAT_UBM_PARTIDA, $scope.datosPartidas);
+                $scope.arbolNodos();
+                $scope.datos.DAG_CAT_PARTIDA4=parseInt($scope.datos.DAG_CAT_PARTIDA4);
+                $scope.datos.DAG_CAT_PRESUP_PARTIDA=parseInt($scope.datos.DAG_CAT_PRESUP_PARTIDA);
+                $scope.datos.DAG_CAT_UBM_PARTIDA=parseInt($scope.datos.DAG_CAT_PRESUP_PARTIDA);
+                $scope.datos.DAG_CAT_UBM_ITEM=$scope.datos.DAG_CAT_PRESUP_ITEM;
+                //$scope.datos.DAG_CAT_UBM_FACDEP=parseInt($scope.datos.DAG_CAT_PRESUP_FACDEP);
+                $scope.datos.DAG_CAT_UBM_DESC_ITEM=$scope.datos.DAG_CAT_PRESUP_DESC_ITEM;
+                $scope.datos.DAG_CAT_UBM_DESC_PART=$scope.datos.DAG_CAT_PRESUP_DESC_PART;
+                $scope.datos.INT_APLICA = '2';
+                $scope.agregado = "false";
+                if ($scope.datos.DAG_CAT_PRESUP_APLI=='2'){$scope.datos.INT_APLICA = '3';}
+                //console.log("RAEV ", jsonVar);
+            }
+        };
+    }
+</script>
+<div class="animated fadeInRight">
+<!-- begin form -->
+    <form class="form-horizontal" name="formulario" novalidate>
+        <div div class="wrap" ng-controller="frmCatalogoController" data-ng-init="inicioCatalogo(datos)">
+            <div class="ibox-title_2">
+                <h5>CONFIRMACION DE CATALOGACION DE ITEM:</h5>
+            </div>
+            <div class="hr-line-dashed"></div>
+            
+            <!-- <div class="col-md-12">
+                <button class="btn btn-primary" ng-click="actualizarArbol()"> <i></i>Cargar arbol</button>
+            </div> -->
+
+            <!-- ------------------------------- Inicio Solicitante --------------------------------------------------------- -->
+            <div class="ibox-title_2">
+                <h5>Datos de la solicitud</h5>
+            </div>
+            <div class="form-group"><label class="col-sm-2 control-label" style="red">SECTOR: <small class="m-l-sm" style="color: red"></small></label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.DAG_CAT_SECTOR_VALOR}}" class="form-control"></div>
+            </div>
+            <div class="form-group"><label class="col-sm-2 control-label" style="red">DIRECCION ADMINISTRATIVA: <small class="m-l-sm" style="color: red"></small></label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.DAG_CAT_DA_VALOR}}" class="form-control"></div>
+            </div>
+            <div class="form-group"><label class="col-sm-2 control-label" style="red">ITEM: <small class="m-l-sm" style="color: red"></small></label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.DAG_CAT_ITEM}}" class="form-control"></div>
+            </div>
+            <div class="form-group"><label class="col-sm-2 control-label" style="red">IMAGEN:<small class="m-l-sm" style="color: red"></small></label>
+                <picture>
+                    <source
+                        media="(min-width: 650px)"
+                        srcset="{{datos.DAG_CAT_SOL_IMG}}">
+                    <source
+                        media="(min-width: 465px)"
+                        srcset="{{datos.DAG_CAT_SOL_IMG}}">
+                    <img
+                        src="{{datos.DAG_CAT_SOL_IMG}}"
+                        alt="Imagen del activo">
+                </picture>
+            </div>
+            <div class="form-group"><label class="col-sm-2 control-label" style="red">DESCRIPCION DEL ITEM: <small class="m-l-sm" style="color: red"></small></label>
+                <div class="col-sm-10"><textarea ng-model="datos.DESC_IT" id="DESC_IT" name="DESC_IT" class="form-control" placeholder="Sin dato" ng-disabled="true" onkeyUp="return conMayusculas(this);"></textarea>
+                </div>
+            </div>
+            <div class="form-group"><label class="col-sm-2 control-label" style="red">JUSTIFICACION: <small class="m-l-sm" style="color: red"></small></label>
+                <div class="col-sm-10"><textarea ng-model="datos.DAG_CAT_JUSTINCO" id="DAG_CAT_JUSTINCO" name="DAG_CAT_JUSTINCO" class="form-control" placeholder="Sin dato" ng-disabled="true" onkeyUp="return conMayusculas(this);"></textarea>
+                </div>
+            </div>
+            <div class="form-group"><label class="col-sm-2 control-label" style="red">MARCAS Y MODELOS SUGERIDOS: <small class="m-l-sm" style="color: red"></small></label>
+                <div class="col-sm-10"><textarea ng-model="datos.DAG_CAT_MARCMOD" id="DAG_CAT_MARCMOD" name="DAG_CAT_MARCMOD" class="form-control" placeholder="Sin dato" ng-disabled="true" onkeyUp="return conMayusculas(this);"></textarea>
+                </div>
+            </div>
+            <div class="form-group"><label class="col-sm-2 control-label" style="red">PRECIO REFERENCIAL: <small class="m-l-sm" style="color: red"></small></label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.DAG_CAT_PRECIO | currency:'bs. '}}" class="form-control"></div>
+            </div>            
+            <!-- <div class="form-group"><label class="col-sm-2 control-label" style="red">UNIDAD DE MEDIDA: <small class="m-l-sm" style="color: red"></small></label>
+                <div class="col-sm-10"><textarea ng-model="datos.DAG_CAT_UM_VALOR" id="DAG_CAT_UM_VALOR" name="DAG_CAT_UM_VALOR" class="form-control" placeholder="Sin dato" ng-disabled="true" onkeyUp="return conMayusculas(this);"></textarea>
+                </div>
+            </div> -->
+            <div class="form-group"><label class="col-sm-2 control-label" style="red">PARTIDA SUGERIDA: <small class="m-l-sm" style="color: red"></small></label>
+                <div class="col-sm-10">
+                   <select 
+                        id="DAG_CAT_PARTIDA4" 
+                        name="DAG_CAT_PARTIDA4" 
+                        placeholder="-- Seleccione --" 
+                        ng-model="datos.DAG_CAT_PARTIDA4" 
+                        class="form-control" 
+                        ng-options='datoP.ptp_id as (datoP.ptp_nivel + " " + datoP.ptp_nombre) for datoP in datosPartidas'
+                        ng-disabled="true"
+                        required>
+                        <option value=""></option>
+                    </select> 
+                </div>
+            </div>
+            <div class="form-group"><label class="col-sm-2 control-label" style="red">DESCRIPCION DE PARTIDA SUGERIDA: <small class="m-l-sm" style="color: red"></small></label>
+                <div class="col-sm-10"><textarea ng-model="datos.DAG_CAT_DESCRIPCION" id="DAG_CAT_DESCRIPCION" name="DAG_CAT_DESCRIPCION" class="form-control" placeholder="Sin dato" ng-disabled="true" onkeyUp="return conMayusculas(this);"></textarea>
+                </div>
+            </div>
+            <!-- <div class="form-group"><label class="col-sm-2 control-label" style="red">FACTOR DE DEPRECIACION: <small class="m-l-sm" style="color: red"></small></label>
+                <div class="col-sm-10"><textarea ng-model="datos.DAG_FAC_VALOR" id="DAG_FAC_VALOR" name="DAG_FAC_VALOR" class="form-control" placeholder="Sin dato" ng-disabled="true" onkeyUp="return conMayusculas(this);"></textarea>
+                </div>
+            </div> -->
+            <div class="form-group"><label class="col-sm-2 control-label" style="red">SOLICITANTE: <small class="m-l-sm" style="color: red"></small></label>
+                <div class="col-sm-10"><textarea ng-model="datos.DAG_RES_SOL" id="DAG_RES_SOL" name="DAG_RES_SOL" class="form-control" placeholder="Sin dato" ng-disabled="true"></textarea>
+                </div>
+            </div>
+            <div class="form-group"><label class="col-sm-2 control-label" style="red">CARGO INSTITUCIONAL: <small class="m-l-sm" style="color: red"></small></label>
+                <div class="col-sm-10"><textarea ng-model="datos.DAG_CARG_INS2" id="DAG_CARG_INS2" name="DAG_CARG_INS2" class="form-control" placeholder="Sin dato" ng-disabled="true"></textarea>
+                </div>
+            </div>
+            <!-- 
+                ------------------------------------------ Fin de solicitante -------------------------------------------------
+                ------------------------------------------ Inicio presupuesto ------------------------------------------------
+             -->
+            <div class="hr-line-dashed"></div>
+            <div class="ibox-title_2">
+                <h5>Criterio emitido por la Unidad de Presupuesto</h5>
+            </div>
+            <div class="form-group"><label class="col-sm-2 control-label" style="red">ITEM: <small class="m-l-sm" style="color: red"></small></label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.DAG_CAT_PRESUP_ITEM}}" class="form-control"></div>
+            </div>
+            <div class="form-group"><label class="col-sm-2 control-label" style="red">DESCRIPCION DEL ITEM: <small class="m-l-sm" style="color: red"></small></label>
+                <div class="col-sm-10"><textarea ng-model="datos.DAG_CAT_PRESUP_DESC_ITEM" id="DAG_CAT_PRESUP_DESC_ITEM" name="DAG_CAT_PRESUP_DESC_ITEM" class="form-control" placeholder="Sin dato" ng-disabled="true" onkeyUp="return conMayusculas(this);"></textarea>
+                </div>
+            </div>
+            <div class="form-group"><label class="col-sm-2 control-label" style="red">CRITERIO DE UNIDAD DE PRESUPUESTO: <small class="m-l-sm" style="color: red"></small></label>
+                <div class="col-sm-10"><textarea ng-model="datos.DAG_CAT_PRESUP_CRITERIO" id="DAG_CAT_PRESUP_CRITERIO" name="DAG_CAT_PRESUP_CRITERIO" class="form-control" placeholder="Sin dato" ng-disabled="true" onkeyUp="return conMayusculas(this);"></textarea>
+                </div>
+            </div>
+            <div class="form-group"><label class="col-sm-2 control-label" style="red">PARTIDA SUGERIDA: <small class="m-l-sm" style="color: red"></small></label>
+                <div class="col-sm-10">
+                   <select 
+                        id="DAG_CAT_PRESUP_PARTIDA" 
+                        name="DAG_CAT_PRESUP_PARTIDA" 
+                        placeholder="-- Seleccione --" 
+                        ng-model="datos.DAG_CAT_PRESUP_PARTIDA" 
+                        class="form-control" 
+                        ng-options='datoP.ptp_id as (datoP.ptp_nivel + " " + datoP.ptp_nombre) for datoP in datosPartidas'
+                        ng-disabled="true"
+                        required>
+                        <option value=""></option>
+                    </select> 
+                </div>
+            </div>
+            <div class="form-group"><label class="col-sm-2 control-label" style="red">DESCRIPCION DE PARTIDA SUGERIDA: <small class="m-l-sm" style="color: red"></small></label>
+                <div class="col-sm-10"><textarea ng-model="datos.DAG_CAT_PRESUP_DESC_PART" id="DAG_CAT_PRESUP_DESC_PART" name="DAG_CAT_PRESUP_DESC_PART" class="form-control" placeholder="Sin dato" ng-disabled="true" onkeyUp="return conMayusculas(this);"></textarea>
+                </div>
+            </div>
+            <!-- <div class="form-group"><label class="col-sm-2 control-label" style="red">FACTOR DE DEPRECIACION: <small class="m-l-sm" style="color: red"></small></label>
+                <div class="col-sm-10"><textarea ng-model="datos.DAG_CAT_PRESUP_FACDEP_VALOR" id="DAG_CAT_PRESUP_FACDEP_VALOR" name="DAG_CAT_PRESUP_FACDEP_VALOR" class="form-control" placeholder="Sin dato" ng-disabled="true" onkeyUp="return conMayusculas(this);"></textarea>
+                </div>
+            </div> -->
+            <!-- 
+                ----------------------------------------- Fin de presupuesto ---------------------------------------------------
+                --------------------------------------------- Inicio UBM ------------------------------------------------------ 
+            -->
+            <div class="hr-line-dashed"></div>
+            <div class="ibox-title_2">
+                <h5>Criterio emitido por la Unidad de Bienes Muebles</h5>
+            </div>
+            <div class="form-group"><label class="col-sm-2 control-label">APLICA:</label>
+                <div class="col-sm-10">
+                    <select id="INT_APLICA" name="INT_APLICA" class="form-control"  ng-model="datos.INT_APLICA" placeholder="-- Seleccione --" required>
+                        <option value="1">Catalogar</option>
+                        <option value="2">Devolver</option>
+                        <option value="3">No aplica</option>
+                    </select>
+                </div>
+            </div>
+            <div class="hr-line-dashed"></div>
+            <div ng-show="datos.INT_APLICA=='1'">
+                <div class="form-group"><label class="col-sm-2 control-label" style="red">ITEM: <small class="m-l-sm" style="color: red">*</small></label>
+                    <div class="col-sm-10"><input type="text" ng-model="datos.DAG_CAT_UBM_ITEM" class="form-control" value="{{datos.DAG_CAT_PRESUP_ITEM}}"></div>
+                </div>
+                <div class="form-group"><label class="col-sm-2 control-label" style="red">DESCRIPCION DEL ITEM: <small class="m-l-sm" style="color: red">*</small></label>
+                    <div class="col-sm-10"><textarea ng-model="datos.DAG_CAT_UBM_DESC_ITEM" id="DAG_CAT_UBM_DESC_ITEM" name="DAG_CAT_UBM_DESC_ITEM" class="form-control" placeholder="Sin dato" ng-disabled="false" value="{{datos.DAG_CAT_PRESUP_DESC_ITEM}}"></textarea>
+                    </div>
+                </div>
+                <!-- <div class="form-group"><label class="col-sm-2 control-label" style="red">PARTIDA SUGERIDA: <small class="m-l-sm" style="color: red">*</small></label>
+                    <div class="col-sm-10">
+                       <select 
+                            id="DAG_CAT_UBM_PARTIDA" 
+                            name="DAG_CAT_UBM_PARTIDA" 
+                            placeholder="-- Seleccione --" 
+                            ng-model="datos.DAG_CAT_UBM_PARTIDA" 
+                            class="form-control" 
+                            ng-options='datoP.ptp_id as (datoP.ptp_nivel + " " + datoP.ptp_nombre) for datoP in datosPartidas'
+                            ng-change="descPartUBMfn(datos.DAG_CAT_UBM_PARTIDA, datosPartidas)" 
+                            required>
+                            <option value=""></option>
+                        </select> 
+                    </div>
+                </div>
+                <div class="form-group"><label class="col-sm-2 control-label" style="red">DESCRIPCION DE PARTIDA SUGERIDA: <small class="m-l-sm" style="color: red">*</small></label>
+                    <div class="col-sm-10"><textarea ng-model="datos.DAG_CAT_UBM_DESC_PART" id="DAG_CAT_UBM_DESC_PART" name="DAG_CAT_UBM_DESC_PART" class="form-control" value="{{datos.DAG_CAT_UBM_DESC_PART}}" ng-disabled="true"></textarea></div>
+                </div> -->
+                <div class="form-group"><label class="col-sm-2 control-label" style="red">FACTOR DE DEPRECIACION: <small class="m-l-sm" style="color: red">*</small></label>
+                    <div class="col-sm-10">
+                       <select 
+                            id="DAG_CAT_UBM_FACDEP" 
+                            name="DAG_CAT_UBM_FACDEP" 
+                            placeholder="-- Seleccione --" 
+                            ng-model="datos.DAG_CAT_UBM_FACDEP" 
+                            class="form-control" 
+                            ng-options='datoD.ftd_id as (datoD.ftd_grupo_generico + " | " + datoD.ftp_coeficiente  + "% | VU:" + datoD.ftp_vidautil + " años") for datoD in datosDepreciacion'>
+                            <option value=""></option>
+                        </select> 
+                    </div>
+                </div>
+                <div class="hr-line-dashed"></div>
+                <div class="col-md-12">
+                    <button class="btn btn-primary" ng-click="addCaracteristica()"> <i class="glyphicon fa fa-plus"></i> Adicionar caracteristica</button>
+                    <button class="btn btn-primary" ng-click="elimCaracteristica()"> <i class="glyphicon fa fa-minus"></i> Eliminar ultima caracteristica</button>
+                </div>
+                <div class="hr-line-dashed"></div>
+                <div ng-repeat="caracteristica in caracteristicas" class="form-group">
+                    <label class="col-sm-2 control-label" style="red">CARACTERISTICA</label>
+                    <div class="col-sm-10">
+                        <div class="input-group" >
+                            <input type="text" class="form-control" placeholder="" ng-model="caracteristica.name" onkeyUp="return conMayusculas(this);" ng-change="descCaractfn(caracteristicas)">
+                        </div>                
+                    </div>
+                </div>
+            <!-- ---------------------------------------- Inicio Arbol -----------------------------------------------------  -->
+                <!-- <div class="col-md-12">
+                    <button class="btn btn-primary" ng-click="addNode()"> <i></i>NODO</button>
+                </div> --> 
+                <div class="form-group"><label class="col-sm-2 control-label" style="red">UBICACION DEL ITEM: <small class="m-l-sm" style="color: red">*</small></label>
+                    <div class="col-md-10" style="height:200px;  overflow-y:scroll;">
+                        <div id="tree1" ng-click="alestra()"></div>
+                    </div>
+                </div>
+            <!-- ------------------------------------------ Fin Arbol ------------------------------------------------------- -->
+                <div class="form-group"><label class="col-sm-2 control-label">UNIDAD DE MEDIDA:</label>
+                    <div class="col-sm-10">
+                        <select id="DAG_CAT_UBM_UNIMED" name="DAG_CAT_UBM_UNIMED" class="form-control"  ng-model="datos.DAG_CAT_UBM_UNIMED" placeholder="-- Seleccione --" required>
+                            <option value="1">Unidad o Pieza</option>
+                            <option value="2">Longitud</option>
+                            <option value="3">Masa</option>
+                            <option value="4">Volumen</option>
+                            <option value="5">Area</option>
+                            <option value="6">Tiempo</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="hr-line-dashed"></div>
+            <div class="form-group"><label class="col-sm-2 control-label" style="red">JUSTIFICACION: <small class="m-l-sm" style="color: red">*</small></label>
+                <div class="col-sm-10"><textarea ng-model="datos.DAG_CAT_UBM_CRITERIO" id="DAG_CAT_UBM_CRITERIO" name="DAG_CAT_UBM_CRITERIO" class="form-control" placeholder="Sin dato" ng-disabled="false" required></textarea>
+                <span style="color:red" ng-show="formulario.DAG_CAT_UBM_CRITERIO.$invalid">
+                        <span ng-show="formulario.DAG_CAT_UBM_CRITERIO.$error.required">Es requerido.
+                        </span>
+                    </span>
+                </div>
+            </div>
+            <!-- ----------------------------------------------- Fin UBM ---------------------------------------------------- -->
+            <div class="hr-line-dashed"></div>
+            <button type="button" class="btn btn-primary" ng-disabled="false" ng-click="volver()"> <i class="glyphicon fa fa-times"></i> Cancelar </button> 
+            <button type="button" class="btn btn-primary" ng-click="guardarItem()" ng-disabled="formulario.$invalid"> <i class="glyphicon fa fa-save"></i> Guardar / Continuar</button>
+        </div>        
+    </form>
+</div>
+

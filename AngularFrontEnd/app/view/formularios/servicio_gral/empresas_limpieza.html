@@ -1,0 +1,100 @@
+<script type="text/javascript">
+            // When the document is ready
+      function conMayusculas(field) {
+        field.value = field.value.toUpperCase()
+      };
+      //*** Este Codigo permite Validar que sea un campo Numerico
+            function soloNumerico(variable){
+                Numer=parseInt(variable);
+                if (isNaN(Numer)){
+                    return "";
+                }
+                return Numer;
+            }
+            function valNumero(Control){
+                Control.value=soloNumerico(Control.value);
+            }
+            //*** Fin del Codigo para Validar que sea un campo Numerico
+</script>
+<div  class="col-md-12" ng-controller="empresaController" data-ng-init="inicioEmpresas()">
+    <div class="col-lg-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>Empresas de Limpieza</h5>
+
+                <div ibox-tools></div>
+                    <div class="botones_inspinia_lmc">
+                        <a class="btn btn-primary" ng-click="limpiar()" data-toggle="modal" data-target="#registro"><i class="glyphicon glyphicon-plus-sign"></i>Nueva Empresa</a>
+                    </div>
+            </div>
+            <div class="ibox-content">
+                <table ng-table="tablaEmpresas" show-filter="true" class="table table-striped">
+                    <tr ng-repeat="empresa in $data" ng-class="{'colorInactivo': empresa.est == 'INACTIVO'}">
+                        <td align="center" data-title="'Opciones'" style="width: 80px;">
+                            <a class="btn btn-info btn-circle" data-toggle="modal" data-target="#registro" ng-click="modificarEmpresaCargar(empresa)"><i class="fa fa-pencil"></i></a>
+                            <a class="btn btn-info btn-circle" onclick="" data-toggle="modal" data-target="#registro" ng-click="eliminarEmpresaCargar(empresa)"><i class="fa fa-trash-o"></i></a>
+                        </td>
+                        <!--td data-title="'ID'">{{rol.rlsId}}</td-->
+                        <td data-title="'Nombre'" sortable="'nombre'" filter="{'nombre':'text'}">{{empresa.nombre}}</td>
+                        <td data-title="'Direccion'" sortable="'dir'" filter="{'dir':'text'}">{{empresa.dir}}</td>
+                        <td data-title="'Telefono'" sortable="'tel'" filter="{'tel':'text'}">{{empresa.tel}}</td>
+                        <td data-title="'Celular'" sortable="'cel'" filter="{'cel':'text'}">{{empresa.cel}}</td>
+                        <td data-title="'Correo'" sortable="'correo'" filter="{'correo':'text'}">{{empresa.correo}}</td>
+                        <td data-title="'Registrado'" sortable="'fcharegistro'" filter="{'fcharegistro':'text'}">{{empresa.fcharegistro}}</td>
+                        <td data-title="'Modificado'" sortable="'fchamodificado'" filter="{'fchamodificado':'text'}">{{empresa.fchamodificado}}</td>
+                        <td data-title="'Estado'" sortable="'est'" filter="{'est':'text'}">{{empresa.est}}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!-- MODAL -->
+    <div class="modal fade" id="registro" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Cerrar</span></button>
+                    <h4 class="modal-title" id="myModalLabel">{{titulo}}</h4>
+                </div>
+                <div class="modal-body" >
+                    <form name="formularioEmpresas" novalidate>
+                        <div class="form-group">
+                            <label for="url" >Nombre de la Empresa:</label>
+                            <div class="controls">
+                                <input  ng-value="&nbsp;" ng-model="datosEmpresa.nombre" name="nombre" id="nombre" class="form-control" type="text" placeholder="ingrese nombre de la empresa" ng-disabled="only" ng-required="true" onkeyUp="return conMayusculas(this)">
+                                <span style="color:red" ng-show="formularioEmpresas.nombre.$invalid">
+                                    <span ng-show="formularioEmpresas.rlsRol.$error.required">Nombre de la Empresa es requerido.
+                                    </span>
+                                </span>
+                            </div>
+                            <label for="url" >Direccion de la Empresa:</label>
+                            <div class="controls">
+                                <input  ng-value="&nbsp;" ng-model="datosEmpresa.dir" name="dir" id="dir" class="form-control" type="text" placeholder="ingrese direccion de la empresa" ng-disabled="only" ng-required="true" onkeyUp="return conMayusculas(this)">
+                            </div>
+                            <label for="url" >Telefono de la Empresa:</label>
+                             <div class="controls">
+                                <input  ng-value="&nbsp;" ng-model="datosEmpresa.tel" name="tel" id="tel" class="form-control" type="text" placeholder="ingrese el telefono de la empresa" ng-disabled="only" ng-required="true" onkeyUp="return conMayusculas(this)">
+                            </div>
+                            <label for="url" >Celular de la Empresa:</label>
+                             <div class="controls">
+                                <input  ng-value="&nbsp;" ng-model="datosEmpresa.cel" name="cel" id="cel" class="form-control" type="text" placeholder="ingrese el celular de la empresa" ng-disabled="only" ng-required="true" onkeyUp="return conMayusculas(this)">
+                            </div>
+                            <label for="url" >Correo de la Empresa:</label>
+                             <div class="controls">
+                                <input  ng-value="&nbsp;" ng-model="datosEmpresa.correo" name="correo" id="correo" class="form-control" type="text" placeholder="ingrese el correo de la empresa" ng-disabled="only" ng-required="true" onkeyUp="return conMayusculas(this)">
+                            </div>
+                            </div>
+                             
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <button data-dismiss="modal" ng-click="adicionarEmpresa(datosEmpresa)" type="button" class="btn btn-primary" ng-show="boton=='new'" ng-hide="boton=='upd' || boton=='del'" ng-disabled="formularioEmpresa.nombre.$invalid">Guardar</button>
+                    <button ng-click="modificarEmpresa(datosEmpresa.id,datosEmpresa)" data-dismiss="modal" type="button" class="btn btn-primary" ng-show="boton=='upd'" ng-hide="boton=='new' || boton=='del'" ng-disabled="formularioEmpresa.id.$invalid">Modificar</button>
+                    <button ng-click="eliminarEmpresa(datosEmpresa.id)" data-dismiss="modal" type="button" class="btn btn-primary" ng-show="boton=='del'" ng-hide="boton=='new' || boton=='upd'">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

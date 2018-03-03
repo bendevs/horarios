@@ -1,0 +1,860 @@
+<script>
+function juegosController($scope, $rootScope, $routeParams, $location, $http, Data, sessionService, CONFIG, LogGuardarInfo, DreamFactory,ngTableParams,$filter,sweet, $sce, registroLog,FileUploader, wsContribuyenteNatural,wsContribuyenteJuridico,wsLicencia, $window, wsRgistrarPubliciadad) {
+    var fecha= new Date();
+    $scope.fechactual=fecha.getFullYear() + "-" + fecha.getMonth() + "-" + fecha.getDate() + " " + fecha.getHours() + ":" + fecha.getMinutes() + ":" + fecha.getSeconds();
+    
+    $scope.startDateOpen = function($event) {
+        $event.preventDefault();
+        $event.stopPropagation();
+        $scope.startDateOpened = true;
+    }; 
+
+    datoObjectFinalPub = [];   
+    
+    $scope.getListaRequisitos = function(lista){
+        $rootScope.datosRequisitosCheckBox = lista;
+
+        if ($scope.datos.publicidad_grilla == [] || $scope.datos.publicidad_grilla == 'undefined' || $scope.datos.publicidad_grilla == null) {
+            $scope.verPublicidad = false;
+        } else{
+            $scope.verPublicidad = true;
+            var respuestPub = $scope.datos.publicidad_grilla;
+            for(j=1; j<respuestPub.length;j++){
+                datoObjectPub = new Object(); 
+                datoObjectPub.nroElem=respuestPub[j].nroElem; 
+                datoObjectPub.INT_TIPO_LETRE=respuestPub[j].INT_TIPO_LETRE; 
+                datoObjectPub.INT_CARA=respuestPub[j].INT_CARA;
+                datoObjectPub.FECHAINICIO=respuestPub[j].FECHAINICIO;
+                datoObjectPub.INT_DESC=respuestPub[j].INT_DESC;
+                datoObjectPub.INT_ALTO=respuestPub[j].INT_ALTO;
+                datoObjectPub.INT_ANCHO=respuestPub[j].INT_ANCHO;
+                datoObjectFinalPub[j-1] = datoObjectPub;    
+            }
+            $scope.datosPublicidad = datoObjectFinalPub;
+        };
+    }
+
+    $scope.getListaCondicionesTecnicas = function(lista){
+        $rootScope.datosRequisitosCondiciones = lista;       
+    }
+
+    $scope.checkAll = function() {
+        $scope.datos.INT_CON_TEC = $scope.INT_CON_TEC.map(function(item) { return item.resid; });
+    };
+
+    $scope.setContribuyenteJuridico = function(datosJ) { //alert('JURIDICO');
+            console.log(datosJ);
+
+            //$scope.datos1;
+            $scope.datos.f01_num_doc_rep = datosJ.INT_NUM_DOC;
+            $scope.datos.f01_tip_doc_rep = datosJ.INT_TIPO_DOC_IDENTIDAD;
+            $scope.datos.f01_expedido_rep = datosJ.INT_EXP;
+            $scope.datos.f01_pri_nom_rep = datosJ.INT_RL_PRIMER_NOMBRE;
+            $scope.datos.f01_seg_nom_rep = datosJ.INT_RL_SEGUNDO_NOMBRE;
+            $scope.datos.f01_ter_nom_rep = "";
+            $scope.datos.f01_ape_pat_rep = datosJ.INT_RL_PATERNO;
+            $scope.datos.f01_ape_mat_rep = datosJ.INT_RL_MATERNO;
+            $scope.datos.f01_ape_cas_rep = datosJ.INT_RL_CASADA;
+            $scope.datos.f01_cel_rep = datosJ.INT_TEL_CELULAR;
+            $scope.datos.f01_email_rep = datosJ.INT_CORREO;
+            $scope.datos.f01_num_pod_leg = datosJ.INT_RL_NUM_DOCUMENTO;
+            $scope.datos.f01_num_not = datosJ.INT_NUM_NOTARIA;
+            $scope.datos.f01_ges_vig_pod = datosJ.f01_ges_vig_pod
+            //sEstado:    "V" ,
+            $scope.datos.f01_id_zona_rep = datosJ.INT_ZONA;
+            $scope.datos.f01_id_zona_rep = datosJ.INT_ZONA;
+            
+            $scope.datos.f01_tipo_viarep = datosJ.INT_VIA;
+            $scope.datos.f01_nom_via_rep = datosJ.INT_NOMBRE_VIA;
+            $scope.datos.f01_num_rep = datosJ.INT_NUM;
+            //sTipoTransaccion:   "R" ,
+            //sUsuario:   "fsegales"  ,
+            //sIpUsuario: "192,168,5,248" ,
+            //sEquipo:    "GMLPPC05314"   ,
+            //sFuncionario:   "fsegales"  ,
+            $scope.datos.f01_nit = datosJ.INT_NIT;
+            $scope.datos.f01_raz_soc = datosJ.INT_DENOMINACION;
+            //sTelefonoE: "",
+            $scope.datos.f01_zona_act = datosJ.INT_AC_ID_ZONA;
+            $scope.datos.f01_zona_act_descrip = datosJ.INT_AC_ZONA;
+            $scope.datos.f01_tip_via_act = datosJ.INT_TIP_VIA;
+            $scope.datos.f01_num_act = datosJ.INT_AC_NOMBRE_VIA;
+            $scope.datos.f01_num_act1 = datosJ.INT_AC_NUMERO;
+            $scope.datos.f01_edificio_act = datosJ.INT_AC_EDIFICIO;
+            $scope.datos.f01_bloque_act = datosJ.INT_AC_BLOQUE;
+            $scope.datos.f01_piso_act = datosJ.INT_AC_PISO;
+            $scope.datos.f01_dpto_of_loc = datosJ.INT_AC_NUMERO;
+            //sDireccionDetalladaE:   ""  ,
+            //sFechaRegistro: "01/04/2016"    ,
+            $scope.datos.f01_tipo_per = "J";
+
+            console.log($scope.datos);
+            setTimeout(function(){ $.blockUI(); },1000);
+            wsContribuyenteJuridico.RegistrarNuevoContribuyenteGenesisJuridico($scope.datos).then(function(response){
+                $scope.datos.f01_id_contribuyente = response.idEmpresa;
+                //$scope.deshabilitadocheck=true;      
+                //$scope.deshabilitadoAE=false;
+                $scope.registroActividad($scope.datos);
+                console.log(response);
+             //sweet.show('Contribuyente Registrado', 'El Contribuyente se registro correctamente', 'success');
+             setTimeout(function(){ $.unblockUI(); },1000);                                         
+            });
+            wsContribuyenteJuridico.error(function(response){
+                sweet.show('', "Error al Registrar Contribuyente", 'error');
+               setTimeout(function(){ $.unblockUI(); },1000);
+            });
+            
+      };
+    $scope.registroActividad = function(datos) { 
+        var fechaInicio= datos.INT_INICIO_AE.split('/')
+        var resFechaInicio = fechaInicio[2] +"-"+ fechaInicio[1] +"-"+fechaInicio[0];
+
+        var fechaFin=datos.f01_fecha_fin_act.split("/");
+        var resFechaFin=fechaFin[2] +"-"+ fechaFin[1] +"-"+fechaFin[0];
+
+
+        console.log("fechaInicio", resFechaInicio);
+        $scope.modRegistro = null;
+        var misDatos = {
+            "procedure_name":"AE.spActividadEconomicaRegistroSIMGEP",
+            "body":{"params":[
+                {"name":"idContribuyente","value":datos.f01_id_contribuyente},
+                {"name":"clase","value":datos.f01_tipo_per},
+                {"name":"hojaRuta","value":datos.AE_NRO_CASO},
+                {"name":"numeroOrden","value":datos.f01_nro_orden},
+                {"name":"nit","value":datos.INT_NIT},
+                {"name":"cuentaEnergiaElectrica","value":datos.f01_cod_luz},
+                {"name":"idActividadDesarrollada","value": datos.INT_CAT_DESARROLADA_ID},
+                {"name":"denominacion","value": datos.f01_raz_soc},
+                {"name":"inicio","value":resFechaInicio},
+                {"name":"fin","value":resFechaFin},
+                {"name": "tipoVia","value": datos.INT_TIP_VIA},
+                {"name": "via","value": datos.INT_AC_NOMBRE_VIA},
+                {"name": "numero","value": datos.INT_AC_NUMERO},
+                {"name": "edificio","value": datos.INT_AC_EDIFICIO},
+                {"name": "bloque","value": datos.INT_AC_BLOQUE},
+                {"name": "piso","value": datos.INT_AC_PISO},
+                {"name": "departamento","value": datos.INT_AC_NUMERO},
+                {"name": "idZona","value": datos.INT_AC_ID_ZONA},
+                {"name": "idDistrito","value": datos.INT_AC_DISTRITO},
+                {"name": "entreCalles","value": "al medio"},
+                {"name": "telefono","value": datos.f01_tel_act1},
+                {"name": "casilla","value": datos.f01_casilla},
+                {"name": "codigoZona","value": datos.f01_idCodigoZona},
+                {"name": "superficie","value": datos.INT_AC_SUPERFICIE},
+                {"name": "idCategoria","value": datos.INT_TIPO_LICENCIA},
+                {"name": "productosElaborados","value": datos.f01_productosElaborados},
+                {"name": "actividadesSecundarias","value": datos.f01_actividadesSecundarias},
+                {"name": "establecimiento","value": datos.INT_AC_ESTADO},
+                {"name": "tipoActividad","value": datos.f01_tip_act},
+                {"name": "factor","value": datos.INT_AC_FACTOR},
+                {"name": "horarioAtencion","value": datos.INT_AC_HR_INICIO+" - "+datos.INT_AC_HR_FINAL},
+                {"name": "capacidad","value": parseInt(datos.INT_AC_CAPACIDAD)},//datos.INT_AC_CAPACIDAD},
+                {"name": "estado","value": "V"},
+                {"name": "tipoTransaccion","value": "R"},
+                {"name": "usuario","value": sessionService.get('US_GENESIS')},
+                {"name": "ipUsuario","value": "192,168,5,190"},
+                {"name": "equipo","value": "GMLPPC05314"},
+                {"name": "funcionario","value": sessionService.get('US_GENESIS')},
+                {"name": "tipoFormulario","value": 1},
+                {"name": "observaciones","value": datos.f01_observaciones_i} 
+            ]}  
+
+
+                //{"name":"tipoVia","value":"PL"},
+                // {"name":"via","value":"FAS"},
+                // {"name":"numero","value":"325345"},
+                // {"name":"edificio"},
+                // {"name":"bloque"},
+                // {"name":"piso"},
+                // {"name":"departamento"},
+                // {"name":"idZona","value":24},
+                // {"name":"idDistrito","value":3},
+                // {"name":"entreCalles","value":"al medio"},
+                // {"name":"telefono"},{"name":"casilla"},
+                // {"name":"codigoZona"},
+                // {"name":"superficie","value":"34"},
+                // {"name":"idCategoria","value":2},
+                // {"name":"productosElaborados","value":"AFSF"},
+                // {"name":"actividadesSecundarias","value":"FASF"},
+                // {"name":"establecimiento","value":"PROPIO"},
+                // {"name":"tipoActividad","value":"MA"},
+                // {"name":"factor","value":"TM"},
+                // {"name":"horarioAtencion","value":"12:00AM - 1:00AM"},
+                // {"name":"capacidad","value":30},
+                // {"name":"estado","value":"V"},
+                // {"name":"tipoTransaccion","value":"R"},
+                // {"name":"usuario","value":"fsegales"},
+                // {"name":"ipUsuario","value":"192,168,5,190"},
+                // {"name":"equipo","value":"GMLPPC05314"},
+                // {"name":"funcionario","value":"fsegales"},
+                // {"name":"tipoFormulario","value":1},
+                // {"name":"observaciones","value":"52425"}]} 
+
+            // "body":{"params": [
+            //         {"name": "idContribuyente","value": datos.f01_id_contribuyente },
+            //         {"name": "clase","value": datos.f01_tipo_per},//datos.f01_tipo_per
+            //         {"name": "hojaRuta","value": "123/2016"},
+            //         {"name": "numeroOrden","value": datos.f01_nro_orden},//datos.f01_nro_orden
+            //         {"name": "nit","value": datos.INT_NIT},
+            //         {"name": "cuentaEnergiaElectrica","value": datos.f01_cod_luz},
+            //         //{"name": "idActividadDesarrollada","value": datos.INT_CAT_AGRUPADA},//datos.f01_categoria_agrupada
+            //         {"name": "idActividadDesarrollada","value": datos.INT_CAT_DESARROLADA_ID},//datos.f01_categoria_agrupada
+            //         {"name": "denominacion","value": datos.f01_raz_soc},
+            //         //{"name": "inicio","value": datos.INT_AC_HR_INICIO},INT_INICIO_AE
+            //         {"name": "inicio","value": datos.INT_INICIO_AE},
+            //         //{"name": "fin","value": datos.INT_AC_HR_FINAL},
+            //         {"name": "fin","value": datos.f01_fecha_fin_act},
+            //         {"name": "tipoVia","value": datos.INT_TIP_VIA},
+            //         {"name": "via","value": datos.INT_AC_NOMBRE_VIA},
+            //         {"name": "numero","value": datos.INT_AC_NOMBRE_VIA1},
+            //         {"name": "edificio","value": datos.INT_AC_EDIFICIO},
+            //         {"name": "bloque","value": datos.INT_AC_BLOQUE},
+            //         {"name": "piso","value": datos.INT_AC_PISO},
+            //         {"name": "departamento","value": datos.INT_AC_NUMERO},
+            //         {"name": "idZona","value": datos.INT_AC_ID_ZONA},
+            //         {"name": "idDistrito","value": datos.INT_AC_DISTRITO},
+            //         {"name": "entreCalles","value": "al medio"},
+            //         {"name": "telefono","value": datos.f01_tel_act1},
+            //         {"name": "casilla","value": datos.f01_casilla},
+            //         {"name": "codigoZona","value": datos.f01_idCodigoZona},
+            //         {"name": "superficie","value": datos.INT_AC_SUPERFICIE},
+            //         {"name": "idCategoria","value": datos.INT_TIPO_LICENCIA},
+            //         {"name": "productosElaborados","value": datos.f01_productosElaborados},
+            //         {"name": "actividadesSecundarias","value": datos.f01_actividadesSecundarias},
+            //         {"name": "establecimiento","value": datos.INT_AC_ESTADO},
+            //         {"name": "tipoActividad","value": datos.f01_tip_act},
+            //         {"name": "factor","value": datos.INT_AC_FACTOR},
+            //         {"name": "horarioAtencion","value": datos.INT_AC_HR_INICIO+" - "+datos.INT_AC_HR_FINAL},
+            //         {"name": "capacidad","value": parseInt(datos.INT_AC_CAPACIDAD)},//datos.INT_AC_CAPACIDAD},
+            //         {"name": "estado","value": "V"},
+            //         {"name": "tipoTransaccion","value": "R"},
+            //         {"name": "usuario","value": "fsegales"},
+            //         {"name": "ipUsuario","value": "192,168,5,190"},
+            //         {"name": "equipo","value": "GMLPPC05314"},
+            //         {"name": "funcionario","value": "fsegales"},
+            //         {"name": "tipoFormulario","value": 1},
+            //         {"name": "observaciones","value": datos.f01_observaciones_i}                                
+            // ]}
+        };
+        setTimeout(function(){ $.blockUI(); },1000);    
+        var obj=DreamFactory.api[CONFIG.SERVICEGENESIS].callStoredProcWithParams(misDatos);
+        $scope.boton='new';
+        obj.success(function (response){
+        $scope.datos.f01_id_actividad_economica = response[0].idActividadEconomica;
+        /*if ($scope.datos.publicidad_grilla == undefined || $scope.datos.publicidad_grilla == null || $scope.datos.publicidad_grilla == []) {
+            $scope.desabilitaPublicidad = true;
+        } else{
+            var publi = $scope.datos.publicidad_grilla;
+            if (publi.length>0) {
+                $scope.desabilitaPublicidad = false;
+            }
+        };*/
+        //****PREUBA DE ROS***
+         if($scope.datos.f01_id_actividad_economica){
+            if ($scope.datos.swpublicidad == 'CP'){
+                $scope.getRegistrarPublicidad(datos);
+            }
+            else{
+                $scope.guardarae = false;
+            }
+        }
+        console.log($scope.datos);
+        sweet.show('Actividad Económica Registrada', 'La Actividad Económica se Registro correctamente', 'success');                                         
+            });
+            setTimeout(function(){ $.unblockUI(); },1000);
+            obj.error(function(response){
+               sweet.show('', "Error al Registrar Actividad Económica", 'error');
+               setTimeout(function(){ $.unblockUI(); },1000);
+            });
+    };
+
+    $scope.getRegistrarPublicidad=function(dato){
+        console.log("publicidadddd   ",dato);
+        var persona = "";
+        if (dato.INT_TIPO_CONTRIBUYENTE == 'NATURAL') {
+            persona = 'N';
+        } else{
+            persona = 'J';
+        };
+        $.blockUI(); 
+        $scope.publi_envio = [];
+        for(j=0; j<dato.publicidad.length;j++) {
+            console.log(">>>>>>",dato.publicidad_grilla[j]);
+            var superior = dato.publicidad[j].INT_ALTO * dato.publicidad[j].INT_ANCHO;
+            superior = (Math.round(superior * 10) / 10)+"";
+            var supe = superior.replace(".",",");
+            $scope.publi_envio.push({
+                nroElem: j+1,
+                idActividadEconomica: dato.f01_id_actividad_economica,
+                idContribuyente: dato.f01_id_contribuyente,
+                clase: persona,
+                ipUsuario: "192.168.32.30",
+                equipo: "gmlppc05909",
+                usuario: sessionService.get('US_NOMBRE')+" "+sessionService.get('US_PATERNO')+" "+sessionService.get('US_MATERNO'),
+                funcionario: sessionService.get('US_GENESIS'),
+                idCategoria: dato.publicidad[j].idcate,
+                idTipoLetrero: dato.publicidad[j].idcarac,
+                idCaracteristica: parseInt(dato.publicidad[j].id_cara),
+                fechaInicio: dato.publicidad[j].FECHAINICIO,
+                fechaFin: dato.f01_fecha_fin_act,
+                viaMatriz: dato.INT_AC_FACTOR,
+                idZona: dato.f01_idCodigoZona,
+                tipoVia: dato.INT_AC_TIP_VIA,
+                via: dato.INT_AC_NOMBRE_VIA,
+                numero: dato.INT_AC_NUMERO,
+                placa: "ND ",
+                desc: dato.publicidad[j].INT_DESC,
+                sup: supe
+            });
+        }
+        var jsonString= JSON.stringify($scope.publi_envio);
+        console.log($scope.publi_envio);
+        console.log(jsonString);
+        wsRgistrarPubliciadad.registra_publicidades(jsonString).then(function(response){
+            console.log("datos response:", response);
+            sweet.show('Publicidad Registrada', 'La Publicidad se Registro correctamente', 'success'); 
+            $scope.datos.f01_id_actividad_publicidad = response;
+            $scope.guardarae = false;
+            $.unblockUI();
+        });
+    };
+
+
+
+    $scope.tituloForm1 = "TRÁMITE: EMISIÓN DE AUTORIZACIÓN PARA EL FUNCIONAMIENTO DE JUEGOS MECANICOS_ELECTROMECANICOS VERIFICACIÓN DE REQUISITOS Y ORDEN DE DEMOLICIÓN - PERSONA JURÍDICA";
+    $scope.titulo2Form1 = "VERIFICACIÓN DE REQUISITOS Y ORDEN DE DEMOLICIÓN - PERSONA JURÍDICA";
+}
+</script>
+<div class="animated fadeInRight">
+    <form class="form-horizontal" name="formulario" novalidate>
+        <div class="wrap" ng-controller="juegosController" ng-init="getListaRequisitos(datos.AE_REQ);getListaCondicionesTecnicas(datos.INT_CON_TEC);">
+            <div class="ibox-title_2">
+                <h5>Datos Generales de la Actividad</h5>
+            </div>
+        
+            <div class="form-group"><label class="col-sm-2 control-label">Fecha de Solicitud:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_FEC_SOLICITUD}}" class="form-control"></div>
+            </div> 
+            <div class="hr-line-dashed"></div>
+            <div class="form-group"><label class="col-sm-2 control-label">Tipo de Juegos:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_CARRUSEL}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>  
+             <div class="form-group"><label class="col-sm-2 control-label" style="red"><font color="#FF0000" size="5px"> * </font> Actividad: </label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_ACTIVIDAD_DESCRIPCION}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+            <div class="form-group"><label class="col-sm-2 control-label"><font color="#FF0000" size="5px"> * </font>Tipo de Contribuyente:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_TIPO_CONTRIBUYENTE}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+            <div class="form-group"><label class="col-sm-2 control-label"><font color="#FF0000" size="5px"> * </font> PMC Nro.:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_NUM_PMC}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="ibox-title_2">
+                <h5>Documentos Legales del Representante Legal</h5>
+            </div>
+
+            <div class="form-group"><label class="col-sm-2 control-label">NIT:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_RL_NIT}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="form-group"><label class="col-sm-2 control-label">Razón Social:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_RL_RAZON_SOCIAL}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+<!-- 
+            <div class="form-group"><label class="col-sm-2 control-label">Tipo de Documento:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_RL_TIPO_DOCUMENTO}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div> -->
+
+            <div class="form-group"><label class="col-sm-2 control-label">Número de Poder Legal:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_RL_NUM_DOCUMENTO}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="form-group"><label class="col-sm-2 control-label">Fecha de Emisión:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_RL_FEC_EMISION_DOCUMENTO}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div> 
+
+            <div class="form-group"><label class="col-sm-2 control-label">Notaría Nro.:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_NUM_NOTARIA}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="ibox-title_2">
+                <h5>Datos Personales del Representante Legal</h5>
+            </div>
+
+            <div class="form-group"><label class="col-sm-2 control-label">Tipo de Documento:<small class="m-l-sm" style="color: red"></small></label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_TIPO_DOC_IDENTIDAD}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="form-group"><label class="col-sm-2 control-label">Numero de Documento:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_NUM_DOC}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="form-group"><label class="col-sm-2 control-label">Expedido en:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_EXP}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div> 
+
+            <div class="form-group"><label class="col-sm-2 control-label">Correo Electrónico:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_CORREO}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div> 
+
+            <div class="form-group"><label class="col-sm-2 control-label">Número de Teléfono Celular:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_TEL_CELULAR}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="form-group"><label class="col-sm-2 control-label">Primer Nombre:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_RL_PRIMER_NOMBRE}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="form-group"><label class="col-sm-2 control-label">Segundo Nombre:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_RL_SEGUNDO_NOMBRE}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="form-group"><label class="col-sm-2 control-label">Apellido Paterno:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_RL_PATERNO}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="form-group"><label class="col-sm-2 control-label">Apellido Materno:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_RL_MATERNO}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="form-group"><label class="col-sm-2 control-label">Apellido Casada:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_RL_CASADA}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="form-group"><label class="col-sm-2 control-label">Nacionalidad:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_NACIONALIDAD}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="form-group"><label class="col-sm-2 control-label">Fecha de Nacimiento:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_RL_FEC_NACIMIENTO}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="ibox-title_2">
+                <h5>Datos de la Dirección del Representante Legal</h5>
+            </div>
+        
+            <div class="form-group"><label class="col-sm-2 control-label">Macrodistrito:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_MACRO_DESC}}" class="form-control"></div>
+            </div> 
+            <div class="hr-line-dashed"></div>       
+
+            <div class="form-group"><label class="col-sm-2 control-label">Zona:<small class="m-l-sm" style="color: red"></small></label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_ZONA_DESC}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="form-group"><label class="col-sm-2 control-label">Tipo de Vía:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_TIP_VIA}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="form-group"><label class="col-sm-2 control-label">Nombre de Vía:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_NOMBRE_VIA}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div> 
+
+            <div class="form-group"><label class="col-sm-2 control-label">Número:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_NUM}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div> 
+
+            <div class="form-group"><label class="col-sm-2 control-label">Edificio:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_EDIF}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="form-group"><label class="col-sm-2 control-label">Bloque:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_BLOQUE}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div> 
+
+            <div class="form-group"><label class="col-sm-2 control-label">Piso:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_PISO}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div> 
+
+            <div class="form-group"><label class="col-sm-2 control-label">Departamento Nro.:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_NUM_DEP}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div> 
+
+            <!--<div class="form-group"><label class="col-sm-2 control-label">Direccion Detallada: <small class="m-l-sm" style="color: red">*</small></label>
+                <div class="col-sm-10">
+                    <textarea id="INT_DIR_DET" name="INT_DIR_DET" ng-model="datos.INT_DIR_DET" class="form-control" required ng-disabled="true" onkeyUp="return conMayusculas(this);"></textarea>
+                    <span style="color:red" ng-show="formulario.INT_DIR_DET.$invalid">
+                        <span ng-show="formulario.INT_DIR_DET.$error.required">Es requerido.</span>
+                    </span>
+                </div>
+            </div>
+            <div class="hr-line-dashed"></div>-->
+
+            <div class="ibox-title_2">
+                <h5>Datos de la Actividad</h5>
+            </div>
+        
+            <div class="form-group"><label class="col-sm-2 control-label">NIT:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_NIT}}" class="form-control"></div>
+            </div> 
+            <div class="hr-line-dashed"></div>       
+
+            <div class="form-group"><label class="col-sm-2 control-label">Razon Social / Denominación:<small class="m-l-sm" style="color: red"></small></label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_DENOMINACION}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="form-group"><label class="col-sm-2 control-label">Fecha de Inicio de la Actividad:<small class="m-l-sm" style="color: red"></small></label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_INICIO_AE}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="form-group"><label class="col-sm-2 control-label">Superficie en mt2:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_AC_SUPERFICIE}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="form-group"><label class="col-sm-2 control-label">Capacidad (Aprox.):</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_AC_CAPACIDAD}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div> 
+
+            <div class="form-group"><label class="col-sm-2 control-label">Horario de Inicio:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_AC_HR_INICIO}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div> 
+
+            <div class="form-group"><label class="col-sm-2 control-label">Horario de Finalización:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_AC_HR_FINAL}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="form-group"><label class="col-sm-2 control-label">Establecimiento:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_AC_ESTADO}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div> 
+
+            <!-- <div class="form-group"><label class="col-sm-2 control-label">Tiene Actividad Económica Principal:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_ACTIVIDAD_PRINCIPAL}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div> 
+
+            <div class="form-group"><label class="col-sm-2 control-label">Actividad Principal:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_AC_PRINCIPAL}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+ -->
+            <div class="ibox-title_2">
+                <h5>Ubicación de la Actividad</h5>
+            </div>
+        
+            <div class="form-group"><label class="col-sm-2 control-label">Macrodistrito:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_AC_MACRO}}" class="form-control"></div>
+            </div> 
+            <div class="hr-line-dashed"></div>       
+
+            <div class="form-group"><label class="col-sm-2 control-label">Zona:<small class="m-l-sm" style="color: red"></small></label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_AC_ZONA}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="form-group"><label class="col-sm-2 control-label">Tipo de Vía:<small class="m-l-sm" style="color: red"></small></label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_AC_TIP_VIA}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="form-group"><label class="col-sm-2 control-label">Nombre de Vía:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_AC_NOMBRE_VIA}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="form-group"><label class="col-sm-2 control-label">Número:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_AC_NUMERO}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div> 
+
+            <div class="form-group"><label class="col-sm-2 control-label">Edificio:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_AC_EDIFICIO}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div> 
+
+            <div class="form-group"><label class="col-sm-2 control-label">Bloque:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_AC_BLOQUE}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="form-group"><label class="col-sm-2 control-label">Piso:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_AC_PISO}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div> 
+
+            <div class="form-group"><label class="col-sm-2 control-label">Departamento Nro.:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_AC_NUMERO}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div> 
+
+            <div class="form-group"><label class="col-sm-2 control-label">Teléfono:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_AC_TEL}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="form-group"><label class="col-sm-2 control-label">Número de Teléfono Celular:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_AC_CEL}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="form-group"><label class="col-sm-2 control-label">Correo Electrónico:</label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_AC_COR}}" class="form-control"></div>
+            </div>
+            <div class="hr-line-dashed"></div>
+            <div class="form-group"><label class="col-sm-2 control-label">Datos Referenciales: </label>
+                <div class="col-sm-10">
+                    <textarea id="INT_AC_DIR_DET" name="INT_AC_DIR_DET" ng-model="datos.INT_AC_DIR_DET" class="form-control" disabled=""></textarea>
+                    <!--<span style="color:red" ng-show="formulario.INT_DIR_DET.$invalid">
+                        <span ng-show="formulario.INT_DIR_DET.$error.required">Es requerido.</span>
+                    </span>-->
+                </div>
+            </div>
+            <div class="hr-line-dashed"></div> 
+         
+        <!-- /////////////////////////////////// REQUISITOS CHECK BOX /////////////////////////////////// -->
+            <div class="ibox-title_2">
+                <h5>Información de Requisitos para Obtener Licencia / Autorización</h5>
+            </div>
+            <div class="form-group"><label class="col-sm-2 control-label">Requisitos:</label>
+                <div class="col-sm-10">
+                    <table class="table table-striped "><tbody>
+                        <tr ng-repeat="role in datosRequisitosCheckBox">
+                            <td><div class="ngSelectionCell">
+                                <input tabindex="-1" class="ngSelectionCheckbox" type="checkbox" ng-checked="role.estado" ng-model="role.estado" ng-disabled="true"/></div></td>
+                            <td>{{role.resvalor}}</td>
+                        </tr></tbody>
+                    </table>
+                </div>
+            </div> 
+            <div class="hr-line-dashed"></div>
+        <!-- /////////////////////////////////// REQUISITOS CHECK BOX /////////////////////////////////// -->
+            
+
+           <div class="ibox-title_2">
+                <h5>Datos para Emisión de Autorización - Validación Jefe UDE</h5>
+            </div>
+            <div class="form-group"><label class="col-sm-2 control-label"><font color="#FF0000" size="5px"> * </font>Documento:</label>
+                <div class="col-sm-10">
+                    <select id="INT_VALIDA_FIRMA" name="INT_VALIDA_FIRMA" class="form-control"  ng-model="datos.INT_VALIDA_FIRMA" ng-change="getAccesoFirma(datos.INT_VALIDA_FIRMA);" required >
+                        <option value="VALIDADO">VALIDADO</option>
+                        <option value="RECHAZADO">RECHAZADO</option>
+                    </select>
+                    <span style="color:red" ng-show="formulario.INT_VALIDA_FIRMA.$invalid">
+                        <span ng-show="formulario.INT_VALIDA_FIRMA.$error.required">Es requerido.
+                        </span>
+                    </span>
+                    
+                </div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div ng-show="datos.INT_VALIDA_FIRMA =='VALIDADO'">
+                <div class="form-group"><label class="col-sm-2 control-label">Firma certificado en línea:</label>
+                    <div class="col-sm-10">
+                        <!-- <input type="checkbox" ng-model="datos.INT_FIRMA_" ng-true-value="'SI'" ng-false-value="'NO'" /> -->
+                        <input type="checkbox" id="INT_FIRMA_" name="INT_FIRMA_" ng-model="datos.INT_FIRMA_" ng-required="datos.INT_VALIDA_FIRMA =='VALIDADO'"/>
+                        <span style="color:red" ng-show="formulario.INT_FIRMA_.$invalid">
+                            <span ng-show="formulario.INT_FIRMA_.$error.required">Es requerido.
+                            </span>
+                        </span>
+                    </div>
+                </div>
+                <div class="hr-line-dashed"></div>
+
+                 <div class="form-group"><label class="col-sm-2 control-label">Fecha de emisión del documento:</label>
+                    <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_INICIO_AE}}" class="form-control"></div>
+                </div>
+                <div class="hr-line-dashed"></div>
+            </div>
+
+
+            <div ng-show="datos.INT_VALIDA_FIRMA =='RECHAZADO'">
+                <div class="form-group"><label class="col-sm-2 control-label">Observaciones:</label>
+                    <div class="col-sm-10">
+                        <!-- <textarea id="INT_DESCRIP_UDE" name="INT_DESCRIP_UDE" ng-model="datos.INT_DESCRIP_UDE" class="form-control" placeholder="" onkeyUp="return conMayusculas(this);" ></textarea> -->
+                        <textarea id="INT_DESCRIP_UDE" name="INT_DESCRIP_UDE" ng-model="datos.INT_DESCRIP_UDE" class="form-control" placeholder="" onkeyUp="return conMayusculas(this);" ng-required="datos.INT_VALIDA_FIRMA =='RECHAZADO'" ></textarea>
+                        <span style="color:red" ng-show="formulario.INT_DESCRIP_UDE.$invalid">
+                            <span ng-show="formulario.INT_DESCRIP_UDE.$error.required">Es requerido.
+                            </span>
+                        </span>
+                    </div>
+                </div>
+                <div class="hr-line-dashed"></div>
+            </div>
+
+
+            <!-- <div class="form-group"><label class="col-sm-2 control-label"><font color="#FF0000" size="5px"> * </font>El Técnico UDE emite recomendación:</label>
+                <div class="col-sm-10">
+                    <select id="INT_T_REC_UDE" name="INT_T_REC_UDE" class="form-control"  ng-model="datos.INT_T_REC_UDE" >
+                        <option value="APROBADO">APROBADO</option>
+                        <option value="OBSERVADO">OBSERVADO</option>
+                        <option value="ABANDONO">ABANDONO</option> 
+                    </select>
+                    <span style="color:red" ng-show="formulario.INT_T_REC_UDE.$invalid">
+                        <span ng-show="formulario.INT_T_REC_UDE.$error.required">Es requerido.
+                        </span>
+                    </span>
+                </div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="ibox-title_2">
+                <h5>Datos para  Emisión de Licencia/Autorización</h5>
+            </div>
+            <div ng-show="datos.INT_T_REC_UDE=='APROBADO'">
+                <div class="form-group"><label class="col-sm-2 control-label"><br><small class="text-navy">Detalle de Tareas y Documentos Generados:</small></label>
+                    <div class="col-sm-10">
+                        <div class="i-checks"><label class="">
+                            <div class="icheckbox_square-green">
+                                <input type="checkbox" ng-model="datos.chkAltaContribuyente" ng-true-value="'SI'" ng-false-value="'NO'" /> ALTA DEL CONTRIBUYENTE                             
+                            </div>
+                        </div>
+
+                        <div class="i-checks"><label class="">
+                            <div class="icheckbox_square-green">
+                                <input type="checkbox" ng-model="datos.chkAltaEconomica" ng-true-value="'SI'" ng-false-value="'NO'" /> ALTA DE LA ACTIVIDAD ECONÓMICA
+                            </div>
+                        </div>
+
+                        <div class="i-checks"><label class="">
+                            <div class="icheckbox_square-green">
+                                <input type="checkbox" ng-model="datos.emisionLicenciaFuncionamiento" ng-true-value="'SI'" ng-false-value="'NO'" /> AEMISIÓN DE LICIENCIA DE FUNCIONAMIENTO                                
+                            </div>
+                        </div>
+                    </div>
+
+                </div>                
+                <div class="hr-line-dashed"></div>
+
+                <div class="form-group"><label class="col-sm-2 control-label">Fecha de emisión del documento:</label>
+                    <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.INT_INICIO_AE}}" class="form-control"></div>
+                </div>
+                <div class="hr-line-dashed"></div>
+            </div>
+
+            <div class="form-group"><label class="col-sm-2 control-label">Observaciones:</label>
+                <div class="col-sm-10">
+                    <textarea id="INT_DESCRIP_UDE" name="INT_DESCRIP_UDE" ng-model="datos.INT_DESCRIP_UDE" class="form-control" placeholder="" required onkeyUp="return conMayusculas(this);" ></textarea>
+                </div>
+            </div>
+            <div class="hr-line-dashed"></div> -->
+
+            <div class="form-group"><label class="col-sm-2 control-label">Conclusiones:</label>
+                <div class="col-sm-10">
+                    <textarea id="INT_PROVEIDO" name="INT_PROVEIDO" ng-model="datos.INT_PROVEIDO" class="form-control" required onkeyUp="return conMayusculas(this);"></textarea>
+                    <span style="color:red" ng-show="formulario.INT_PROVEIDO.$invalid">
+                        <span ng-show="formulario.INT_PROVEIDO.$error.required">Es requerido.
+                        </span>
+                    </span>
+                </div>
+            </div>
+            <div class="hr-line-dashed"></div>
+
+            <div class="ibox-title_2">
+                <h5>VIAE</h5>
+            </div>
+
+            <div ng-if = "verPublicidad != true" class="form-group"><label class="col-sm-10">Actividad Económica Sin VIAE</label></div>
+
+            <div class="col-md-12" ng-if = "verPublicidad == true">
+                <table ng-table="tablaRoles" class="table table-striped table-bordered">
+                    <tr ng-repeat="pup in datosPublicidad" >
+                        <td data-title="'ID'">{{pup.nroElem}}</td>
+                        <td data-title="'TIPO LETRERO'" >{{pup.INT_TIPO_LETRE}}</td>
+                        <td data-title="'CARACTERISTICA'" >{{pup.INT_CARA}}</td>
+                        <td data-title="'FECHA INICIO'" >{{pup.FECHAINICIO}}</td>
+                        <td data-title="'DESCRIPCIÓN'" >{{pup.INT_DESC}}</td>
+                        <td data-title="'ALTO'" >{{pup.INT_ALTO}}</td>
+                        <td data-title="'ANCHO'" >{{pup.INT_ANCHO}}</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!--<div class="form-group"><label class="col-sm-2 control-label">Historial:</label>
+                <div class="col-sm-10">
+                    <textarea id="INT_HISTORIAL" name="INT_HISTORIAL" ng-model="datos.INT_HISTORIAL" class="form-control" required onkeyUp="return conMayusculas(this);"></textarea>
+                    <span style="color:red" ng-show="formulario.INT_HISTORIAL.$invalid">
+                        <span ng-show="formulario.INT_HISTORIAL.$error.required">Es requerido.
+                        </span>
+                    </span>
+                </div>
+            </div>-->
+            <div class="hr-line-dashed"></div>
+
+            <div class="col-sm-12" align="right" ng-show="false">
+                <div class="form-group" >
+                    <div class="col-sm-8" align="left">
+                        <label for="url" >{{datos.AE_SW_TIPO}}</label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-12" align="right" ng-show="false">
+                <div class="form-group" >
+                    <div class="col-sm-8" align="left">
+                        <label for="url" >{{datos.AE_NRO_CASO}}</label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-12" align="right" ng-show="false">
+                <div class="form-group" >
+                    <div class="col-sm-8" align="left">
+                        <label for="url" >{{datos.CI_BIGDATA}}</label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-12" align="right" ng-show="false">
+                <div class="form-group" >
+                    <div class="col-sm-8" align="left">
+                        <label for="url" >{{datos.INT_ACTIVIDAD}}</label>
+                    </div>
+                </div>
+            </div>
+
+           <!--  <a class="btn btn-primary" ng-disabled="false" ng-click="volver()">
+                <i class="glyphicon fa fa-times"></i>
+                     Cancelar
+            </a>
+            <a class="btn btn-primary" ng-click="cargarDatos(datos);guardarData(datos);evalReglasFormulario()" data-dismiss="modal" ng-disabled="formulario.$invalid">
+                <i class="glyphicon fa fa-save"></i>
+                     Guardar / Continuar
+            </a> -->
+
+            <div ng-show="datos.INT_VALIDA_FIRMA =='VALIDADO'">
+                <button data-dismiss="modal" type="button" class="btn btn-success fa fa-save" ng-click="setContribuyenteJuridico(datos)" ng-disabled="formulario.INT_FIRMA_.$invalid"><span span class="textoAux"> REGISTRAR </span></button>
+            </div>
+            <br>
+
+            <button type="button" class="btn btn-primary" ng-disabled="false" ng-click="volver()"> <i class="glyphicon fa fa-times"></i> Cancelar </button> 
+
+            <button type="button" class="btn btn-primary" ng-click="cargarDatos(datos);guardarData(datos)" ng-disabled="formulario.$invalid"> <i class="glyphicon fa fa-save"></i> Guardar / Continuar</button>
+            <!-- botones -->
+        </div>
+    </form>
+</div>

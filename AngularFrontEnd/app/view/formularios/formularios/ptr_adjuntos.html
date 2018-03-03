@@ -1,0 +1,682 @@
+<script type="text/javascript">    
+function adjuntos_ptr($scope,$timeout,DreamFactory,CONFIG,$window,$rootScope,sessionService,ngTableParams,$filter,$route,sweet,$http,FileUploader,$sce,fileUpload,$timeout)
+    {
+        var fechas= new Date();
+        var fechactual=fechas.getFullYear() + "-" + fechas.getMonth() + "-" + fechas.getDate() + " " + fechas.getHours() + ":" + fechas.getMinutes() + ":" + fechas.getSeconds();
+        $scope.getRegistros = function(){
+            $.blockUI
+            var h = $scope.sCasoNro.toString();
+            var comp = h.split('/');
+            var nro;
+            var pos = h.indexOf('/');
+            if (comp[1] == undefined){
+                nro = $scope.sCasoNro;
+            }else{
+                $scope.sCasonombre = $scope.sCasoNro;
+                nro = parseInt($scope.sCasoNro.substring(7, pos));
+                $scope.sCasoNro = nro;
+            }
+            var filtro = "doc_proceso='" + $scope.sIdProcesoActual + "' and doc_estado = 'A' and doc_id=" + nro ;
+            var resOpcion = {
+                "table_name":"dms_gt_documentos",
+                "filter":filtro
+            };
+            var obj = DreamFactory.api[CONFIG.SERVICE].getRecordsByFilter(resOpcion)
+            .success(function (response){
+                response = response.record;
+                $scope.nroregistro = response.length + 1;
+                $scope.obtRegistros = response;
+                var data = response;   
+                $scope.tablaRegistros = new ngTableParams({
+                    page: 1,          
+                    count: 10,
+                    filter: {},
+                    sorting: {}      
+                }, {
+                    total: $scope.obtRegistros.length,
+                    getData: function($defer, params) {
+                        var filteredData = params.filter() ?
+                        $filter('filter')($scope.obtRegistros, params.filter()) :
+                        $scope.obtRegistros;              
+                        var orderedData = params.sorting() ?
+                        $filter('orderBy')(filteredData, params.orderBy()) :
+                        $scope.obtRegistros;
+                        params.total(orderedData.length);
+                        $defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));                 
+                    }
+                });
+                $.unblockUI();
+            }).error(function(error) {
+                $.unblockUI();  
+            });
+            $.blockUI();
+        };
+        $scope.cambiarFile = function(obj, valor){
+            var nombre = obj.files[0].name;
+            $scope.dato[obj.name] = obj.files[0].name;
+            tipo = nombre.split(".");
+             if(tipo[1] == "png" || tipo[1] == "jpg" || tipo[1] == "jpeg" || tipo[1] == "gif" || tipo[1] == "dwg" ||tipo[1] == "doc" || tipo[1] == "pdf"){
+                if(obj.files[0].size > 2500000 && (tipo[1] == "png" || tipo[1] == "jpg" || tipo[1] == "jpeg" || tipo[1] == "gif" )){
+                    sweetAlert('', 'Archivo muy Grande', 'error');                    
+                }
+             }else{
+                    sweetAlert('', 'Tipo de Archivo no Valido', 'error');
+             }
+        }; 
+        $scope.archotro = false;
+        $scope.archpdf = false;
+        $scope.verImagen = function(imagen){
+            console.log(data);
+            var extencion = imagen.doc_nombre.split('.');
+            if( extencion[1] == "png" || extencion[1] == "jpg" || extencion[1] == "JPG"|| extencion[1] == "jpeg" || extencion[1] == "gif" ){
+                 var imga = imagen.doc_url_logica;
+                  imga = imga.replace(/Ñ/gi,"%d1");
+                  imga = imga.replace(/ñ/gi,"%f1");
+                  imga = imga.replace(/Á/gi,"%c1");
+                  imga = imga.replace(/á/gi,"%e1");
+                  imga = imga.replace(/É/gi,"%c9");
+                  imga = imga.replace(/é/gi,"%e9");
+                  imga = imga.replace(/Í/gi,"%cd");
+                  imga = imga.replace(/í/gi,"%ed");
+                  imga = imga.replace(/Ó/gi,"%d3");
+                  imga = imga.replace(/ó/gi,"%f3");
+                  imga = imga.replace(/Ú/gi,"%da");
+                  imga = imga.replace(/ú/gi,"%fa");
+                  imga = imga.replace(/“/gi,"%93");
+                  imga = imga.replace(/”/gi,"%94");
+                  imga = imga.replace(/&/gi,"%26");
+                $scope.archotro = true;
+                $scope.archpdf = false;
+                $scope.archivoP=imga;
+                $('#imgSalida').attr("src",imga);
+            }else if (extencion[1] == "pdf"){
+                $scope.archotro = false;
+                $scope.archpdf = true;
+                $('#visorFum object').attr('data',imagen.doc_url_logica);
+            }else{ document.location = imagen.doc_url_logica;}
+        };
+        $scope.mostposs = function(datooo){
+            if(datooo.doc_tps_doc_id != 2){
+                $scope.patrimonio = "0";
+                $scope.posicionfinal = "0";
+            }else{
+                $scope.patrimonio = $scope.sCasonombre.substring(0,7);
+                $scope.posicionfinal = "1";
+            }
+          }
+        $scope.adicionarRegistros = function(data){
+            var f = document.getElementById('doc_nombre');
+            archivo = f.files[0].name;
+            car_esp = 0;
+            if(archivo.indexOf('á') != -1 || archivo.indexOf('Á') != -1){
+                car_esp = 1;
+            }
+            if(archivo.indexOf('é') != -1 || archivo.indexOf('É') != -1){
+                car_esp = 1;
+            }
+            if(archivo.indexOf('í') != -1 || archivo.indexOf('Í') != -1){
+                car_esp = 1;
+            }
+            if(archivo.indexOf('ó') != -1 || archivo.indexOf('Ó') != -1){
+                car_esp = 1;
+            }
+            if(archivo.indexOf('ú') != -1 || archivo.indexOf('Ú') != -1){
+                car_esp = 1;
+            }
+            if(archivo.indexOf('Ñ') != -1 || archivo.indexOf('ñ') != -1){
+                car_esp = 1;
+            }
+            if(archivo.indexOf('“') != -1 || archivo.indexOf('”') != -1 || archivo.indexOf('&') != -1){
+                car_esp = 1;
+            }
+            if (car_esp == 1) {
+                sweet.show('Error en nombre de la imagen', 'El nombre del documento no debe contener caracteres especiales', 'warning');
+                document.getElementById('doc_nombre').value = "";
+            } else {
+                var nombrecor = 'doc_correlativo'+$scope.patrimonio+'1';
+                var select = document.getElementById(nombrecor);      
+                data.direccion = 'OTROS';
+                if($scope.posicionfinal != "0"){
+                    $scope.posicionfinal = select.options[select.selectedIndex].text;
+                }else{
+                    data.doc_correlativo = " ";
+                }
+                if(data.doc_tps_doc_id != '2'){
+                        data.direccion = 'OTROS';
+                }
+                else{
+                    data.direccion='FOTOS'
+                }
+                if($scope.patrimonio == 'PTR-ESP'){
+                    $scope.procesoActual = 'WWDocumentadorEsp';
+                }else if($scope.patrimonio == 'PTR_CBI'){
+                    $scope.procesoActual = 'WWDocumentadorInm';
+                }else if($scope.patrimonio == 'PTR-PCI'){
+                    $scope.procesoActual = 'WWDocumentadorInma';
+                }else if($scope.patrimonio == 'PTR_BMA'){
+                    $scope.procesoActual = 'WWDocumentadorArq';
+                }else if($scope.patrimonio == 'PTR_IME'){
+                    $scope.procesoActual = 'WWDocumentadorEsc';
+                }else{
+                    $scope.procesoActual = $scope.sIdProcesoActual;
+                }
+                var file = document.getElementById('doc_nombre');
+                console.log(file.files[0].name);
+                $scope.imagenDoc=uploadUrl + file.files[0].name  + '?app_name=' + CONFIG.APP_NAME;
+                $scope.direccionvirtual= "/PATRIMONIO/" + $scope.procesoActual + "/" + $scope.sCasoNro + "/" + data.direccion;
+                var uploadUrl = CONFIG.APIURL+"/files"+$scope.direccionvirtual+"/";
+                var nombreFile = file.files[0].name ;
+                tipo = nombreFile.split(".");
+                var cadenaURL = uploadUrl + file.files[0].name  + '?app_name=' + CONFIG.APP_NAME;
+                var cadenaURI = $scope.direccionvirtual +"/" + file.files[0].name ;
+                fileUpload.uploadFileToUrl(file.files[0], uploadUrl);
+                var datosUpload = {};
+                datosUpload['doc_sistema'] = 'IF'; 
+                datosUpload['doc_proceso'] = $scope.sIdProcesoActual;
+                datosUpload['doc_id'] = $scope.sCasoNro
+                datosUpload['doc_ci_nodo'] = $scope.sCasoNombre;
+                datosUpload['doc_datos'] = data.doc_datos; 
+                datosUpload['doc_titulo'] = data.doc_titulo; 
+                datosUpload['doc_palabras'] = 0;   
+                datosUpload['doc_version'] ='1';      
+                datosUpload['doc_tiempo'] = 0;      
+                datosUpload['doc_firma_digital'] = 0;      
+                datosUpload['doc_acceso'] = "P";
+                datosUpload['doc_tamanio_documento'] = "0";      
+                datosUpload['doc_tps_doc_id'] = data.doc_tps_doc_id; 
+                datosUpload['doc_tipo_documentacion'] = $scope.posicionfinal;  
+                datosUpload['doc_tipo_ingreso'] = 'I';      
+                datosUpload['doc_estado_de_envio'] = 'N';      
+                datosUpload['doc_correlativo'] = data.doc_correlativo;
+                datosUpload['doc_tipo_documento_ext'] = '';
+                datosUpload['doc_nrotramite_nexo'] = '';
+                datosUpload['doc_id_carpeta'] = '0';
+                datosUpload['doc_registro'] = fechactual;
+                datosUpload['doc_modificacion'] = fechactual;
+                datosUpload['doc_usuario'] = sessionService.get('USUARIO');
+                datosUpload['doc_estado'] = 'A';
+                datosUpload['doc_url'] = cadenaURI;
+                datosUpload['doc_url_logica'] = cadenaURL;
+                datosUpload['doc_nombre'] = nombreFile;
+                datosUpload['doc_tipo_documento'] = tipo[1];  
+                var ressubirU = {
+                    table_name:"dms_gt_documentos",
+                    body:datosUpload
+                };
+                var obj=DreamFactory.api[CONFIG.SERVICE].createRecords(ressubirU);
+                obj.success(function(data){
+                    $.unblockUI();
+                    $scope.dato='';
+                    sweet.show('Adjunto Adicionado', 'Adjunto fue creado satisfactoriamente', 'success');
+                    $('#adjunto').modal('hide');
+                    $scope.getRegistros();
+                })
+                .error(function(data){
+                    sweet.show('Adjunto No Adicionado', 'Error al subir adjunto', 'success');
+                    $('#adjunto').modal('hide');
+                    $.unblockUI();
+                })
+            }
+        };
+        $scope.modificarRegistros = function(prohid,data){
+            var f = document.getElementById('doc_nombre');
+            archivo = f.files[0].name;
+            car_esp = 0;
+            if(archivo.indexOf('á') != -1 || archivo.indexOf('Á') != -1){
+                car_esp = 1;
+            }
+            if(archivo.indexOf('é') != -1 || archivo.indexOf('É') != -1){
+                car_esp = 1;
+            }
+            if(archivo.indexOf('í') != -1 || archivo.indexOf('Í') != -1){
+                car_esp = 1;
+            }
+            if(archivo.indexOf('ó') != -1 || archivo.indexOf('Ó') != -1){
+                car_esp = 1;
+            }
+            if(archivo.indexOf('ú') != -1 || archivo.indexOf('Ú') != -1){
+                car_esp = 1;
+            }
+            if(archivo.indexOf('Ñ') != -1 || archivo.indexOf('ñ') != -1){
+                car_esp = 1;
+            }
+            if(archivo.indexOf('“') != -1 || archivo.indexOf('”') != -1 || archivo.indexOf('&') != -1){
+                car_esp = 1;
+            }
+            if (car_esp == 1) {
+                sweet.show('Error en nombre de la imagen', 'El nombre no debe contener caracteres especiales (á,Á,é,É,í,Í,ó,Ó,ú,Ú,Ñ,ñ,&)', 'warning');
+                document.getElementById('doc_nombre').value = "";
+            } else {
+                data.direccion = 'OTROS';
+                var nombrecor = 'doc_correlativo'+$scope.patrimonio+'1';
+                var select = document.getElementById(nombrecor); 
+                if($scope.posicionfinal != "0"){
+                    $scope.posicionfinal = select.options[select.selectedIndex].text;
+                }else{        
+                    data.doc_correlativo = " ";
+                }
+                if(data.doc_tps_doc_id != '2'){
+                        data.direccion = 'OTROS';
+                }
+                else{
+                    data.direccion='FOTOS'
+                }
+                if($scope.patrimonio == 'PTR-ESP'){
+                    $scope.procesoActual = 'WWDocumentadorEsp';
+                }else if($scope.patrimonio == 'PTR_CBI'){
+                    $scope.procesoActual = 'WWDocumentadorInm';
+                }else if($scope.patrimonio == 'PTR-PCI'){
+                    $scope.procesoActual = 'WWDocumentadorInma';
+                }else if($scope.patrimonio == 'PTR_BMA'){
+                    $scope.procesoActual = 'WWDocumentadorArq';
+                }else if($scope.patrimonio == 'PTR_IME'){
+                    $scope.procesoActual = 'WWDocumentadorEsc';
+                }else{
+                    $scope.procesoActual = $scope.sIdProcesoActual;
+                }
+                var file = document.getElementById('doc_nombre');
+                if(file.files.length > 0){
+                    $scope.imagenDoc=uploadUrl + file.files[0].name  + '?app_name=' + CONFIG.APP_NAME;
+                    $scope.direccionvirtual= "/PATRIMONIO/" + $scope.procesoActual + "/" + $scope.sCasoNro + "/" + data.direccion;
+                    var uploadUrl = CONFIG.APIURL+"/files"+$scope.direccionvirtual+"/";
+                    var nombreFile = file.files[0].name ;
+                    tipo = nombreFile.split(".");
+                    var cadenaURL = uploadUrl + file.files[0].name  + '?app_name=' + CONFIG.APP_NAME;
+                    var cadenaURI = $scope.direccionvirtual +"/" + file.files[0].name ;
+                    fileUpload.uploadFileToUrl(file.files[0], uploadUrl);
+                }else{
+                    var nombreFile = data.doc_nombre;
+                    tipo = nombreFile.split(".");
+                    var cadenaURL = data.doc_url_logica;
+                    var cadenaURI = data.doc_url;
+                }
+                var datosUpload = {};
+                datosUpload['doc_datos'] = data.doc_datos; 
+                datosUpload['doc_titulo'] = data.doc_titulo;    
+                datosUpload['doc_tps_doc_id'] = data.doc_tps_doc_id;    
+                datosUpload['doc_correlativo'] = data.doc_correlativo;
+                datosUpload['doc_modificacion'] = fechactual;
+                datosUpload['doc_url'] = cadenaURI;
+                datosUpload['doc_url_logica'] = cadenaURL;
+                datosUpload['doc_nombre'] = nombreFile;
+                datosUpload['doc_tipo_documento'] = tipo[1];
+                datosUpload['doc_tipo_documentacion'] =  $scope.posicionfinal;
+                var ressubirU = {
+                    table_name:"dms_gt_documentos",
+                    id:prohid,
+                    body:datosUpload
+                };
+                var obj=DreamFactory.api[CONFIG.SERVICE].updateRecord(ressubirU);
+                obj.success(function(data){
+                    $.unblockUI();
+                    console.log(data);
+                    sweet.show('', 'Registro modificado', 'success');
+                    $('#adjunto').modal('hide');
+                    $scope.dato='';
+                    $scope.getRegistros();
+                })
+                .error(function(data){
+                    $.unblockUI();
+                    sweet.show('', 'Registro no modificado', 'error');
+                    $('#adjunto').modal('hide');
+
+                }) 
+            }
+
+            /*
+
+            
+            */        
+        };
+        $scope.eliminarRegistros = function(prohid){
+            var datosUpload = {};
+            datosUpload['doc_estado'] = 'B';
+            datosUpload['doc_modificacion'] = fechactual;
+            var ressubirU = {
+                table_name:"dms_gt_documentos",
+                id:prohid,
+                body:datosUpload
+            };
+            var obj=DreamFactory.api[CONFIG.SERVICE].updateRecord(ressubirU);
+            obj.success(function(data){
+                $.unblockUI();
+                sweet.show('', 'Registro eliminado', 'success');
+                $scope.dato='';
+                $scope.getRegistros();
+            })
+            .error(function(data){
+                $.unblockUI();
+                sweet.show('', 'Registro no eliminado', 'error');
+            })
+        }; 
+
+        $scope.modificarRegistroCargar = function(registro){
+            if(registro.doc_tps_doc_id != 2){
+                $scope.patrimonio = "0";
+                $scope.posicionfinal = "0";
+            }else{
+                $scope.patrimonio = $scope.sCasonombre.substring(0,7);
+                $scope.posicionfinal = "1";
+            }
+            $scope.desabilitado=false;
+            $scope.dato = registro;
+            $scope.boton="upd";
+            $scope.titulo="Modificar Adjunto";
+        };
+        $scope.eliminarRegistroCargar = function(registro){
+            var tipo = $scope.sCasonombre.substring(0,7);
+            $scope.patrimonio = tipo;
+            $scope.desabilitado=true;
+            $scope.dato = registro;
+            $scope.boton="del";
+            $scope.titulo="Eliminar Adjunto";
+        };
+        $scope.limpiaradj = function(){
+            $scope.patrimonio = "0";
+            $scope.dato='';
+            document.getElementById('doc_nombre').value = "";
+            document.getElementById('doc_nombres').value = "";
+            $scope.desabilitado=false;
+            $scope.boton="new";
+            $scope.titulo="Adjutar Documentos";      
+        };
+        //iniciando el controlador
+        $scope.$on('api:ready',function(){
+            $scope.getRegistros();
+        });
+        $scope.inicioRegistros = function () {
+            if(DreamFactory.isReady()){
+                $scope.getRegistros();
+            }
+            scroll(0,0);
+        };    
+        
+    };
+
+</script>
+<style>
+    input:required:invalid {
+        border: 1px solid red;
+    }
+    input:required:valid {
+        border: 1px solid green;
+    }
+    select:required:invalid {
+        border: 1px solid red;
+    }
+    select:required:valid {
+        border: 1px solid green;
+    }
+    .custom-upload {
+        position: relative;
+        height: 40px;
+        width: 100%;
+        margin:30px;
+    }
+    .custom-upload input[type=file]
+    {
+        outline:none;
+        position: relative;
+        text-align: right;    
+        -moz-opacity:0 ;
+        filter:alpha(opacity: 0);
+        opacity: 0;
+        z-index: 2;
+        width:85%;
+        height:100%;
+        
+    }
+    .custom-upload .fake-file
+    {
+        background:url(http://www.fold3.com/i/upload-icon.png) center right no-repeat;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        width: 85%;
+        padding: 0;
+        margin: 0;
+        z-index: 1;
+        line-height: 100%;
+    }
+    .custom-upload .fake-file input
+    {
+        font-size:16px;
+        height:40px;
+        width:85%;
+    }
+
+</style>
+<script type="text/javascript">
+    $('.custom-upload input[type=file]').change(function(){        
+        $(this).next().find('input').val($(this).val());
+        angular.element(this).scope().cambiarFile(this, $(this).val());
+    });
+</script>
+
+<script type="text/javascript" src="../../libs/js/render.js"></script>
+    <div class="wrap" ng-controller="adjuntos_ptr" data-ng-init="inicioRegistros()">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>Documentos Adjuntos</h5>
+
+                    <div ibox-tools></div>
+                    <div class="botones_inspinia_lmc">
+                        <a class="btn btn-primary" ng-click="limpiaradj()" data-toggle="modal" data-target="#adjunto">
+                            <i class="glyphicon glyphicon-plus-sign"></i>Nuevo Documento</a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <table ng-table="tablaRegistros"  show-filter="true" class="table table-striped">
+                        <tr ng-repeat="registro in obtRegistros" ng-class="{'colorInactivo': registro.prsEstado == 'INACTIVO'}">
+                            <td align="center" data-title="'Opciones'" style="width: 120px;">
+                                <a ng-click="modificarRegistroCargar(registro)" class="btn btn-info btn-circle" data-toggle="modal" data-target="#adjunto"><i class="fa fa-pencil"></i></a>
+                                <a ng-click="eliminarRegistroCargar(registro)" class="btn btn-info btn-circle" data-toggle="modal" data-target="#adjunto"><i class="fa fa-trash-o" ></i></a>
+                                <a ng-click="verImagen(registro)" class="btn btn-info btn-circle" data-toggle="modal" data-target="#imagen">
+                            <i class="fa fa-eye" style="color:#249FE6"></i></a>
+                            </td>
+                            <td data-title="'Posicion'" >{{registro.doc_correlativo}}</td>
+                            <td data-title="'Posicion'" >{{registro.doc_tipo_documentacion}}</td>
+                            <td data-title="'Título'" sortable="'doc_titulo'" filter="{'doc_titulo':'text'}">{{registro.doc_titulo}}</td>
+                            <td data-title="'Descripción'" sortable="'doc_datos'" filter="{'doc_datos':'text'}">{{registro.doc_datos}}</td>
+                            <td data-title="'Nombre'" sortable="'doc_nombre'" filter="{'doc_nombre':'text'}">{{registro.doc_nombre}}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+      
+        <div class="modal fade" id="imagen" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Cerrar</span></button>
+                        <h4 class="modal-title" id="myModalLabel">IMAGEN</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div id="visorFum" ng-show="archpdf">
+                           <object data="" type="application/pdf" width="100%" height="500"></object>
+                        </div>
+                        <div ng-show="archotro">
+                            <img id="imgSalida" ng-src="{{archivoP}}" width="100%" height="100%">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="cerrar" name="cerrar" type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="adjunto" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Cerrar</span></button>
+                        <h4 class="modal-title" id="myModalLabel">{{titulo}}</h4>
+                    </div>
+                    <div class="modal-body" >
+                        <form name="formularioRegistros" readOnly="true" novalidate>
+                            <div class="row">
+                                <div class="ibox-title_2">
+                                    <h5>ADJUNTAR DOCUMENTO</h5>
+                                </div>
+                                <div class="col-md-12" id="div_doc_nombre">
+                                    <div class="form-group" >
+                                        <label for="url">DOCUMENTO ADJUNTO:</label>
+                                        <div class="controls">
+                                           <div class="custom-upload">
+                                                <input type="file" name="doc_nombre" id="doc_nombre" uploader-model="doc_nombre"  >
+                                                <div class="fake-file">
+                                                    <input id = "doc_nombres" ng-model="dato.doc_nombre" type="text">
+                                                </div>             
+                                            </div>         
+                                        </div>
+                                    </div>
+                                </div>                            
+                                <div class="col-md-12" id="div_doc_tps_doc_id">
+                                    <div class="form-group" >
+                                        <label for="url">TIPIFICACION:</label>
+                                        <div class="controls">
+                                            <select id="doc_tps_doc_id" ng-change = "mostposs(dato)" name="registro[]" class="form-control" ng-model="dato.doc_tps_doc_id">
+                                                <option value="-1"> -- Seleccione -- </option>
+                                                <option value="2">Fotografias</option>
+                                                <option value="1">Autocad</option>
+                                                <option value="3">Mapas o Planos</option>
+                                                <option value="4">Texto</option>
+                                                <option value="5">Video o Sonido</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12" ng-show="patrimonio == 'PTR_CBI'" id="div_doc_correlativo">
+                                    <div class="form-group" >
+                                        <label for="url">POSICION:</label>
+                                        <div class="controls">
+                                            <select id="doc_correlativoPTR_CBI1" name="registro[]" class="form-control" ng-model="dato.doc_correlativo">
+                                                <option value= 1>Foto Principal</option> 
+                                                <option value= 2>Plano de Ubicacion</option>
+                                                <option value= 3>Tipologia Arquitectonica</option>
+                                                <option value= 4 >Perfil de Acera</option>
+                                                <option value= 5>Fotografia 1</option>
+                                                <option value= 6>Fotografia 2</option>   
+                                                <option value= 7>Fotografia 3</option>
+                                                <option value= 8>Fotografia 4</option>   
+                                                <option value= 9>Fotografia 5</option>
+                                                <option value= 10>Fotografia 6</option>
+                                                <option value="Otro">Otro</option>  
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12" ng-show="patrimonio == 'PTR_BMA'" id="div_doc_correlativo">
+                                    <div class="form-group" >
+                                        <label for="url">POSICION:</label>
+                                        <div class="controls">
+                                            <select id="doc_correlativoPTR_BMA1" name="registro[]" class="form-control" ng-model="dato.doc_correlativo">
+                                                <option value= 1>Fotografia del Plano de Ubicación</option>
+                                                <option value= 5>Fotografia 1</option>
+                                                <option value= 6>Fotografia 2</option>   
+                                                <option value= 7>Fotografia 3</option>
+                                                <option value= 8>Fotografia 4</option>   
+                                                <option value= 9>Fotografia 5</option>
+                                                <option value= 10>Fotografia 6</option>
+                                                <option value="Otro">Otro</option>  
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12" ng-show="patrimonio == 'PTR-PCI'" id="div_doc_correlativo">
+                                    <div class="form-group" >
+                                        <label for="url">POSICION:</label>
+                                        <div class="controls">
+                                            <select id="doc_correlativoPTR-PCI1" name="registro[]" class="form-control" ng-model="dato.doc_correlativo">
+                                                <option value= 1>Fotografia Principal 1</option>
+                                                <option value= 2>Fotografia Principal 2</option>
+                                                <option value= 5>Fotografia 1</option>
+                                                <option value= 6>Fotografia 2</option>   
+                                                <option value= 7>Fotografia 3</option>
+                                                <option value= 8>Fotografia 4</option>   
+                                                <option value= 9>Fotografia 5</option>
+                                                <option value= 10>Fotografia 6</option>
+                                                <option value="Otro">Otro</option>  
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12" ng-show="patrimonio == 'PTR_IME'" id="div_doc_correlativo">
+                                    <div class="form-group" >
+                                        <label for="url">POSICION:</label>
+                                        <div class="controls">
+                                            <select id="doc_correlativoPTR_IME1" name="registro[]" class="form-control" ng-model="dato.doc_correlativo">
+                                                <option value= 1>Fotografia Frente</option>
+                                                <option value= 2>Fotografia Perfil</option>
+                                                <option value= 3>Fotografia incluyendo pedestal y placas</option>
+                                                <option value= 4>Plano de Ubicación</option>
+                                                <option value= 5>Fotografia 1</option>
+                                                <option value= 6>Fotografia 2</option>   
+                                                <option value= 7>Fotografia 3</option>
+                                                <option value= 8>Fotografia 4</option>   
+                                                <option value= 9>Fotografia 5</option>
+                                                <option value= 10>Fotografia 6</option>
+                                                <option value="Otro">Otro</option>  
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12" ng-show="patrimonio == 'PTR-ESP'" id="div_doc_correlativo">
+                                    <div class="form-group" >
+                                        <label for="url">POSICION:</label>
+                                        <div class="controls">
+                                            <select id="doc_correlativoPTR-ESP1" name="registro[]" class="form-control" ng-model="dato.doc_correlativo">
+                                                <option value= 1>Plano de Ubicación</option>
+                                                <option value= 2>Esquema Arquitectonico</option>
+                                                <option value= 3>Angulo Visual Horizontal</option>
+                                                <option value= 5>Fotografia 1</option>
+                                                <option value= 6>Fotografia 2</option>   
+                                                <option value= 7>Fotografia 3</option>
+                                                <option value= 8>Fotografia 4</option>   
+                                                <option value= 9>Fotografia 5</option>
+                                                <option value= 10>Fotografia 6</option>
+                                                <option value="Otro">Otro</option>  
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12" id="div_doc_titulo">
+                                    <div class="form-group" >
+                                        <label for="url">TITULO:</label>
+                                        <div class="controls">
+                                            <input type="text"  class="form-control" ng-disabled="only" id="doc_titulo" name="registro[]"  value="" ng-model="dato.doc_titulo">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12" id="div_doc_datos">
+                                    <div class="form-group" >
+                                        <label for="url">DESCRIPCION:</label>
+                                        <div class="controls">
+                                            <input type="text"  class="form-control" ng-disabled="only" id="doc_datos" name="registro[]" value="" ng-model="dato.doc_datos">
+                                        </div>
+                                    </div>
+                                </div> 
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="demo2" type="button" class="btn btn-default" data-dismiss="modal">Cerrar </button>
+                        <button ng-click="adicionarRegistros(dato);" type="button" class="btn btn-primary" ng-show="boton=='new'" ng-hide="boton=='upd' || boton=='del'"  ng-disabled="formularioRegistros.$invalid">Guardar</button>
+                        <button ng-click="modificarRegistros(dato.doc_idd,dato);" type="button" class="btn btn-primary" ng-show="boton=='upd'" ng-hide="boton=='new' || boton=='del'" ng-disabled="formularioRegistros.$invalid">Modificar</button>
+                        <button ng-click="eliminarRegistros(dato.doc_idd)" data-dismiss="modal" type="button" class="btn btn-primary" ng-show="boton=='del'" ng-hide="boton=='new' || boton=='upd'">Eliminar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="hr-line-dashed"></div>
+    <a class="btn btn-primary" ng-disabled="false" ng-click="volver()">
+        <i class="glyphicon fa fa-times"></i>
+        Cancelar
+    </a>
+    <a class="btn btn-primary" ng-click="cargarDatos(datos);guardarData(datos);" ng-disabled="false">
+        <i class="glyphicon fa fa-save"></i>
+        Guardar / Continuar
+    </a>

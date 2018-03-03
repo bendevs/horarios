@@ -1,0 +1,172 @@
+<div class="col-md-12" class="row" ng-controller="dagAsigJerarController" data-ng-init="inicioDagAsigJer()">
+<!--<div class="col-md-12" class="row" ng-controller="dagController" data-ng-init="inicioDag(datos)"> -->
+	<form class="form-horizontal" name="formulario" novalidate>
+	    <table  width="100%">
+	        <td><h3>ASIGNACION JERARQUICA</h3></td> 
+	    </table>
+	    <div class="hr-line-dashed"></div>
+	    <div class="ibox-title_2">
+			<h5>Datos del funcionario responsable</h5>
+	    </div>
+	    <div class="form-group">
+	        <label class="col-sm-1 control-label" style="red">Funcionario Responsable: <small class="m-l-sm" style="color: red"></small></label>
+	        <div class="col-sm-10"><input type="text" ng-model="funcionario" ng-change="cerear()" placeholder="Buscar Funcionario" class="form-control">
+	            <br>
+	            <ul style="border: 1px solid #009688;height:80px;  overflow-y:scroll;">
+	                <li ng-repeat="funcionario in ListFuncionarios | filter:funcionario " ng-click="cambiafuncionario(funcionario.dag_ubm_fr_ci,funcionario.dag_ubm_fr_paterno,funcionario.dag_ubm_fr_materno,funcionario.dag_ubm_fr_nombres)">
+	                    <a>{{funcionario.dag_ubm_fr_ci}} {{funcionario.dag_ubm_fr_paterno}} {{funcionario.dag_ubm_fr_materno}}, {{funcionario.dag_ubm_fr_nombres}}</a>
+	                </li>
+	            </ul>
+	        </div>
+		    <div class="form-group">
+		    	<label class="col-sm-2 control-label" style="red">Sector:</label>
+		        <div class="col-sm-1"><input type="text" disabled="" placeholder="{{S_SOLICITANTE}}" class="form-control"></div>
+		        <div class="col-sm-8"><input type="text" disabled="" placeholder="{{S_SOLICITANTE_D}}" class="form-control"></div>
+		    </div>
+		    <div class="form-group">
+		    	<label class="col-sm-2 control-label" style="red">Direccion Administrativa:</label>
+		        <div class="col-sm-1"><input type="text" disabled="" placeholder="{{DA_SOLICITANTE}}" class="form-control"></div>
+		        <div class="col-sm-8"><input type="text" disabled="" placeholder="{{DA_SOLICITANTE_D}}" class="form-control"></div>
+		    </div>
+		    <div class="form-group">
+		    	<label class="col-sm-2 control-label" style="red">Unidad Ejecutora:</label>
+		        <div class="col-sm-1"><input type="text" disabled="" placeholder="{{UE_SOLICITANTE}}" class="form-control"></div>
+		        <div class="col-sm-8"><input type="text" disabled="" placeholder="{{UE_SOLICITANTE_D}}" class="form-control"></div>
+		    </div>
+		    <div class="form-group">
+		    	<label class="col-sm-2 control-label" style="red">Unidad Organizacional:</label>
+		        <div class="col-sm-1"><input type="text" disabled="" placeholder="{{UO_SOLICITANTE}}" class="form-control"></div>
+		        <div class="col-sm-8"><input type="text" disabled="" placeholder="{{UO_SOLICITANTE_D}}" class="form-control"></div>
+		    </div>
+		</div>
+		<div class="hr-line-dashed"></div>
+		<div class="ibox-title_2">
+			<h5>Datos del activo</h5>
+	    </div>
+	    <div class="form-group">
+	    	<div class="form-group"><label class="col-sm-2 control-label" style="red">Buscar codigo: <small class="m-l-sm" style="color: red"></small></label>
+	            <div class="col-sm-1">
+	            	<input id="IN_CODIGOAF" name="IN_CODIGOAF" type="text" class="form-control" placeholder="XXXXX-XXXXXXX" ng-model="CODIGOAF" ng-change="GetActivo(CODIGOAF)" maxlength="13">
+	            </div>
+	        </div>
+	    </div>
+	    <div>
+	        <table class="table-responsive" id="dataTable" style="font-size: x-small; border-spacing: 5px;">
+	            <thead style="background-color: #009688 !important;color: white !important;">
+	            	<tr>BUSQUEDA DE ACTIVOS</tr>
+	                <tr>
+	                    <!-- <th>#</th> -->
+	                    <th style="border: 1px solid #dddddd;"></th>
+	                    <th style="border: 1px solid #dddddd;text-align:center;">CODIGO</th>
+	                    <th style="border: 1px solid #dddddd;text-align:center;">CODIGO BERTHIN 2006</th>
+	                    <th style="border: 1px solid #dddddd;text-align:center;">CODIGO ANTERIOR</th>
+	                    <th style="border: 1px solid #dddddd;text-align:center;">TIPO DE ACTIVO</th>
+	                    <th style="border: 1px solid #dddddd;text-align:center;">DESCRIPCION</th>
+	                </tr>
+	            </thead>
+	            <tbody>
+	                <tr ng-repeat="item in ListActivos" ng-class="{'selected':$index == selectedRow}" >
+	                    <!-- <td>{{$index}}+1</td> -->
+	                    <td style="border: 1px solid #009688;"><a tooltip = "Asignar" class="btn btn-small btn-circle" ng-click="setClickedRow($index)"><span class="fa fa-check"></span></a></td>
+	                    <td style="border: 1px solid #009688;">{{item.dag_ubm_activo_codigoaf}}</td>
+	                    <td style="border: 1px solid #009688;">{{item.dag_ubm_activo_codigo}}</td>
+	                    <td style="border: 1px solid #009688;">{{item.dag_ubm_activo_codigoold}}</td>
+	                    <td style="border: 1px solid #009688;">{{item.dag_ubm_activo_nombre}}</td>
+	                    <td style="border: 1px solid #009688;">{{item.dag_ubm_activo_descripcion}}</td>
+	                </tr>
+	            </tbody>
+	        </table>
+	    </div>
+	    <br>
+	    <div>
+	        <table class="table-responsive" id="dataTable1" style="font-size: x-small; border-spacing: 5px;">
+	            <thead style="background-color: #009688 !important;color: white !important;">
+	            	<tr>ACTIVOS A ASIGNAR</tr>
+	                <tr>
+	                    <!-- <th>#</th> -->
+	                    <th style="border: 1px solid #dddddd;"></th>
+	                    <th style="border: 1px solid #dddddd;text-align:center;">CODIGO</th>
+	                    <th style="border: 1px solid #dddddd;text-align:center;">CODIGO BERTHIN 2006</th>
+	                    <th style="border: 1px solid #dddddd;text-align:center;">CODIGO ANTERIOR</th>
+	                    <th style="border: 1px solid #dddddd;text-align:center;">TIPO DE ACTIVO</th>
+	                    <th style="border: 1px solid #dddddd;text-align:center;">DESCRIPCION</th>
+	                </tr>
+	            </thead>
+	            <tbody>
+	                <tr ng-repeat="item1 in ListActivos1" ng-class="{'selected':$index == selectedRow}" ng-click="setClickedRow1($index)">
+	                    <!-- <td>{{$index}}+1</td> -->
+	                    <td style="border: 1px solid #009688;"><a tooltip = "Eliminar" class="btn btn-small btn-circle" ng-click="setClickedRow1($index)"><span class="fa fa-remove"></span></a></td>
+	                    <td style="border: 1px solid #009688;">{{item1.dag_ubm_activo_codigoaf}}</td>
+	                    <td style="border: 1px solid #009688;">{{item1.dag_ubm_activo_codigo}}</td>
+	                    <td style="border: 1px solid #009688;">{{item1.dag_ubm_activo_codigoold}}</td>
+	                    <td style="border: 1px solid #009688;">{{item1.dag_ubm_activo_nombre}}</td>
+	                    <td style="border: 1px solid #009688;">{{item1.dag_ubm_activo_descripcion}}</td>
+	                </tr>
+	            </tbody>
+	        </table>
+	    </div>
+	    <div class="hr-line-dashed"></div>
+	    <div class="ibox-title_2">
+			<h5>Area Organizacional de asignacion</h5>
+	    </div>
+	    <div class="form-group"><label class="col-sm-2 control-label">Sector:</label>
+            <div class="col-sm-10">
+                <select 
+                    class="form-control"
+                    id="selSector" 
+                    name="selSector" 
+                    ng-model="Sec_Sel" 
+                    placeholder="-- Seleccione --" 
+                    ng-options="datoS.dag_s_s as (datoS.dag_s_s + ' ' + datoS.dag_s_descripcion) for datoS in datosSector"
+                    ng-click="RevisarFunc()"
+                    required>
+                    <option value=""></option>
+                </select>
+        </div>
+        </div>
+        <div class="form-group"><label class="col-sm-2 control-label">Direccion Administrativa:</label>
+            <div class="col-sm-10">
+                <select 
+                    class="form-control"
+                    id="selDA"
+                    name="selDA"
+                    ng-model="DA_Sel"
+                    ng-options="datoDA.dag_da_da as (datoDA.dag_da_da + ' ' + datoDA.dag_da_descripcion) for datoDA in datosDirAdm | filter:{dag_da_s:Sec_Sel}:true">
+                    <option value=""></option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">Unidad Ejecutora:</label>
+            <div class="col-sm-10">
+                <select 
+                    class="form-control"
+                    id="selUE"
+                    name="selUE"
+                    ng-model="UE_Sel"
+                    ng-options="datoUE.dag_ue_ue as (datoUE.dag_ue_ue + ' ' + datoUE.dag_ue_descripcion) for datoUE in datosUniEje | filter:{dag_ue_s:Sec_Sel,dag_ue_da:DA_Sel}:true">
+                    <option value=""></option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">Unidad Organizacional:</label>
+            <div class="col-sm-10">
+                <select 
+                    class="form-control"
+                    id="selUO"
+                    name="selUO"
+                    ng-model="UO_Sel"
+                    ng-options="datoUE.dag_uo_uo as (datoUE.dag_uo_uo + ' ' + datoUE.dag_uo_descripcion) for datoUE in datosUniOrg | filter:{dag_uo_s:Sec_Sel,dag_uo_da:DA_Sel,dag_uo_ue:UE_Sel}:true">
+                    <option value=""></option>
+                </select>
+            </div>
+        </div>
+	    <div class="form-group">
+	    	<div class="hr-line-dashed"></div>
+            <div class="form-group">
+                <button type="button" class="btn btn-primary" ng-click="guardarcontinuar()" ng-disabled="formulario.$invalid"><i class="glyphicon fa fa-save"></i> Finalizar Asignacion</button>
+            </div>
+	    </div>
+    </form>
+</div>

@@ -1,0 +1,382 @@
+<script>
+function cocheController($scope, DreamFactory, CONFIG, $q) {
+    var fecha= new Date();
+    $scope.fechactual=fecha.getFullYear() + "-" + fecha.getMonth() + "-" + fecha.getDate() + " " + fecha.getHours() + ":" + fecha.getMinutes() + ":" + fecha.getSeconds();
+    $scope.cargaDatos = function() {
+       var aaa=$scope.getDatos('int_inspectores');
+
+       console.log('aquiii',$scope.inspectores);
+    };
+
+    $scope.startDateOpen = function($event) {
+        $event.preventDefault();
+        $event.stopPropagation();
+        $scope.startDateOpened = true;
+    };
+    $scope.cargaDatos();
+    $scope.tituloForm1 = "TRÁMITE: EMISIÓN DE LICENCIA / AUTORIZACIÓN PARA EL FUNCIONAMIENTO DE SERVICIO DE INTERNET";
+    $scope.titulo2Form1 = "VERIFICACIÓN DE REQUISITOS Y ORDEN DE DEMOLICIÓN - PERSONA NATURAL";
+}
+</script>
+<div class="wrap" ng-controller="cocheController">
+    <h3 align="center">  {{tituloForm1}}</h3>
+    <h4 align="center">  {{titulo2Form1}}</h4>
+    <legend> Datos Generales de la Actividad</legend>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Fecha de Solicitud:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.fecha}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Tipo de Contribuyente: </label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.solicitante}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font> Actividad: </label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.ae}}</label>
+                </div>
+            </div>
+        </div>
+    <legend> Datos Solicitante</legend>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Solicitante:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.INT_SOLICITANTE}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Tipo de Documento:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.tipodoc}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Numero de Documento:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.INT_RL_NUM_DOCUMENTO}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Expedido en:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.region}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Correo Electrónico:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.INT_CORREO}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Número de Teléfono Celular:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.INT_TEL_CELULAR}}</label>
+                </div>
+            </div>
+        </div>
+    <legend> Datos de la Actividad</legend>
+        </div><div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >NIT:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.NIT}}</label>
+                </div>
+            </div>
+        </div>
+        </div><div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Razon Social / Denominación:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.razon_social}}</label>
+                </div>
+            </div>
+        </div>
+        </div><div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Fecha de Inicio de la Actividad:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.fecha_inicio_actividad}}</label>
+                </div>
+            </div>
+        </div>
+        </div><div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Superficie en mt2:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.superficie}}</label>
+                </div>
+            </div>
+        </div>
+        </div><div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Capacidad (Aprox.):</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.capacidad}}</label>
+                </div>
+            </div>
+        </div>
+        </div><div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Horario de Inicio:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.horario_inicio}}</label>
+                </div>
+            </div>
+        </div>
+        </div><div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Horario de Finalización:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.horario_fin}}</label>
+                </div>
+            </div>
+        </div>
+        </div><div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Establecimiento:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.establecimiento}}</label>
+                </div>
+            </div>
+        </div>
+        </div><div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Tiene Actividad Económica Principal:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.tiene_actividad_principal}}</label>
+                </div>
+            </div>
+        </div>
+        </div><div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Actividad Principal:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.actividad_principal}}</label>
+                </div>
+            </div>
+        </div>
+    <legend> Ubicación de la Actividad</legend>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Macrodistrito:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.macrodistrito_ae}}</label>
+                </div>
+            </div>
+        </div><div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Zona:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.zona_ae}}</label>
+                </div>
+            </div>
+        </div><div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Tipo de Vía:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.tipo_via_ae}}</label>
+                </div>
+            </div>
+        </div><div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Nombre de Vía:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.nombre_via_ae}}</label>
+                </div>
+            </div>
+        </div><div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Número:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.numero_casa_ae}}</label>
+                </div>
+            </div>
+        </div><div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Edificio:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.edificio_casa_ae}}</label>
+                </div>
+            </div>
+        </div><div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Bloque:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.bloque_casa_ae}}</label>
+                </div>
+            </div>
+        </div><div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Piso:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.piso_casa_ae}}</label>
+                </div>
+            </div>
+        </div>
+        </div><div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Departamento Nro.:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.depto_nro_ae}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Teléfono:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.telefono_ae}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Número de Teléfono Celular:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.celular_ae}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Correo Electrónico:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.correo_ae}}</label>
+                </div>
+            </div>
+        </div>
+    <legend> Información de Requisitos para Obtener Licencia / Autorización</legend>
+        <div class="col-sm-12">
+            Requisitos:
+            <div class="form-group" align="left" >
+                <div class="col-sm-4" align="right">
+                    <input type="checkbox" ng-model="checkboxes.items[1]" ng-disabled="desabilitado"/> <font ng-show="checkboxes.items[1]">SI</font><font ng-show="!checkboxes.items[1]">NO</font>
+                </div>
+                <label class="col-sm-8" for="url" >FOTOCOPIA CÉDULA DE IDENTIDAD O CARNET DE EXTRANJERO:</label><br>
+            </div>
+        </div>
+        <div class="col-sm-12">
+            <div class="form-group" align="left" >
+                <div class="col-sm-4" align="right">
+                    <input type="checkbox" ng-model="checkboxes.items[1]" ng-disabled="desabilitado"/> <font ng-show="checkboxes.items[1]">SI</font><font ng-show="!checkboxes.items[1]">NO</font>
+                </div>
+                <label class="col-sm-8" for="url" >ÚLTIMA FACTURA DE ALGUN SERVICIO QUE ACREDITE LA DIRECCIÓN DEL INMUEBLE DONDE FUNCIONARÁ LA ACTIVIDAD ECONÓMICA</label><br>
+            </div>
+        </div>
+        <div class="col-sm-12">
+            <div class="form-group" align="left" >
+                <div class="col-sm-4" align="right">
+                    <input type="checkbox" ng-model="checkboxes.items[1]" ng-disabled="desabilitado"/> <font ng-show="checkboxes.items[1]">SI</font><font ng-show="!checkboxes.items[1]">NO</font>
+                </div>
+                <label class="col-sm-8" for="url" >PARA INMUEBLES SUPERIORES A MAYORES A 150 M2, CROQUIS O PLANO DE DISTRIBUCIÓN DE AMBIENTES QUE INCLUYA MEDIDA CORRESPONDIENTES:</label><br>
+            </div>
+        </div>
+        <div class="col-sm-12">
+            <div class="form-group" align="left" >
+                <div class="col-sm-4" align="right">
+                    <input type="checkbox" ng-model="checkboxes.items[1]" ng-disabled="desabilitado"/> <font ng-show="checkboxes.items[1]">SI</font><font ng-show="!checkboxes.items[1]">NO</font>
+                </div>
+                <label class="col-sm-8" for="url" >CERTIFICADO DE REGISTRO DE ANTECEDENTES PENALES DEL SOLICITANTE Y DE QUIEN SE ENCUENTRE A CARGO DE LA PRESTACIÓN DEL SERVICIO:</label><br>
+            </div>
+        </div>
+    <legend> Programación de Inspección</legend>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Inspector Designado: </label>
+                <div class="col-sm-8" align="left">
+                    <select id="inspector_designado" name="inspector_designado" ng-model="datos.inspector_designado" class="form-control" required>
+                        <option value="JUAN PEREZ">JUAN PEREZ</option>
+                        <option value="ROBERTO GOMEZ">ROBERTO GOMEZ</option>
+                    </select>{{inspectores}}
+                    <span style="color:red" ng-show="formulario.inspector_designado.$invalid">
+                        <span ng-show="formulario.inspector_designado.$error.required">Es requerido.
+                        </span>
+                    </span><br>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font> Fecha de Inspección: </label>
+                <div class="col-sm-8" align="left">
+                    <p class="input-group"><input name="fecha_inspeccion" id="fecha_inspeccion" type="text" class="form-control" datepicker-popup="" ng-model="datos.fecha_inspeccion" is-open="startDateOpened" ng-required="true" close-text="Close" ng-disabled="desabilitado"/>
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-default" ng-click="startDateOpen($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+                    </span></p><br>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Conclusiones: </label>
+                <div class="col-sm-8" align="left">
+                    <textarea id="proveido_conclusiones" name="proveido_conclusiones" ng-model="datos.proveido_conclusiones" class="form-control" required></textarea>
+                    <span style="color:red" ng-show="formulario.proveido_conclusiones.$invalid">
+                        <span ng-show="formulario.proveido_conclusiones.$error.required">Es requerido.
+                        </span>
+                    </span><br>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font> Total Nro Fojas: </label>
+                <div class="col-sm-8" align="left">
+                    <input ng-model="datos.total_fojas" id="total_fojas" name="total_fojas" class="form-control" type="text" placeholder="ingrese la cedula de identidad" ng-disabled="false" ><br>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Descripción Fojas: </label>
+                <div class="col-sm-8" align="left">
+                    <textarea id="desc_fojas" name="desc_fojas" ng-model="datos.desc_fojas" class="form-control" required></textarea>
+                    <span style="color:red" ng-show="formulario.desc_fojas.$invalid">
+                        <span ng-show="formulario.desc_fojas.$error.required">Es requerido.
+                        </span>
+                    </span><br>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Historial:</label>
+                <div class="col-sm-8" align="left">
+                    <textarea id="historial" name="historial" ng-model="datos.historial" class="form-control" required></textarea>
+                    <span style="color:red" ng-show="formulario.historial.$invalid">
+                        <span ng-show="formulario.historial.$error.required">Es requerido.
+                        </span>
+                    </span><br>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button data-dismiss="modal" type="button" class="btn btn-danger fa fa-save" ng-disabled="false" ng-click="volver()"><span span class="textoAux"> CANCELAR </span></button>
+            <button ng-show="siguiente!=null || casoActual.actsigid!=0" ng-click="cargarDatos(datos);guardarData(datos);evalReglasFormulario()" data-dismiss="modal" type="button" class="btn btn-success fa fa-save" ng-disabled="false"><span span class="textoAux"> GUARDAR / CONTINUAR </span></button>
+            <button ng-show="siguiente==null || casoActual.actsigid!=0" ng-click="cargarDatos(datos);guardarData(datos);derivar();" data-dismiss="modal" type="button" class="btn btn-success fa fa-save" ng-disabled="false"><span span class="textoAux"> DERIVAR </span></button>
+            <button ng-show="casoActual.actsigid==0 && siguiente==null" data-dismiss="modal" type="button" class="btn btn-success fa fa-save" ng-disabled="false" ng-click="cargarDatos(datos);guardarData(datos);evalReglasAvanzar();"><span span class="textoAux"> DERIVAR </span></button>
+            <button ng-show="casoActual.actsigid==0 && siguiente==null" data-dismiss="modal" type="button" class="btn btn-success fa fa-save" ng-disabled="false" ng-click="cerrarCaso()"><span span class="textoAux"> CERRAR CASO </span></button>
+        </div>
+    <legend> </legend>
+</div>

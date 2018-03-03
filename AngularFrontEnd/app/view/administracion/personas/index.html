@@ -1,0 +1,211 @@
+<div class="col-md-12" class="row" ng-controller="personasController" data-ng-init="inicioPersonas()">
+    <div class="col-lg-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>Personas</h5>
+
+                <div ibox-tools></div>
+                <div class="botones_inspinia_lmc">
+                    <a class="btn btn-primary" ng-click="limpiar()" data-toggle="modal" data-target="#registro">
+                        <i class="glyphicon glyphicon-plus-sign"></i>Nueva Persona</a>
+                </div>
+            </div>
+            <div class="ibox-content">
+                <table ng-table="tablaPersonas"  show-filter="true" class="table table-striped">
+                    <tr ng-repeat="persona in $data" ng-class="{'colorInactivo': persona.prsEstado == 'INACTIVO'}">
+                        <td align="center" data-title="'Opciones'" style="width: 80px;">
+                            <a ng-click="modificarPersonaCargar(persona)" class="btn btn-info btn-circle" data-toggle="modal" data-target="#registro"><i class="fa fa-pencil"></i></a>
+                            <a ng-click="eliminarPersonaCargar(persona)" class="btn btn-info btn-circle" data-toggle="modal" data-target="#registro"><i class="fa fa-trash-o" ></i></a>
+                        </td>
+                        <td data-title="'Nombre Completo'" sortable="'prsNombre'" filter="{'prsNombre':'text'}">{{persona.prsNombre}}</td>
+                        <td data-title="'C.I.'" sortable="'prsCi'" filter="{'prsCi':'text'}">{{persona.prsCi}}</td>
+                        <td data-title="'Estado Civil'" sortable="'prsStcvl'" filter="{'prsStcvl':'text'}">{{persona.prsStcvl}}</td>
+                        <td data-title="'Direccion'" sortable="'prsDireccion'" filter="{'prsDireccion':'text'}">{{persona.prsDireccion}}</td>
+                        <td data-title="'Telefono'" sortable="'prsTelefono'" filter="{'prsTelefono':'text'}">{{persona.prsTelefono}}</td>
+                        <td data-title="'Celular'" sortable="'prsCelular'" filter="{'prsCelular':'text'}">{{persona.prsCelular}}</td>
+                        <td data-title="'Correo'" sortable="'prsCorreo'" filter="{'prsCorreo':'text'}">{{persona.prsCorreo}}</td>
+                        <!--td data-title="'Sexo'" sortable="'prsSexo'" filter="{'prsSexo':'text'}">{{persona.prsSexo}}</td-->
+                        <td data-title="'Fecha Nac.'" sortable="'prsfecnmt'" filter="{'prsfecnmt':'text'}">{{persona.prsfecnmt}}</td>
+                        <td data-title="'Estado'" sortable="'prsEstado'" filter="{'prsEstado':'text'}">{{persona.prsEstado}}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+  
+    
+    <!-- MODAL -->
+    <div class="modal fade" id="registro" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Cerrar</span></button>
+                    <h4 class="modal-title" id="myModalLabel">{{titulo}}</h4>
+                </div>
+                <div class="modal-body" >
+                    <form name="formularioPersonas" readOnly="true" novalidate>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group" >
+                                    <label for="url" >Nombre:</label>
+                                    <div class="controls">
+                                        <input  cols="40" rows="5" ng-model="datosPersona.prsNom" id="prsNom" name="prsNom" class="form-control" type="text" placeholder="ingrese nombres" ng-disabled="desabilitado" required onkeyUp="return conMayusculas(this);">
+                                        <span style="color:red" ng-show="formularioPersonas.prsNom.$invalid">
+                                            <span ng-show="formularioPersonas.prsNom.$error.required">Nombre es requerido.
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group" >
+                                    <label for="url" >Paterno:</label>
+                                    <div class="controls">
+                                        <input  ng-model="datosPersona.prsPat" id="prsPat" name="prsPat" class="form-control" type="text" placeholder="ingrese apellido paterno" ng-disabled="desabilitado" required onkeyUp="return conMayusculas(this);">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group" >
+                                    <label for="url" >Materno:</label>
+                                    <div class="controls">
+                                        <input  ng-model="datosPersona.prsMat" id="prsMat" name="prsMat" class="form-control" type="text" placeholder="ingrese apellido materno" ng-disabled="desabilitado" required onkeyUp="return conMayusculas(this);">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group" >
+                                    <label for="url" >CI:</label>
+                                    <div class="controls">
+                                        <input  ng-model="datosPersona.prsCi" id="prsCi" name="prsCi" class="form-control" type="text" placeholder="ingrese ci" ng-disabled="desabilitado" onkeyUp="return valNumero(this);" required>
+                                        <span style="color:red" ng-show="formularioPersonas.prsCi.$invalid">
+                                            <span ng-show="formularioPersonas.prsCi.$error.required">Nro de Carnet es requerido.
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group" >
+                                    <label for="url" >Direccion:</label>
+                                    <div class="controls">
+                                        <input  ng-model="datosPersona.prsDireccion" id="prsDireccion" name="prsDireccion" class="form-control" type="text" placeholder="ingrese direccion" ng-disabled="desabilitado" required onkeyUp="return conMayusculas(this);">
+                                        <span style="color:red" ng-show="formularioPersonas.prsDireccion.$invalid">
+                                            <span ng-show="formularioPersonas.prsDireccion.$error.required">Direccion es requerido.
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group" >
+                                    <label for="url" >Direccion Auxiliar:</label>
+                                    <div class="controls">
+                                        <input  ng-model="datosPersona.prsDireccion2" id="prsDireccion2" name="prsDireccion2" class="form-control" type="text" placeholder="ingrese direccion" ng-disabled="desabilitado" onkeyUp="return conMayusculas(this);">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group" >
+                                    <label for="url" >Telefono:</label>
+                                    <div class="controls">
+                                        <input  ng-model="datosPersona.prsTelefono" id="prsTelefono" name="prsTelefono" class="form-control" type="text" placeholder="ingrese numero de telefono" ng-disabled="desabilitado" onkeyUp="return valNumero(this);" required>
+                                        <span style="color:red" ng-show="formularioPersonas.prsTelefono.$invalid">
+                                            <span ng-show="formularioPersonas.prsTelefono.$error.required">Telefono es requerido.
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group" >
+                                    <label for="url" >Telefono auxiliar:</label>
+                                    <div class="controls">
+                                        <input  ng-model="datosPersona.prsTelefono2" id="prsTelefono2" name="prsTelefono2"class="form-control" type="text" placeholder="ingrese numero de telefono" ng-disabled="desabilitado" onkeyUp="return valNumero(this);">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group" >
+                                    <label for="url" >Celular:</label>
+                                    <div class="controls">
+                                        <input  ng-model="datosPersona.prsCelular" id="prsCelular" name="prsCelular" class="form-control" type="text" placeholder="ingrese numero de celular" ng-disabled="desabilitado" onkeyUp="return valNumero(this);">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group" >
+                                    <label for="category">Empresa Telefonica</label>
+                                    <div class="controls">
+                                        <select id="prsEmpTel" class="form-control" ng-model="datosPersona.prsEmpTel" ng-disabled="desabilitado" name="prsEmpTel">
+                                            <option value="Entel">Entel</option>
+                                            <option value="Viva">Viva</option>
+                                            <option value="Tigo">Tigo</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="form-group" >
+                                    <label for="url" >Correo:</label>
+                                    <div class="controls">
+                                        <input  ng-model="datosPersona.prsCorreo" id="prsCorreo" name="prsCorreo" class="form-control" type="email" placeholder="ingrese e-mail" ng-disabled="desabilitado" >
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group" >
+                                    <label for="category">Estado Civil</label>
+                                    <div class="controls">
+                                        <select ng-model="datosPersona.prsStcvlId" id="prsStcvlId" name="prsStcvlId" class="form-control" ng-disabled="desabilitado" ng-required="true">
+                                            <option ng-repeat="estado in estados" value="{{estado.estcivilId}}">{{estado.estCivil}}</option>
+                                        </select>
+                                        <span style="color:red" ng-show="formularioPersonas.prsStcvlId.$invalid">
+                                            <span ng-show="formularioPersonas.prsStcvlId.$error.required">Estado civil es requerido.
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group" >
+                                    <label for="url" >Género:</label>
+                                    <div class="controls" >
+                                        <input type="radio" ng-model="datosPersona.prsSexo" name="prsSexo" value="M" ng-change="" ng-disabled="desabilitado" ng-required="true">Masculino&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                        <input type="radio" ng-model="datosPersona.prsSexo" name="prsSexo" value="F" ng-change="" ng-disabled="desabilitado" ng-required="true">Femenino<br>
+                                        <span style="color:red" ng-show="formularioPersonas.prsSexo.$invalid">
+                                            <span ng-show="formularioPersonas.prsSexo.$error.required">Género es requerido.
+                                            </span>
+                                        </span>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group" >
+                                    <label for="url" >Fecha de Nacimiento:</label>
+                                    <div class="controls">
+                                        <p class="input-group"><input name="prsfecnmt" id="prsfecnmt" type="text" class="form-control" datepicker-popup="" ng-model="datosPersona.prsfecnmt" is-open="startDateOpened" ng-required="true" close-text="Close" ng-disabled="desabilitado"/>
+                                        <span class="input-group-btn">
+                                            <button type="button" class="btn btn-default" ng-click="startDateOpen($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+                                        </span></p>
+                                        <span style="color:red" ng-show="formularioPersonas.prsfecnmt.$invalid">
+                                            <span ng-show="formularioPersonas.prsfecnmt.$error.required">Fecha de Nacimiento es requerido.
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button id="demo2" type="button" class="btn btn-default" data-dismiss="modal">Cerrar </button>
+                    <button ng-click="adicionarPersona(datosPersona);" data-dismiss="modal" type="button" class="btn btn-primary" ng-show="boton=='new'" ng-hide="boton=='upd' || boton=='del'"  ng-disabled="formularioPersonas.$invalid">Guardar</button>
+                    <button ng-click="modificarPersona(datosPersona.prsId,datosPersona);" data-dismiss="modal" type="button" class="btn btn-primary" ng-show="boton=='upd'" ng-hide="boton=='new' || boton=='del'" ng-disabled="formularioPersonas.$invalid">Modificar</button>
+                    <button ng-click="eliminarPersona(datosPersona.prsId)" data-dismiss="modal" type="button" class="btn btn-primary" ng-show="boton=='del'" ng-hide="boton=='new' || boton=='upd'">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

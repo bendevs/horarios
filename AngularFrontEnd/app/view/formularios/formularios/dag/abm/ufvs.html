@@ -1,0 +1,102 @@
+
+ <script type="text/javascript">
+     function conMayusculas(field) {
+             field.value = field.value.toUpperCase()
+     }
+ </script>
+<div ng-controller="ufvsController" data-ng-init="inicioUfvs()" class="row">
+ <div class="col-lg-12">
+         <div class="ibox float-e-margins">
+             <div class="ibox-title">
+                 <h5>UFVS</h5>
+                 <div ibox-tools></div>
+                     <div class="botones_inspinia_lmc">
+                         <a class="btn btn-primary" ng-click="limpiar()" data-toggle="modal" data-target="#registro"><i class="glyphicon glyphicon-plus-sign" ng-disabled="desabilitado"></i> Nuevo UFVS</a>
+                     </div>
+                     <div class="form-group"><label class="col-sm-3 control-label">Gestion: <font size="5px" color="#FF0000"> </font></label>
+                       <div class="col-sm-8">
+                         <select id="gestion"
+                              name="gestion"
+                              placeholder="-- Seleccione --"
+                              ng-model="datos.gestion"
+                              ng-change = "getUfvs(datos.gestion)"
+                              class="form-control">
+                              <option style="display:none" value="">--Seleccione--</option>
+                             <option ng-repeat="obj in gestiones" value="{{obj.anio}}">
+                             {{obj.anio}}
+                           </option>
+                         </select>
+                       </div>
+                     </div>
+             </div>
+             <div class="ibox-content">
+               <table ng-table="tablaUfvs"  format-fn="colorCellFormat"  show-filter="true"  class="table table-striped"  >
+                 <tr ng-repeat="ufvs in $data" ng-class="{'colorInactivo': sectores.sec_estado == 'I', 'colorBloqueado': sectores.sec_estado == 'BLOQUEADO'}" >
+                   <td align="center" data-title="'Opciones'" style="width: 80px;">
+                     <a ng-click="modificarGrupoCargar(ufvs)" class="btn btn-info btn-circle" data-toggle="modal" data-target="#registro"><i class="fa   fa-pencil "></i> </a>
+                     <!--a ng-click="eliminarGrupoCargar(ufvs)"  class="btn btn-info btn-circle"  data-toggle="modal" data-target="#registro"><i class="fa  fa-trash-o "></i></a-->
+                   </td>
+                   <td data-title="'Codigo'" sortable="'codigo'" filter="{'codigo':'text'}">{{ufvs.codigo}}</td>
+                   <td data-title="'Fecha'" sortable="'fecha'" filter="{'fecha':'text'}">{{ufvs.fecha}}</td>
+                   <td data-title="'Tipo Cambio'" sortable="'tipo_cambio'" filter="{'tipo_cambio':'text'}" >{{ufvs.tipo_cambio}}</td>
+                 </tr>
+               </table>
+             </div>
+         </div>
+ </div>
+<!-- modal -->
+<div class="modal fade" id="registro" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+     <div class="modal-content">
+       <div class="modal-header">
+       <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Cerrar</span></button>
+       <h4 class="modal-title" id="myModalLabel">{{titulo}}  </h4>
+       </div>
+       <div class="modal-body" >
+         <form name="formularioGrupos"  readOnly="true" novalidate >
+           <div class="form-group">
+             <div class="form-group">
+                  <label class="col-sm-2 control-label">Fecha Inicio de Recepción:</label>
+                  <div class="col-sm-4">
+                       <p class="input-group">
+                         <input name="fechainicio" id="fechainicio" type="text" class="form-control" datepicker-popup="" ng-model="datos.fechainicio" is-open="startDateOpened" required close-text="Close" ng-disabled="desabilitado" min-date="modelFecha.endDate"/>
+                           <span class="input-group-btn">
+                               <button type="button" class="btn btn-default" ng-click="startDateOpen($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+                           </span>
+                       </p>
+                  </div>
+                  <div class="form-group" >
+                      <label class="col-sm-2 control-label no-padding-right" for="url" >Tipo Cambio: <font color="#FF0000" size="5px"> </font></label>
+                      <div class="col-sm-4" align="left">
+                          <input   ng-model="datos.tipo_cambio" id="tipo_cambio" name="tipo_cambio"  class="form-control" type="number" placeholder="Ingrese Codigo" >
+                      </div>
+                  </div>
+
+             </div>
+             <br><br>
+             <!--div class="ibox-content">
+               <table ng-table="UFVS"  format-fn="colorCellFormat"  show-filter="true"  class="table table-striped"  >
+                 <tr ng-repeat="fecha in fechas" ng-class="{'colorInactivo': sectores.sec_estado == 'I', 'colorBloqueado': sectores.sec_estado == 'BLOQUEADO'}" >
+                   <td data-title="'Codigo'">{{fecha.codigo}}</td>
+                   <td data-title="'Fecha'" >{{fecha.fecha}}</td>
+                   <td data-title="'Tipo Cambio'" >{{fecha.tipo_cambio}}</td>
+                   <td data-title="'Tipo Cambio'" ><input name="valor" id="valor" type="checkbox" class="form-control" ng-model ="datos.valor"/>
+                   </td>
+                 </tr>
+               </table>
+             </div-->
+         </div>
+         <div class="hr-line-dashed"></div>
+
+             <br><br>
+         </form>
+       </div>
+       <div class="modal-footer">
+       <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+       <button ng-click="adicionarUfvs(datos)" data-dismiss="modal" type="button" class="btn btn-primary" ng-show="boton=='new'" ng-hide="boton=='upd' || boton=='del'"  ng-disabled="formularioGrupos.grpGrupo.$invalid ">Guardar</button>
+       <button ng-click="modificarUfvs(datos)" data-dismiss="modal" type="button" class="btn btn-primary" ng-show="boton=='upd'" ng-hide="boton=='new' || boton=='del'" ng-disabled="formularioGrupos.grpGrupo.$invalid ">Modificar</button>
+       <button ng-click="eliminarUfvs(datos)" data-dismiss="modal" type="button" class="btn btn-primary" ng-show="boton=='del'" ng-hide="boton=='new' || boton=='upd'"   >Eliminar</button>
+       </div>
+     </div>
+   </div>
+</div>

@@ -1,0 +1,1230 @@
+<style type="text/css">
+/*img {
+  filter: gray; 
+  -webkit-filter: grayscale(1); 
+    -webkit-box-shadow: 0px 2px 6px 2px rgba(0,0,0,0.75);
+    -moz-box-shadow: 0px 2px 6px 2px rgba(0,0,0,0.75);
+    box-shadow: 0px 2px 6px 2px rgba(0,0,0,0.75);
+    margin-bottom:20px;
+}
+
+img:hover {
+  filter: none; 
+  -webkit-filter: grayscale(0); 
+ 
+}*/
+
+
+input[name="slider-select-element"] {
+    display: none;
+}
+
+#slider-arrows {
+    margin: -10% auto 0 auto;
+    width: 90%;
+}
+
+#slider-box {
+    height: 100%;
+    width: 300%;
+}
+
+#slider-container {
+    height: 20%;
+    margin: 0 auto;
+    overflow: hidden;
+    text-align: left;
+    width: 80%;
+}
+
+.element{
+    min-height: 300px;
+    max-height: 300px;
+    width: 100%;
+}
+
+.element-blue {
+    background: blue;
+}
+
+.element-green {
+    background: green;
+}
+
+.element-red {
+    background: red;
+}
+
+.slider-element {
+    float: left;
+    width: 33.333%;
+}
+
+#element1:checked ~ #slider-arrows label:nth-child(2),
+#element2:checked ~ #slider-arrows label:nth-child(3),
+#element3:checked ~ #slider-arrows label:nth-child(1) {
+    display: block;
+    float: right;
+}
+
+#element1:checked ~ #slider-arrows label:nth-child(3),
+#element2:checked ~ #slider-arrows label:nth-child(1),
+#element3:checked ~ #slider-arrows label:nth-child(2) {
+    display: block;
+    float: left;
+}
+
+#element1:checked ~ #slider-arrows label:nth-child(2):before,
+#element2:checked ~ #slider-arrows label:nth-child(3):before,
+#element3:checked ~ #slider-arrows label:nth-child(1):before {
+    color: black;
+    content: "\f054";
+    font-family: FontAwesome;
+    font-style: normal;
+    font-weight: normal;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: antialiased;
+}
+
+#element1:checked ~ #slider-arrows label:nth-child(3):before,
+#element3:checked ~ #slider-arrows label:nth-child(2):before,
+#element2:checked ~ #slider-arrows label:nth-child(1):before {
+    color: black;
+    content: "\f053";
+    font-family: FontAwesome;
+    font-style: normal;
+    font-weight: normal;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: antialiased;
+}
+
+#element1:checked ~ #slider-container #slider-box {
+    margin-left: 0;
+}
+
+#element2:checked ~ #slider-container #slider-box {
+    margin-left: -100%;
+}
+
+#element3:checked ~ #slider-container #slider-box {
+    margin-left: -200%;
+}
+#element4:checked ~ #slider-container #slider-box {
+    margin-left: -300%;
+}
+
+#slider-arrows label {
+    color: transparent;
+    cursor: pointer;
+    display: none;
+    font-size: 2rem;
+    height: 20px;
+    width: 20px;
+}
+
+#slider-box {
+    -webkit-transition: all 0.75s ease;
+    -moz-transition: all 0.75s ease;
+    -ms-transition: all 0.75s ease;
+    -o-transition: all 0.75s ease;
+    transition: all 0.75s ease;
+}
+</style>
+<script type="text/javascript">
+    function adquisisionController($scope, $timeout, $route, $rootScope, $routeParams, $location, $http, Data, sessionService, CONFIG, LogGuardarInfo, DreamFactory, ngTableParams, $filter, sessionService, $filter, sweet, $sce, registroLog,FileUploader,fileUpload,wsContribuyenteNatural,wsLicencia, $window) {
+        var aRegistro = {"valor": "","campo": "","activo":"","tarea_caracterist2":"","responsable":""};
+        $scope.caracteristica = aRegistro;
+        $scope.item = [];
+        $scope.ListFuncionarios = "";
+        $scope.selectedRow = null;
+        $scope.datos.obtAsignaciones = [];
+
+        var fecha = new Date();
+        $scope.fechactual = fecha.getFullYear() + "-" + fecha.getMonth() + "-" + fecha.getDate() + " " + fecha.getHours() + ":" + fecha.getMinutes() + ":" + fecha.getSeconds();
+        $scope.model = {
+          startDate: new Date('09/21/2015'),
+          endDate: new Date()
+        };
+        $scope.startDateOpen = function($event) {
+               $event.preventDefault();
+               $event.stopPropagation();
+               $scope.startDateOpened = true;
+        };
+        $scope.guardarItem = function (){
+            
+                $scope.cargarDatos($scope.datos);
+                $scope.guardarData($scope.datos);
+        }
+        
+        $scope.verificarDatos = function(datos){
+         // var cadena1 = JSON.parse(datos);
+        //console.log(cadena1);
+        /* var idCiu = sessionService.IDUSUARIO;
+          console.log(sessionStorage.IDUSUARIO);
+           var idUsu = sessionService.get.IDCIUDADANO;
+          console.log(idUsu);*/
+          //console.log(datos);
+         /* console.log(datos);
+          //datos = JSON.parse(datos);
+          var c = JSON.stringify(datos);
+          console.log(c);
+          var x = datos.tarea_caracterist;
+          //var x = JSON.stringify(x);
+          console.log(x);
+         //c= c.replace(,'');
+         // console.log("===>>",c.replace("\"","'"));
+           var resPartida = {              
+                "procedure_name":"dag.pruebajson3",
+                "body":{
+                    "params": [                                
+                        {
+                            "name": "entrada",
+                            "value": c
+                        },
+                         {
+                            "name": "caracteristicas",
+                            "value": x
+                        }
+                        
+                    ]
+                }           
+              
+            };
+            DreamFactory.api[CONFIG.SERVICE].callStoredProcWithParams(resPartida).success(function (response){
+              //$scope.data = response;
+              console.log("OK");
+                              sweet.show('', 'Se inserto todos los datos correctamente', 'success');
+              console.log("==>",response);
+              $.unblockUI();
+            }).error(function(error) {
+                $scope.errors["error_rol"] = error;
+                console.log("errorrrrrr");
+            });*/
+            $scope.cargarDatos(datos);
+            $scope.guardarData(datos);
+        }
+        $scope.comb = function(){
+            var resPartida = {
+                "function_name":"dag.sp_partida"
+            };
+            
+            DreamFactory.api[CONFIG.SERVICE].callStoredFuncWithParams(resPartida).success(function (response){
+              $scope.combop = response;
+              $.unblockUI();
+            }).error(function(error) {
+                $scope.errors["error_rol"] = error;
+            });
+        }
+        $scope.caracteristicass = function(dato){       
+            var resPartida = {              
+                "function_name":"dag.sp_caracteristicas",
+                "body":{
+                    "params": [                                
+                        {
+                            "name": "codigo",
+                            "value": dato
+                        }
+                    ]
+                }           
+              
+            };
+            DreamFactory.api[CONFIG.SERVICE].callStoredFuncWithParams(resPartida).success(function (response){
+              $scope.data = response;
+              $.unblockUI();
+            }).error(function(error) {
+                $scope.errors["error_rol"] = error;
+            });
+        }
+        $scope.descripcion = function(dato){
+          $scope.mostrar = "ok";
+            var resPartida = {
+                "function_name":"dag.sp_dag_caracteristicas",
+                "body":{
+                    "params": [                                
+                        {
+                            "name": "id_car",
+                            "value": dato
+                        }
+                    ]
+                }           
+              
+            };
+            DreamFactory.api[CONFIG.SERVICE].callStoredFuncWithParams(resPartida).success(function (response){
+                if (response !='[]') {
+                  var DetItem="";
+                  DetItem = response;
+                  $scope.caracteristicas1 = JSON.parse(DetItem[0].sp_dag_caracteristicas);
+                  var size = Object.keys($scope.caracteristicas1).length;
+                      $scope.caracteristicas = [];
+                      for(var j=0; j<size; j++){
+                          $scope.caracteristicas.push({
+                              name: $scope.caracteristicas1[j],
+                              value: $scope.caracteristicas1[j]                                                     
+                          });                          
+                      }                  
+                }
+              $.unblockUI();
+              }).error(function(error) {
+                  $scope.errors["error_rol"] = error;
+              });              
+        }
+        $scope.Cargarfuncionarios = function () {
+            var datosFuncionarios = {
+                "procedure_name":"dag.sp_dag_ubm_funcionarioreponsable",
+            };
+            DreamFactory.api[CONFIG.SERVICE].callStoredProcWithParams(datosFuncionarios).success(function (response){
+                var tmpListFuncionarios = JSON.stringify(response);
+                $scope.ListFuncionarios = JSON.parse(tmpListFuncionarios);
+            })
+            .error(function(data){
+                sweet.show('', 'Error al cargar la informacion del item: ', 'error');
+            });
+        }
+      $scope.mostrarVector = function (dato){
+        console.log(dato);
+        console.log("este es el dato==>",dato[1]);
+        console.log("este es el dato==>",dato[2]);
+        console.log("este es el dato==>",dato[3]);
+      }
+
+        $scope.probarCodificacion = function () {
+          var dat2 = document.getElementById("tarea_caracterist").value;
+         console.log("este es el tarea_caracterist",dat2);
+         var dattoo = JSON.parse(dat2);
+         console.log("aqui esta el parseado",dattoo);
+         var indice = 1;
+          setTimeout(function(){
+             for(var i=1; i<= dattoo.length-1;i++){
+
+            var codificacion = {
+                "procedure_name":"dag.sp_dag_codificacion2",
+                "body":{
+                    "params": [                                
+                        {
+                            "name": "activo1",
+                            "value": dattoo[i].activo
+                        },
+                        {
+                          "name": "cantidad",
+                            "value": dattoo[i].cantidad
+                        }
+                    ]
+                } 
+            };
+            DreamFactory.api[CONFIG.SERVICE].callStoredProcWithParams(codificacion).success(function (response){
+                console.log("estaaaaaaaaaaaa es la codificacion==>",response);
+                console.log("aqui esta el vector==>",response[0].sp_dag_codificacion2);
+
+                x = response[0].sp_dag_codificacion2;
+                 if(indice > 0){
+                  console.log("aqui la codificacion",dattoo[indice].codificacion);
+                  dattoo[indice].codificacion = response[0].sp_dag_codificacion2;
+                   $scope.codificacion3(dattoo,indice);
+                  indice = indice + 1;
+                  console.log(dattoo);
+                
+                 }
+            })
+            .error(function(data){
+                sweet.show('', 'Error al cargar la informacion del item: ', 'error');
+            });
+         }
+        console.log("aqui esta el parseado con los datosssssssss",dattoo);
+          },5000);
+        };
+
+        $scope.codificacion3 = function(dattoo,id){
+          alert(343);
+          var x =[];
+          var x = dattoo[id].codificacion;
+            x = x.split(' ');
+            console.log("esto es lo que quiero",x);
+            console.log(x[0]);
+            console.log(x[1]);
+             if(angular.equals(x[0],x[1]))
+              {
+              dattoo[id].codificacion=x[1];
+              }
+              else
+              {
+                dattoo[id].codificacion = '['+x[0]+'-'+x[1]+']';
+              }
+              
+            
+           var c = 1;
+           x=0;
+           obj=[];
+           angular.forEach(dattoo,function(val, index){ 
+              if (c==1) {
+                c = c+1;
+
+              }else{
+                obj[x]=val;
+                
+                x=x+1;
+
+              }
+           });        
+           $scope.items1 = obj;
+          }
+
+        $scope.cerear = function () {
+          $scope.datos.obtAsignaciones[$scope.selectedRow].dag_ubm_asig_funcionario_responsable = $scope.tmprowfunc;
+        }
+        $scope.cambiafuncionario = function(funcionario,ap_pat,ap_mat,nomb){
+            $scope.caracteristica.responsable = funcionario + ' ' + ap_pat + ' ' + ap_mat + ', ' + nomb;
+            //$scope.datos.obtAsignaciones[$scope.selectedRow].dag_ubm_asig_funcionario_responsable = funcionario + ' ' + ap_pat + ' ' + ap_mat + ', ' + nomb;
+            //$scope.datos.obtAsignaciones[$scope.selectedRow].dag_ubm_asig_cod_funcionario_responsable = funcionario;
+        }
+        $scope.guardargrid = function(dato){
+          $scope.pushItem();
+          $scope.datos0 = JSON.stringify(dato);
+           var data = document.getElementById("tarea_caracterist").value;
+           JSON.parse(data);
+           var data2 = JSON.parse(data);
+           var id = data2.length+1;
+            addRowJson($scope.datos0,"tarea_caracterist");
+           var dat2 = document.getElementById("tarea_caracterist").value;
+           $scope.datos.tarea_caracterist = dat2;
+           datoo2 = JSON.parse(dat2);           
+           var c = 1;
+           x=0;
+           obj=[];
+           angular.forEach(datoo2,function(val, index){
+              if (c==1) {
+                c = c+1;
+
+              }else{
+                
+                obj[x]=val;
+                x=x+1;
+
+              }
+              
+           });
+
+          $scope.items1 = obj;
+          $scope.cargar();
+                                                             
+        }
+
+        
+
+        $scope.idd = function(id){
+          $scope.Cargarfuncionarios();
+          
+          $scope.modal="upd";
+          
+          id = id;
+          $scope.id = id;
+
+          var dat25 = $scope.datos.tarea_caracterist;
+          $scope.recuperar = JSON.parse(dat25);
+          for(var i=0;i<$scope.recuperar.length;i++){
+              if(i==id){
+                $scope.caracteristicass($scope.recuperar[i].campo);
+                $scope.descripcion($scope.recuperar[i].activo);                
+              }
+          }
+          for(var i=0;i<$scope.recuperar.length;i++){
+              if(i==id){
+                $scope.caracteristica.valor = $scope.recuperar[i].valor;
+                $scope.caracteristica.campo = $scope.recuperar[i].campo;
+                $scope.caracteristica.activo = $scope.recuperar[i].activo;
+                $scope.caracteristica.cantidad = $scope.recuperar[i].cantidad;
+                $scope.caracteristica.codificacion = $scope.recuperar[i].codificacion;
+                $scope.caracteristica.tarea_caracterist2 = $scope.recuperar[i].tarea_caracterist2;
+                $scope.caracteristica.responsable = $scope.recuperar[i].responsable;
+                $scope.complet = $scope.recuperar[i].tarea_caracterist2;
+                $scope.datos.ARCHIVOS_MULTIPLES = $scope.recuperar[i].tarea_adjuntos;
+
+                
+                $scope.complet = $scope.recuperar[i].tarea_caracterist2;
+                $scope.caracteristica.tarea_adjuntos = $scope.recuperar[i].tarea_adjuntos;
+                $scope.datos.ARCHIVOS_MULTIPLES = $scope.recuperar[i].tarea_adjuntos;
+              }
+          }
+          $scope.comborec();
+        }
+        $scope.comborec = function(){
+            setTimeout(function () {
+                $scope.$apply(function () {
+                  var id = $scope.id;
+                  var dat25 = $scope.datos.tarea_caracterist;
+                  $scope.recuperar = JSON.parse(dat25);
+                  for(var i=0;i<$scope.recuperar.length;i++){
+                      if(i==id){
+                        document.getElementById("campo").value = $scope.recuperar[i].campo;
+                        document.getElementById("activo").value = $scope.recuperar[i].activo;
+                      }
+                  }
+                  $scope.caracteristicas1 = $scope.complet[0].value;
+                  var size = $scope.complet.length;
+                  $scope.caracteristicas = [];
+                  for(var j=0; j<size; j++){                  
+                      $scope.caracteristicas.push({                      
+                          name: $scope.complet[j].name,
+                          value: $scope.complet[j].value                                              
+                      });                      
+                  }
+                });
+            }, 2000);
+        }
+        $scope.editargrid = function(da){
+          $scope.pushItem();
+          updRowJson(da,"tarea_caracterist",$scope.id);                    
+           var dat2 = document.getElementById("tarea_caracterist").value;
+           $scope.datos.tarea_caracterist = dat2;
+           datoo2 = JSON.parse(dat2);           
+           var c = 1;
+           x=0;
+           obj=[];
+           angular.forEach(datoo2,function(val, index){ 
+              if (c==1) {
+                c = c+1;
+
+              }else{
+                obj[x]=val;
+                
+                x=x+1;
+
+              }
+           });
+           $scope.items1 = obj;
+          $scope.cargar();
+        }
+        $scope.del = function (id) {
+          $scope.mostrar = "ok";
+          Eliminar(id,"tarea_caracterist");
+          var dat2 = document.getElementById("tarea_caracterist").value;
+          datoo2 = JSON.parse(dat2);
+           var c = 1;
+           x=0;
+           obj=[];
+           angular.forEach(datoo2,function(val, index){ 
+              if (c==1) {
+                c = c+1;
+
+              }else{
+                obj[x]=val;
+                
+                x=x+1;
+
+              }
+           });         
+           $scope.items1 = obj;
+           $scope.cargar();
+
+        }
+
+        $scope.pushItem1 = function (){
+          
+          $scope.caracteristica.tarea_adjuntos = $scope.datos.ARCHIVOS_MULTIPLES;
+        }
+        $scope.pushItem = function () {
+          var size = Object.keys($scope.caracteristicas).length;
+          var nodo_carac = Array();
+          var nodo_carac1 = Array();
+            nodo_carac = "";
+            nodo_carac1 = '{';
+            for(var j=0; j<size; j++){
+              nodo_carac = nodo_carac + ' ' + $scope.caracteristicas[j].name + ': ' + $scope.caracteristicas[j].value;
+              if (j<size-1) {
+                nodo_carac = nodo_carac + ',';
+              }
+              nodo_carac1 = nodo_carac1 + ',' + JSON.stringify($scope.caracteristicas[j].name) + ':' + JSON.stringify($scope.caracteristicas[j].value);
+            }
+            nodo_carac1 = nodo_carac1 + '}';
+            $scope.item.push({               
+              caracteristicas: nodo_carac
+            });
+           $scope.caracteristica.tarea_caracterist2 = $scope.caracteristicas;
+        }
+        $scope.cargar = function(){
+          if ($scope.datos.tarea_caracterist) {
+          var ordenar = JSON.parse($scope.datos.tarea_caracterist);
+          
+          
+          for (var i = 1; i < ordenar.length; i++) {
+            if (ordenar.length>0) {
+                var incc = 0;
+                  console.log("el contador",ordenar.length);
+                  for (var k = 1; k < ordenar.length; k++) {
+                     incc = incc+1;
+                     ordenar[k].id = incc;
+                     console.log("este es el id",ordenar[k].id);
+                  }  
+              }
+          }
+          console.log("nueva cadena ",ordenar);
+          var dat2 = ordenar;
+          datoo2 = ordenar;
+          $scope.cart = datoo2[1].tarea_caracterist2;
+           var c = 1;
+           x=0;
+           obj=[];
+           angular.forEach(datoo2,function(val, index){ 
+            if (c==1) {
+              c = c+1;
+
+            }else{
+              obj[x]=val;
+              
+              x=x+1;
+
+            }
+           });
+         
+           $scope.items1 = obj;
+          
+           console.log("respuesta 0",obj);
+          $scope.obtUsuarios = obj;
+          console.log("respuesta 1",$scope.obtUsuarios);
+            var data = obj;   
+            console.log("respuesta 2",data);
+            $scope.tablaUsuarios = new ngTableParams({
+                page: 1,          
+                count: 10,  
+                filter: {},
+                sorting: {}    
+            }, {
+                total: $scope.obtUsuarios.length,
+                getData: function($defer, params) {
+                    var filteredData = params.filter() ?
+                    $filter('filter')($scope.obtUsuarios, params.filter()) :
+                    $scope.obtUsuarios;              
+                    var orderedData = params.sorting() ?
+                    $filter('orderBy')(filteredData, params.orderBy()) :
+                    $scope.obtUsuarios;
+                    params.total(orderedData.length);
+                    $defer.resolve(orderedData.slice((params.page() - 1) * params.count(), params.page() * params.count()));
+                  }
+            });
+          } 
+
+        }
+        $scope.limpiarFormRegistro = function(){
+          document.getElementById("tarea_caracterist2").value = "[]";
+          $scope.caracteristica.tarea_caracterist2 = "[]";
+          $scope.mostrar = "no";
+          $scope.boton="new";
+          $scope.Cargarfuncionarios();
+          $scope.caracteristica = "";
+          $scope.datos.ARCHIVOS_MULTIPLES = "";
+        }
+        $scope.inciarUpload =   function(){        
+        try{
+          $('#multiDocsButon').click(function(){                
+                $('#multiDocsFile').click();
+          });
+        }catch(e){}    
+    };
+        $scope.$on('api:ready',function(){
+          $scope.cargar();
+          $scope.comb();
+          $scope.Cargarfuncionarios();
+          $scope.inciarUpload();
+        });
+    var idCiu = sessionService.get('IDCIUDADANO');
+    $scope.uploader = new FileUploader({
+        url: CONFIG.APIURL + "?desripcion=ciudadano&&idCiudadano=" + idCiu
+    });
+    
+    var uploader = $scope.uploader;
+    
+    uploader.filters.push({
+        name: 'customFilter',
+        fn: function(item , options) {
+            console.log("0");
+            return this.queue.length < 10;
+        }
+    });
+
+    uploader.onWhenAddingFileFailed = function(item /*{File|FileLikeObject}*/, filter, options) {
+    };
+    
+    uploader.onAfterAddingFile = function(fileItem) {
+        tipoDocumento = fileItem.file.type;
+        var nameArray = tipoDocumento.split('/');
+        tipoDocumento = nameArray[1];
+        var count = 0;
+        
+        if(tipoDocumento == "png" || tipoDocumento == "jpg" || tipoDocumento == "jpeg" || tipoDocumento == "txt" || tipoDocumento == "plain" || tipoDocumento == "zip" || tipoDocumento == "rar" || tipoDocumento == "vnd.ms-word.document.12" || tipoDocumento == "vnd.openxmlformats-officedocument.spreadsheetml.sheet" || tipoDocumento == "vnd.visio" || tipoDocumento == "vnd.ms-publisher" || tipoDocumento == "msaccess" || tipoDocumento == "vnd.openxmlformats-officedocument.wordprocessingml.document"){
+            $scope.botonSubirOriginal = null; 
+            $scope.botonSubirError = "oculta";
+        }
+        else{
+            $scope.botonSubirError = null; 
+            $scope.botonSubirOriginal = "oculta";
+        }
+    };
+    
+    $scope.falla = function()
+    {
+        sweet.show('', "Tipo de archivo incorrecto elimine porfavor", 'error'); 
+        $scope.desabilitado2 = true;
+    }
+
+    $scope.almacenarDocumentos = function(aFiles){
+        var sDirTramite = $rootScope.tramiteId;
+        $scope.direccionvirtual = "RC_CLI";
+        var uploadUrl = CONFIG.APIURL + "/files/" + $scope.direccionvirtual + "/" + sDirTramite + "/";
+        angular.forEach(aFiles, function(archivo, key) {
+            if(typeof(archivo) != 'undefined'){
+                var urlIdcos = CONFIG.APIURL + "/files/" + $scope.direccionvirtual + "/" + sDirTramite + "/" + archivo.name + "?app_name=todoangular";
+                fileUpload.uploadFileToUrl(archivo, uploadUrl);
+                $scope.almacenarGDocumental(archivo, urlIdcos);
+            }else{
+                console.log("error en el archivo");
+            }
+        });
+    };
+    $scope.almacenarGDocumental = function(dataArchivo, sUrl){
+        var valores = "";
+        var cadena = "";
+        var nombreFile = dataArchivo.name;
+        var subirU = {};
+        subirU['doc_sistema'] = 'RC_CLI'; 
+        subirU['doc_proceso'] = 'ADJUNTO';
+        subirU['doc_ci_nodo'] = 'DMS';
+        subirU['doc_datos'] = valores;        
+        subirU['doc_version'] ='1';      
+        subirU['doc_tiempo'] = '0';      
+        subirU['doc_firma_digital'] = 0;      
+        subirU['doc_acceso'] = "";
+        subirU['doc_tipo_documento'] = "pdf";      
+        subirU['doc_tamanio_documento'] = "0";          
+        subirU['doc_tps_doc_id'] = '1';//data.vtps_doc_id
+        subirU['doc_tipo_documentacion'] = 'U';      
+        subirU['doc_tipo_ingreso'] = 'I';      
+        subirU['doc_estado_de_envio'] = 'N';      
+        subirU['doc_correlativo'] = '';
+        subirU['doc_tipo_documento_ext'] = '';
+        subirU['doc_nrotramite_nexo'] = '';
+        subirU['doc_id_carpeta'] = '';
+        subirU['doc_usuario'] = sessionService.get('USUARIO');
+        subirU['doc_estado'] = 'A';
+        subirU['doc_url'] = sUrl;
+        subirU['doc_url_logica'] = cadena;
+        subirU['doc_nombre'] = nombreFile;
+        var ressubirU = {
+            table_name:"dms_gt_documentos",
+            body:subirU
+        };
+    };
+
+    $scope.adicionarimagenes = function(datos){
+          console.log("aqui estan las fotos==>>",datos);
+    
+    }
+
+    var archivoUpload = "";
+    
+    uploader.onSuccessItem = function(fileItem, response, status, headers) {
+        //FORMANDO LA URL - ARCHIVO
+        $scope.direccionvirtual = "RC_CLI";
+        var urlIdcos = CONFIG.APIURL + "/files/" + $scope.direccionvirtual + "/" + $rootScope.tramiteId + "/" + fileItem._file.name + "?app_name=todoangular";
+        var fileName = fileItem._file.name;
+        
+        var fileSize = (((fileItem._file.size)/1024)/1024);
+        fileSize = fileSize.toFixed(2);
+        if($scope.datos.ARCHIVOS_MULTIPLES){
+            aDocAdjuntos = $scope.datos.ARCHIVOS_MULTIPLES;
+        }else{
+            aDocAdjuntos    =   new Array();
+        }
+        
+        var datosAdjuntos = {
+            "nombre_archivo" : fileName,
+            "tam_archivo" : fileSize,
+            "estado_archivo" : "Env.",
+            "opcion_archivo" : "-",
+            "url_archivo" : urlIdcos
+        };        
+        aDocAdjuntos.push(datosAdjuntos);
+        $scope.adjuntosArray = aDocAdjuntos;
+        var aFile = new Array();
+        aFile.push(fileItem._file);
+        $scope.almacenarDocumentos(aFile);
+        fileItem.remove();
+        $scope.datos.ARCHIVOS_MULTIPLES = aDocAdjuntos;
+        $rootScope.$broadcast('inicializarFechaOblitatorio', $scope.datos);
+    };
+
+    var clsValidarBtn = $rootScope.$on('validarBtn', function(event, data){
+        if(data.frm_tra_id){
+            $scope.tramitesCiudadano();
+        }
+    });
+    $scope.$on('$destroy', function() {
+        clsValidarBtn();
+                  $scope.responsables();
+
+    }); 
+    
+    $scope.eliminarMultipleAdjunto = function(sIndex){
+        if($scope.datos.ARCHIVOS_MULTIPLES){
+            $scope.adjuntosArray = $scope.datos.ARCHIVOS_MULTIPLES;        
+        }
+        if($scope.adjuntosArray){
+            $scope.adjuntosArray.splice(sIndex, 1);
+        }
+        $rootScope.$broadcast('inicializarFechaOblitatorio', $scope.datos);
+    };
+     
+        $scope.fotos = function (id) {
+          
+          console.log("aqui va id=>",id);        
+          var fot = $scope.datos.tarea_caracterist;
+          $scope.mostrarfotos = JSON.parse(fot);
+          console.log("aDocAdjuntos",$scope.mostrarfotos[id].tarea_adjuntos);
+         // console.log($scope.mostrarfotos[id].tarea_adjuntos);
+          if ($scope.mostrarfotos[id].tarea_adjuntos) {
+              
+            $scope.modal="new";
+          }else{
+           
+           
+             setTimeout(function(){
+               sweet.show('', "No existe Imagenes", 'error');
+                $scope.modal="upd";
+               $.unblockUI();
+             },1000);
+           
+            $scope.$apply();
+          }
+          $scope.verfotos = $scope.mostrarfotos[id].tarea_adjuntos;
+  
+        }
+
+        $scope.inicioadquisision = function () {
+          $scope.responsables();
+          $scope.comb();
+          $scope.cargar();
+          $scope.inciarUpload();
+          $scope.Cargarfuncionarios();
+          if (!$scope.datos.tarea_caracterist)
+            $scope.datos.tarea_caracterist = '[{"tipo":"GRD","titulos":"Partida|Tipo de Activo|Caracteristicas|Valor|Responsable de Activo","campos":"activo|campo|responsable|valor|valor","impresiones":"true|true|true|true|true"}]';
+        };
+        function Eliminar(id,campo) {
+            dat = JSON.parse(document.getElementById(campo).value);
+            delete dat[id];
+            var nuevosDatos=[];
+            nuevosDatos = JSON.stringify(dat);
+            nuevosDatos=nuevosDatos.replace("null,","");
+            nuevosDatos=nuevosDatos.replace(",null","");
+            nuevosDatos=nuevosDatos.replace("null","");
+            document.getElementById(campo).value = nuevosDatos;
+            $scope.datos.tarea_caracterist = nuevosDatos;
+        }
+
+        function updRowJson(fila, campo,id){
+            datos = JSON.parse(document.getElementById(campo).value);
+            var nuevosDatos=[];
+            var snuevosDatos="";
+            cont=0;
+            for(var i=0;i<datos.length;i++){
+                if(i==id) nuevosDatos.push(fila);
+                else        nuevosDatos.push(datos[i]);
+                cont++;
+            }
+            snuevosDatos = JSON.stringify(nuevosDatos,null);
+            document.getElementById(campo).value = snuevosDatos;
+            $scope.datos.tarea_caracterist = snuevosDatos;
+        }
+
+          $scope.responsables = function (){
+         var datosFuncionarios = {
+                "procedure_name":"dag.sp_dag_responsables",
+            };
+            DreamFactory.api[CONFIG.SERVICE].callStoredProcWithParams(datosFuncionarios).success(function (response){
+                console.log(response);
+                $scope.responsables = response;
+            })
+            .error(function(data){
+                sweet.show('', 'Error al cargar la informacion del item: ', 'error');
+            });
+        };
+
+         function adicionarConficacion(fila, campo,id){
+            console.log("campo==>",campo);
+            console.log("fila",fila);
+            console.log("id",id);
+        }
+
+
+    }
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+    function addRowJson(fila, campo){ 
+        nuevaFila= JSON.parse(fila);
+        datos = JSON.parse(document.getElementById(campo).value);
+        datos.push(nuevaFila);
+        var nuevosDatos=[];
+        nuevosDatos = JSON.stringify(datos,null);
+        document.getElementById(campo).value = nuevosDatos;
+    }
+    function showContent() {
+        element = document.getElementById("content0");
+        check = document.getElementById("verificacion");
+        if (check.checked) {
+            element.style.display='block';
+        }
+        else {
+            element.style.display='none';
+        }
+    }
+
+</script>
+
+<div ng-controller="adquisisionController" data-ng-init="inicioadquisision()">
+<!-- begin form -->
+    <form class="form-horizontal" name="formulario" novalidate>
+        <div div class="wrap" >
+            
+          <div class="ibox-title_2" id=""><h5>ARCHIVO:</h5></div>
+            
+          <div class="hr-line-dashed"></div>
+
+          <div class="form-group">
+               <label class="col-sm-2 control-label">Fecha de Verificacion de Activos:</label>
+               <div class="col-sm-10">
+                    <p class="input-group">
+                        <input name="g_fecha" id="g_fecha" type="text" placeholder="{{datos.fechactual}}"   class="form-control" datepicker-popup="" ng-model="datos.g_fecha" is-open="startDateOpened" close-text="Close" ng-disabled="true" min-date="model.endDate"/>
+                        <span class="input-group-btn">
+                            <button type="button" class="btn btn-default" ng-click="startDateOpen($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+                        </span>
+                    </p>
+               </div>
+          </div>
+          
+          <div class="hr-line-dashed"></div>
+
+          <!--div  id=""><h5>REGISTRO FISICO VALORADO DE ACTIVOS FIJOS:</h5></div-->
+          <div  id=""><h5>REGISTRO FISICO VALORADO DE ACTIVOS FIJOS:</h5></div>
+          
+          <div class="hr-line-dashed"></div>
+
+          <div class="form-group">
+                        <label class="col-sm-2 control-label">Responsable Unidad Solicitante:</label>
+                          <div class="col-sm-10">
+                              <select name="UBM_RES_UNIDAD" id="UBM_RES_UNIDAD" ng-model="datos.UBM_RES_UNIDAD" class="form-control" ng-change="asignar()" ng-disabled="true">
+                                 <option ng-repeat="responsable in responsables" value="{{responsable.ci}}" ng-selected="{{responsable.ci==datos.UBM_RES_UNIDAD}}">{{responsable.paterno}} {{responsable.materno}} {{responsable.nombres}} </option >
+                              </select>
+                          <!--select
+                           class="form-control"
+                           id="UO_Sel"
+                           name="UO_Sel"
+                           ng-model="datos.UO_Sel"
+                           ng-options="datoUE.dag_uo_uo as (datoUE.dag_uo_uo + '-' + datoUE.dag_uo_descripcion) for datoUE in datosUniOrg | filter:{dag_uo_s:1,dag_uo_da:2,dag_uo_ue:5}:true"
+                           ng-change="guardarvalor(datos.UO_Sel)">
+                           <option value="{{datoUE.dag_uo_uo}}"> {{datoUE.dag_uo_descripcion}}</option>
+                       </select-->
+                          </div>
+
+            </div>
+          <div class="hr-line-dashed"></div>
+          <div class="form-group">
+               <label class="col-sm-2 control-label">Factura:</label>
+               <div class="col-sm-10">
+                        <input name="UBM_NRO_FACTURA" id="UBM_NRO_FACTURA" type="text" placeholder=""   class="form-control"  ng-model="datos.UBM_NRO_FACTURA" readonly="readonly" ng-disabled="true"/>
+               </div>
+          </div>
+          <div class="hr-line-dashed"></div>
+
+          <div class="form-group">
+            <label class="col-sm-2 control-label"></label>
+                
+               <div class="col-sm-10">
+                  
+                  <!--input class="btn btn-primary" ng-click="probarCodificacion()" type="button" value="Generar Codificacion" /-->   
+               </div>
+          </div>
+
+          <div class="hr-line-dashed"></div>
+            
+          <div class="ibox-content">
+            <div class="col-sm-12">
+              <div class="table-responsive">
+                <table ng-table="tablaUsuarios" show-filter="true" class="table table-striped table-hover">
+                    <tr ng-repeat="item in items1">
+                            <td data-title="'Opciones'">                          
+                              <a tooltip = "Editar" ng-click="idd(item.id)" data-toggle="modal" data-target="#fo" class="btn btn-default btn-circle">
+                                <i class="fa fa-pencil"></i>
+                              </a>      
+                              <!--a tooltip = "Eliminar" ng-click="del(item.id)" class="btn btn-default btn-circle">
+                                  <i class="fa fa-trash-o"></i>
+                              </a-->
+                            </td>
+                            <td data-title="'#'">{{item.id}}</td>
+                            <td data-title="'Partida'" sortable="'campo'" filter="{'campo':'text'}">{{item.campo}}</td>
+                            <td data-title="'Activo'" sortable="'activo'" filter="{'activo':'text'}">{{item.activo}}</td>
+
+
+                            
+                            <td data-title="'Valor'" sortable="'valor'" filter="{'valor':'text'}">{{item.valor}}</td>
+                            <td data-title="'Responsable'" sortable="'responsable'" filter="{'responsable':'text'}">{{item.responsable}}</td>
+                            
+                            <td data-title="'Cantidad'" sortable="'cantidad'" filter="{'cantidad':'text'}">{{item.cantidad}}</td>
+                            
+                            <!--td data-title="'Codificacion'" sortable="'codificacion'" filter="{'codificacion':'text'}">{{item.codificacion}}</td-->
+
+                            
+
+                            <td data-title="'Descripcion'" sortable="'value'" filter="{'tarea_caracterist2':'text'}" >
+                              <table>
+                                <tr ng-repeat="car in item.tarea_caracterist2">
+                                  <td>{{car.name}}:</td>
+                                  <td>{{car.value}}</td>
+                                </tr>
+                              </table>
+                            </td>
+                            <td><a class="glyphicon glyphicon-eye-open" ng-click="fotos(item.id)" data-toggle="modal"  data-target="#fotos"></a>
+                            </td>
+
+                           
+                          
+                            
+                    </tr>
+                </table>
+                 <textarea id="tarea_caracterist" style="visibility:hidden" name="tarea_caracterist" ng-model="datos.tarea_caracterist" class="form-control" onkeyUp="return conMayusculas(this);"></textarea>
+              </div>             
+            </div>
+          </div>        
+
+          <div class="form-group">
+            <label class="col-sm-2 control-label" align="center">Revisión de verificación de activos correcto?:</label>
+              <div class="col-sm-10">
+                  <select id="UBM_VER_CORRECTA" name="registro[]" class="form-control" ng-model="datos.UBM_VER_CORRECTA" onchange="f_obtener_texto('UBM_VER_CORRECTA')" ng-disabled="true">
+                    <option value="">--Seleccione--</option>
+                    <option value="1">SI</option>
+                    <option value="2">NO</option>
+                  </select><input placeholder="Revisión y Asignación Correctas?" class="form-control" id="UBM_ASIG_REVISION_VALOR" name="registro[]" value="undefined" ng-model="datos.UBM_ASIG_REVISION_VALOR" type="hidden">
+              </div>
+          </div>
+
+          <div class="form-group">
+            <label class="col-sm-2 control-label">Observaciones verificación:</label>
+              <div class="col-sm-10">
+                  <textarea cols="45" rows="5" placeholder="Observaciones verificación" class="form-control" id="UBM_OBS_VERIFICACION" name="registro[]" ng-model="datos.UBM_OBS_VERIFICACION" ng-disabled="true"/></textarea>
+              </div>
+          </div>
+          
+          <div class="modal fade" id="fotos" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" ng-show="modal=='new'" ng-hide="modal=='upd'">
+            <div class="modal-dialog modal-lg">
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Cerrar</span></button>
+                      <h4 class="modal-title" id="myModalLabel">Imagenes</h4>
+                  </div><br>
+
+                  <div id="page">
+                      <section>
+                          <input type="radio" name="slider-select-element" id="element1" checked="checked" />
+                          <input type="radio" name="slider-select-element" id="element2" />
+                          <input type="radio" name="slider-select-element" id="element3" />
+                          
+                          <div id="slider-container">
+                              <div id="slider-box" ng-repeat="img in verfotos">
+                                  <div class="slider-element">
+                                      <img class="element" src='{{img.url_archivo}}' alt=''/>
+                                  </div>
+                                  
+                              </div>
+                          </div>
+                          
+                          <div id="slider-arrows">
+                              <label for="element1"></label>
+                              <label for="element2"></label>
+                              <label for="element3"></label>
+                          </div>
+                      </section>            
+                  </div><br><br><br><br><br><br><br>
+
+                  <div class="modal-footer">                      
+                      <button id="cerrar" name="cerrar" type="button"  class="btn btn-primary btn-inverse" data-dismiss="modal">Cerrar</button>                      
+                  </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal fade" id="fo" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Cerrar</span></button>
+                      <h4 class="modal-title" id="myModalLabel">Nuevo Dato</h4>
+                  </div>
+                  <div class="hr-line-dashed"></div>
+
+                      <div class="form-group">
+                        <label class="col-sm-2 control-label">Partida</label>
+                        <div class="col-sm-9">
+                            <select name="campo" id="campo" ng-model="caracteristica.campo" ng-click="caracteristicass(caracteristica.campo)" class="form-control" ng-disabled="true">
+                               <option style="display:none" value="">-- Seleccione --</option>
+                               <option ng-repeat="rol in combop"  value="{{rol.codigo}}">{{rol.codigo}} - {{rol.nombre}}</option>
+                            </select>
+                        </div>
+                      </div>
+
+                      <div class="form-group">
+                        <div class="col-sm-2 control-label"><label for="text0">Tipo de Activo</label>
+                        </div>
+                        <div class="col-sm-9">
+                          <select name="activo" id="activo" ng-model="caracteristica.activo" ng-click="descripcion(caracteristica.activo)" class="form-control" ng-disabled="true">
+                             <option style="display:none" value="">-- Seleccione --</option>
+                             <option ng-repeat="com in data"  value="{{com.id}}">{{com.id}} - {{com.nombre}}</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div class="hr-line-dashed"></div>
+
+                      <div class="form-group">
+                        <div class="col-sm-2 control-label"><label for="text0"></label>
+                        </div>
+                        <div class="col-sm-9">
+                            <label>CARACTERISTICAS: <small class="m-l-sm"></small></label>            
+                        </div>
+                      </div>  
+                                                  
+                      <div class="form-group" ng-show="mostrar=='ok'" ng-hide="mostrar=='no'" ng-repeat="caracteristica in caracteristicas">
+                          <label class="col-sm-2 control-label">{{caracteristica.name}}</label>
+                          <div class="col-sm-9">
+                              <input readonly="readonly" type="text" class="form-control" type="{{caracteristica.type}}" placeholder="" ng-model="caracteristica.value" ng-change="descCaractfn(caracteristicas)"><br>
+                          </div><br>
+                          
+                      </div>
+                      <textarea ng-model="caracteristica.tarea_caracterist2" ng-show="false" id="tarea_caracterist2" name="tarea_caracterist2" type="text" class="form-control">[]</textarea>
+                            
+                      <div class="form-group">
+                        <div class="col-sm-2 control-label"><label for="text0">Valor:</label>
+                        </div>
+                        <div class="col-sm-9"><input id="valor" name="valor" placeholder="Valor" ng-model="caracteristica.valor" class="form-control" type="text" readonly="readonly" ng-disabled="true">
+                        </div>
+                      </div>
+
+                      <div class="form-group">
+                          <label class="col-sm-2 control-label" align="center">Responsable de Activo:</label>
+                          <div class="col-sm-9">
+                              <input type="text" id="responsable" name="responsable" ng-model="caracteristica.responsable" ng-change="cerear()" placeholder="Buscar Funcionario" class="form-control" readonly="readonly"><br>
+                                <ul>
+                                    <li ng-repeat="funcionario in ListFuncionarios | filter:caracteristica.responsable " ng-click="cambiafuncionario(funcionario.dag_ubm_fr_ci,funcionario.dag_ubm_fr_paterno,funcionario.dag_ubm_fr_materno,funcionario.dag_ubm_fr_nombres)">
+                                        <a>{{funcionario.dag_ubm_fr_ci}} {{funcionario.dag_ubm_fr_paterno}} {{funcionario.dag_ubm_fr_materno}}, {{funcionario.dag_ubm_fr_nombres}}</a>
+                                    </li>
+                                </ul>
+                          </div>
+                      </div>
+                      
+                      <div class="form-group">
+                        <div class="col-sm-2 control-label"><label for="text0">Cantidad:</label>
+                        </div>
+                        <div class="col-sm-9"><input id="cantidad" name="cantidad" placeholder="Cantidad" ng-model="caracteristica.cantidad" class="form-control" type="text" readonly="readonly">
+                        </div>
+                      </div>
+
+                      <!--div class="form-group" ng-show="false">
+                        <label class="col-sm-2 control-label">Codificación</label>
+                        <div class="col-sm-9">
+                            <input id="codificacion" name="codificacion" placeholder="codificacion" ng-model="caracteristica.codificacion" class="form-control" type="text">
+                        </div>
+                      </div-->
+                      <div class="form-group" ng-show="false">
+                        <label class="col-sm-2 control-label">ID</label>
+                        <div class="col-sm-9">
+                            <input id="id" name="id" placeholder="id" ng-model="caracteristica.id" class="form-control" type="text">
+                        </div>
+                      </div>
+
+                      <textarea id="tarea_adjuntos" ng-show="false" name="tarea_adjuntos" ng-model="caracteristica.tarea_adjuntos" class="form-control" onkeyUp="return conMayusculas(this);">
+                  </textarea>
+
+                  <div class="col-md-12">
+                            <legend>FOTOS:</legend>
+                        </div>
+                        <!-- DOCUMENTOS ADJUNTOS -->
+                        <div class="col-md-12">
+                            <div class="col-md-12">
+                                <div class="form-group" >
+                                    <label for="url"></label>
+                                    <!-- DOCUMENTOS MULTIPLES -->
+                                    <div class="col-md-12">
+                                        <input type="hidden" name="datos.ARCHIVOS_MULTIPLES" id="datos.ARCHIVOS_MULTIPLES" ng-model="datos.ARCHIVOS_MULTIPLES"/>
+                                    </div>
+                                    <div class="col-md-12">     
+                                        <div class="form-group" >
+                                            <div class="controls">
+                                            <div class="col-md-7">
+                                                <!--<label for="url" >Subir Archivo:</label>-->
+                                                <input ng-mouseleave="pushItem1()" id="multiDocsFile" type="file" name= "files[0]" nv-file-select="" uploader="uploader" style="display: none;"/>
+                                            </div>
+                                                <!--<div class="col-md-12" style="border-style: ridge; border-color: #577C27;">-->
+                                                <div class="col-md-12" style="{{adjuntoCssObligatorio}}">
+                                                    <table class="table" ng-mouseleave="pushItem1()">
+                                                        <thead>
+                                                            <tr>
+                                                                <th width="50%">Nombre</th>
+                                                                <th ng-show="uploader.isHTML5">Tamaño(Mb)</th>
+                                                                <!--th><center>Ver</center></th-->
+                                                                <th><button style="border: 1px solid #8C0E8A;" id="multiDocsButon" class="btn btn-success btn-xs" ng-show="false"><span class="glyphicon glyphicon-upload"></span></button></th>
+                                                            </tr>
+                                                            
+                                                        </thead>
+                                                        <tbody>
+                                                            <!-- TRAMIES ALMACENADOS ACTUALMENTE -->
+                                                            <tr ng-repeat="reg in datos.ARCHIVOS_MULTIPLES track by $index">
+                                                                <td><strong>{{reg.nombre_archivo}}</strong></td>
+                                                                <td><strong>{{reg.tam_archivo}}</strong></td>
+                                                                <td><strong><center><!--a class="glyphicon glyphicon-eye-open" target="_blank" href="{{reg.url_archivo}}" ></a--></center></strong></td>
+                                                                <td><button ng-click="eliminarMultipleAdjunto($index)" id="multiDocsBtnEliminar" class="btn btn-success btn-xs" ng-show="false"><span class="glyphicon glyphicon-remove"></span></button></td>
+                                                            </tr>
+                                                            
+                                                            <tr ng-repeat="registro in uploader.queue ">
+                                                                <td><strong>{{registro.file.name }}</strong></td>
+                                                                <td ng-show="uploader.isHTML5" nowrap>{{ registro.file.size/1024/1024|number:2 }} MB</td>
+                                                                <td class="text-center">
+                                                                    <span ng-show="registro.isSuccess"><i class="glyphicon glyphicon-ok"></i></span>
+                                                                    <span ng-show="registro.isError"><i class="glyphicon glyphicon-remove"></i></span>
+                                                                </td>
+                                                                <td nowrap>
+                                                                <button ng-show="botonSubirOriginal == null"  type="button" class="btn btn-success btn-xs" ng-click="registro.upload();" ng-disabled="registro.isReady || registro.isUploading || registro.isSuccess ">
+                                                                    <span class="glyphicon glyphicon-upload"></span> Subir
+                                                                </button>
+                                                                <button ng-show="botonSubirError == null" type="button" class="btn btn-success btn-xs" ng-click="falla();" ng-disabled="registro.isReady || registro.isUploading">
+                                                                    <span class="glyphicon glyphicon-upload"></span> Subir
+                                                                </button>
+                                                                <button type="button" class="btn btn-danger btn-xs" ng-click="registro.remove()">
+                                                                    <span class="glyphicon glyphicon-trash"></span> Eliminar
+                                                                </button>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <br>
+                                                <br>   
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- DOCUMENTOS MULTIPLES -->                            
+                                </div>
+                            </div>
+                        </div>
+                  
+               
+                  <div class="modal-footer">
+                      <button id="cerrar" name="cerrar" type="button" class="btn btn-primary btn-inverse" data-dismiss="modal">Cerrar</button>
+                      <button ng-click="editargrid(caracteristica);" type="button" class="btn btn-primary" data-dismiss="modal" ng-show="boton=='upd'" ng-hide="boton=='new'">Modificar</button>
+                  </div>
+              </div>
+            </div>
+          </div>
+
+
+          <div class="hr-line-dashed"></div>
+          <button type="button" class="btn btn-primary" ng-disabled="false" ng-click="volver()"> <i class="glyphicon fa fa-times"></i> Cancelar </button> 
+          <button type="button" class="btn btn-primary" ng-click="cargarDatos(datos);guardarData(datos)"> <i class="glyphicon fa fa-save"></i> Guardar / Continuar </button>
+        </div>
+      </form>
+  </div>

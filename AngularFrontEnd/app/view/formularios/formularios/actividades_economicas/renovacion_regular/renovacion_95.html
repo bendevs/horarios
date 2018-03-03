@@ -1,0 +1,1119 @@
+<script>
+function cocheController($scope,  $rootScope, DreamFactory, CONFIG, sessionService ) {
+    var fecha= new Date();
+    $scope.fechactual=fecha.getFullYear() + "-" + fecha.getMonth() + "-" + fecha.getDate() + " " + fecha.getHours() + ":" + fecha.getMinutes() + ":" + fecha.getSeconds();
+    var misDatos = {
+        "procedure_name":"usuarioslst",
+        "body":{
+        }
+    };
+
+    DreamFactory.api[CONFIG.SERVICE].callStoredProcWithParams(misDatos).success(function (results){
+        if(results.length > 0){
+            //console.log(results);
+            $scope.usuarios = results[0];
+        }else{                        
+        }
+    }).error(function(results){
+    });
+    
+    $scope.coche = {
+        marca: "Audi",
+        modelo: "A3",
+        nombreCompleto: function() {
+            var x;
+            x = $scope.coche;
+            return x.marca + " " + x.modelo;
+        }
+    };    
+</script>
+
+<div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Formulario de renovacion de licencia de funcionamiento:</label>
+            <div class='col-sm-8' align='left'>
+            <title>{{datos.tit_for_ren_lic}}</title>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Datos Generales:</label>
+            <div class='col-sm-8' align='left'>
+            <legend for='url' >{{datos.sub_ren_lic}}</legend>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >PMC:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='num_pmc' name='num_pmc' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Id Actividad Economica:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='id_actividad_economica' name='id_actividad_economica' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Tipo de Persona:</label>
+            <div class='col-sm-8' align='left'>
+            <select id='tipo_per' name='tipo_per'></select>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Datos del Contribuyente:</label>
+            <div class='col-sm-8' align='left'>
+            <legend for='url' >{{datos.sub_dat_con}}</legend>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >NIT:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='nit_prop' name='nit_prop' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Tipo de Documento:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='tip_doc_prop' name='tip_doc_prop' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Numero de documento:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='num_dos_prop' name='num_dos_prop' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Expedido:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='expedido_prop' name='expedido_prop' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Primer nombre:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='pri_nom_prop' name='pri_nom_prop' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Segundo nombre:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='seg_nom_prop' name='seg_nom_prop' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Tercer nombre:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='ter_nom_prop' name='ter_nom_prop' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Apellido paterno:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='ape_pat_prop' name='ape_pat_prop' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Apellido materno:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='ape_mat_prop' name='ape_mat_prop' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Apellido de casada:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='ape_cas_prop' name='ape_cas_prop' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Celular:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='cel_prop' name='cel_prop' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Telefono:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='telef_prop' name='telef_prop' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Correo Electronico:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='email_prop' name='email_prop' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Casilla:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='casilla' name='casilla' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Identificacion de la empresa:</label>
+            <div class='col-sm-8' align='left'>
+            <legend for='url' >{{datos.sub_ide_emp}}</legend>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Nit:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='num_doc_per_jur' name='num_doc_per_jur' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Razon social:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='raz_soc_per_jur' name='raz_soc_per_jur' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Datos del representante legal:</label>
+            <div class='col-sm-8' align='left'>
+            <legend for='url' >{{datos.sub_dat_rep_leg}}</legend>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Tipo de documento:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='tip_doc_rep' name='tip_doc_rep' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Numero de documento:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='num_doc_rep' name='num_doc_rep' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Expedido:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='expedido_rep' name='expedido_rep' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Primer nombre:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='pri_nom_rep' name='pri_nom_rep' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Segundo nombre:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='seg_nom_rep' name='seg_nom_rep' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Tercer nombre:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='ter_nom_rep' name='ter_nom_rep' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Apellido paterno:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='ape_pat_rep' name='ape_pat_rep' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Apellido materno:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='ape_mat_rep' name='ape_mat_rep' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Apellido de casada:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='ape_cas_rep' name='ape_cas_rep' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Telefono:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='telef_rep' name='telef_rep' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Celular:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='cel_rep' name='cel_rep' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Correo electronico:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='email_rep' name='email_rep' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Zona:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='zona_rep' name='zona_rep' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Tipo de via:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='tipo_viarep' name='tipo_viarep' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Nombre de via:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='nom_via_rep' name='nom_via_rep' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Numero:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='num_rep' name='num_rep' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Nº de poder notarial:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='num_pod_leg' name='num_pod_leg' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Gestion de vigencia del poder notarial:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='ges_vig_pod' name='ges_vig_pod' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Nº de notaria:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='num_not' name='num_not' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Datos tecnicos de la actividad economica:</label>
+            <div class='col-sm-8' align='left'>
+            <legend for='url' >{{datos.sub_dat_tec}}</legend>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Nit:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='nit' name='nit' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Denominacion:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='raz_soc' name='raz_soc' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Sucursal:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='num_actividad_MatrSuc' name='num_actividad_MatrSuc' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Superficie m2:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='sup' name='sup' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Capacidad aproximada:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='cap_aprox' name='cap_aprox' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >El establecimiento es:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='estab_es' name='estab_es' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Horario de inicio de atencion:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='de_hor' name='de_hor' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Horario de fin de atencion:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='a_hor' name='a_hor' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Productos elaborados:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='productosElaborados' name='productosElaborados' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Actividades secundarias:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='actividadesSecundarias' name='actividadesSecundarias' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Fecha de inicio de la actividad:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='fecha_ini_act' name='fecha_ini_act' class='form-control' type='Date' ng-disabled='desabilitado' ><br>
+        </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Codigo de zona:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='idCodigoZona' name='idCodigoZona' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Ubicación de la actividad economica:</label>
+            <div class='col-sm-8' align='left'>
+            <legend for='url' >{{datos.sub_ubi_act_eco}}</legend>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Macrodistrito:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='macro_act_descrip' name='macro_act_descrip' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Distrito:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='dist_act' name='dist_act' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Zona:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='zona_act' name='zona_act' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Tipo de via:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='tip_via_act' name='tip_via_act' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Nombre de via:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='nom_via_act' name='nom_via_act' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Numero:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='num_act' name='num_act' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Edificio:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='edificio_act' name='edificio_act' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Bloque:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='bloque_act' name='bloque_act' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Piso:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='piso_act' name='piso_act' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Dpto./of./local:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='dpto_of_loc' name='dpto_of_loc' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Telefono:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='tel_act' name='tel_act' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Cuenta energia electrica:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='cod_luz' name='cod_luz' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Clasificacion de la actividad economica:</label>
+            <div class='col-sm-8' align='left'>
+            <legend for='url' >{{datos.sub_req_sol_cat}}</legend>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Tipo de actividad:</label>
+            <div class='col-sm-8' align='left'>
+            <select id='tip_act_eco' name='tip_act_eco'></select>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Tipo de licencia:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='tipo_lic_descrip' name='tipo_lic_descrip' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Tipo de categoria:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='categoria_agrupada_descripcion' name='categoria_agrupada_descripcion' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Actividad desarrollada:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='categoria_descrip' name='categoria_descrip' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Requisitos solicitados:</label>
+            <div class='col-sm-8' align='left'>
+            <legend for='url' >{{datos.sub_req_sol}}</legend>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+            <div class='col-sm-8' align='left'>
+            <input id='req_doc' name='req_doc' class='form-control' type='checkbox'><br>
+          </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Revision de antecedentes:</label>
+            <div class='col-sm-8' align='left'>
+            <legend for='url' >{{datos.sub_rev_ant}}</legend>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >La solicitud:</label>
+            <div class='col-sm-8' align='left'>
+            <select id='ant' name='ant'></select>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Informe de antecedentes:</label>
+            <div class='col-sm-8' align='left'>
+            <legend for='url' >{{datos.sub_inf_ant_apr}}</legend>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+            <div class='col-sm-8' align='left'>
+                <textarea id='inf_apr' name='inf_apr' class='form-control' required ng-disabled='desabilitado'></textarea>
+            </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Informe de antecedentes:</label>
+            <div class='col-sm-8' align='left'>
+            <legend for='url' >{{datos.sub_inf_ant_rech}}</legend>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+            <div class='col-sm-8' align='left'>
+                <textarea id='inf_rech' name='inf_rech' class='form-control' required ng-disabled='desabilitado'></textarea>
+            </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Asignacion de inspector y programacion de inspección:</label>
+            <div class='col-sm-8' align='left'>
+            <legend for='url' >{{datos.sub_asi_ins}}</legend>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Nombre del inpector integral:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='nom_inp_int' name='nom_inp_int' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Fecha de inspeccion:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='fec_de_ins' name='fec_de_ins' class='form-control' type='Date' ng-disabled='desabilitado' ><br>
+        </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Programacion de inspeccion:</label>
+            <div class='col-sm-8' align='left'>
+            <legend for='url' >{{datos.sub_asi_ins}}</legend>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Fecha de inspeccion uaia:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='fech_insp' name='fech_insp' class='form-control' type='Date' ng-disabled='desabilitado' ><br>
+        </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Programacion inspeccion:</label>
+            <div class='col-sm-8' align='left'>
+            <legend for='url' >{{datos.sub_insp}}</legend>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Fecha de inspeccion lab:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='fec_de_ins' name='fec_de_ins' class='form-control' type='Date' ng-disabled='desabilitado' ><br>
+        </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Condiciones necesarias para funcionamiento de la actividad:</label>
+            <div class='col-sm-8' align='left'>
+            <legend for='url' >{{datos.sub_con_nec_fun}}</legend>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+            <div class='col-sm-8' align='left'>
+            <input id='requisitos_tecnicos' name='requisitos_tecnicos' class='form-control' type='checkbox'><br>
+          </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Inspeccion y elaboracion de recomendacion inspector integral:</label>
+            <div class='col-sm-8' align='left'>
+            <legend for='url' >{{datos.sub_ela_inf}}</legend>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Resultado de la inspeccion:</label>
+            <div class='col-sm-8' align='left'>
+            <select id='res_de_la_ins' name='res_de_la_ins'></select>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Elaboracion de informe de recomendacion:</label>
+            <div class='col-sm-8' align='left'>
+            <legend for='url' >{{datos.sub_res_ins_apr}}</legend>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+            <div class='col-sm-8' align='left'>
+                <textarea id='res_ins_apr' name='res_ins_apr' class='form-control' required ng-disabled='desabilitado'></textarea>
+            </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Elaboracion de informe de recomendacion:</label>
+            <div class='col-sm-8' align='left'>
+            <legend for='url' >{{datos.sub_res_ins_rech}}</legend>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+            <div class='col-sm-8' align='left'>
+                <textarea id='res_ins_rech' name='res_ins_rech' class='form-control' required ng-disabled='desabilitado'></textarea>
+            </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Elaboracion de informe de recomendacion:</label>
+            <div class='col-sm-8' align='left'>
+            <legend for='url' >{{datos.sub_res_ins_obs}}</legend>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+            <div class='col-sm-8' align='left'>
+                <textarea id='res_ins_obs' name='res_ins_obs' class='form-control' required ng-disabled='desabilitado'></textarea>
+            </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >.:</label>
+            <div class='col-sm-8' align='left'>
+            <legend for='url' >{{datos.sub_pat}}</legend>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >El inmueble donde funciona la actividad es catalogado como patrimonial:</label>
+            <div class='col-sm-8' align='left'>
+            <input id='inm_pat' name='inm_pat' class='form-control' type='checkbox'><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Elaboracion de informe de recomendacion:</label>
+            <div class='col-sm-8' align='left'>
+            <legend for='url' >{{datos.sub_rec_zoo}}</legend>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Resultado de la inspeccion uaia:</label>
+            <div class='col-sm-8' align='left'>
+            <select id='res_insp' name='res_insp'></select>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Elaboracion de informe de recomendacion:</label>
+            <div class='col-sm-8' align='left'>
+            <legend for='url' >{{datos.sub_rec_apr}}</legend>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+            <div class='col-sm-8' align='left'>
+                <textarea id='inf_apr' name='inf_apr' class='form-control' required ng-disabled='desabilitado'></textarea>
+            </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Elaboracion de informe de recomendacion:</label>
+            <div class='col-sm-8' align='left'>
+            <legend for='url' >{{datos.sub_rec_rech}}</legend>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+            <div class='col-sm-8' align='left'>
+                <textarea id='inf_rech' name='inf_rech' class='form-control' required ng-disabled='desabilitado'></textarea>
+            </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Elaboracion de informe de recomendacion:</label>
+            <div class='col-sm-8' align='left'>
+            <legend for='url' >{{datos.sub_rec_obs}}</legend>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+            <div class='col-sm-8' align='left'>
+                <textarea id='inf_obs' name='inf_obs' class='form-control' required ng-disabled='desabilitado'></textarea>
+            </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Elaboracion de informe de recomendacion:</label>
+            <div class='col-sm-8' align='left'>
+            <legend for='url' >{{datos.sub_rec_lab}}</legend>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Resultado de la inspeccion lab:</label>
+            <div class='col-sm-8' align='left'>
+            <select id='res_insp' name='res_insp'></select>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Elaboracion de informe de recomendacion:</label>
+            <div class='col-sm-8' align='left'>
+            <legend for='url' >{{datos.sub_rec_apr}}</legend>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+            <div class='col-sm-8' align='left'>
+                <textarea id='inf_apr' name='inf_apr' class='form-control' required ng-disabled='desabilitado'></textarea>
+            </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Elaboracion de informe de recomendacion:</label>
+            <div class='col-sm-8' align='left'>
+            <legend for='url' >{{datos.sub_rec_rech}}</legend>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+            <div class='col-sm-8' align='left'>
+                <textarea id='inf_rech' name='inf_rech' class='form-control' required ng-disabled='desabilitado'></textarea>
+            </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Elaboracion de informe de recomendacion:</label>
+            <div class='col-sm-8' align='left'>
+            <legend for='url' >{{datos.sub_rec_obs}}</legend>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+            <div class='col-sm-8' align='left'>
+                <textarea id='inf_obs' name='inf_obs' class='form-control' required ng-disabled='desabilitado'></textarea>
+            </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Elaboracion de informe:</label>
+            <div class='col-sm-8' align='left'>
+            <legend for='url' >{{datos.sub_ela_de_inf}}</legend>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+            <div class='col-sm-8' align='left'>
+                <textarea id='ela_de_inf1' name='ela_de_inf1' class='form-control' required ng-disabled='desabilitado'></textarea>
+            </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Reporte fotografico:</label>
+            <div class='col-sm-8' align='left'>
+            <legend for='url' >{{datos.sub_fot}}</legend>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Fotografias:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='foto1' name='foto1' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+            <div class='col-sm-8' align='left'>
+                <input id='foto2' name='foto2' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+            <div class='col-sm-8' align='left'>
+                <input id='foto3' name='foto3' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Elaboracion de informe tecnico ude:</label>
+            <div class='col-sm-8' align='left'>
+            <legend for='url' >{{datos.sub_ela_de_inf}}</legend>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >La solicitud es::</label>
+            <div class='col-sm-8' align='left'>
+            <select id='res_solicitud_upaee' name='res_solicitud_upaee'></select>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Solicitud aprobada:</label>
+            <div class='col-sm-8' align='left'>
+            <legend for='url' >{{datos.sub_apr}}</legend>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Nro orden form 402:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='nro_orden' name='nro_orden' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Fecha impresion:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='fecha_imp' name='fecha_imp' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Fecha vencimiento:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='fecha_fin_act' name='fecha_fin_act' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Informe de observacion o rechazo:</label>
+            <div class='col-sm-8' align='left'>
+            <legend for='url' >{{datos.sub_rec}}</legend>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+            <div class='col-sm-8' align='left'>
+                <textarea id='inf_rechazo' name='inf_rechazo' class='form-control' required ng-disabled='desabilitado'></textarea>
+            </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Foliado y descripcion - renovacion de licencia:</label>
+            <div class='col-sm-8' align='left'>
+            <legend for='url' >{{datos.sub_foliado}}</legend>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Numero de hojas adjuntas al tramite:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='hojas_recibidas' name='hojas_recibidas' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Descripcion:</label>
+            <div class='col-sm-8' align='left'>
+                <textarea id='observaciones_i' name='observaciones_i' class='form-control' required ng-disabled='desabilitado'></textarea>
+            </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Resolución administrativa:</label>
+            <div class='col-sm-8' align='left'>
+            <legend for='url' >{{datos.sub_res_adm}}</legend>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+            <div class='col-sm-8' align='left'>
+                <textarea id='res_adm' name='res_adm' class='form-control' required ng-disabled='desabilitado'></textarea>
+            </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Foliado y descripcion - resolucion:</label>
+            <div class='col-sm-8' align='left'>
+            <legend for='url' >{{datos.sub_foliado}}</legend>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Numero de hojas adjuntas al tramite:</label>
+            <div class='col-sm-8' align='left'>
+                <input id='hojas_recibidas' name='hojas_recibidas' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Descripcion:</label>
+            <div class='col-sm-8' align='left'>
+                <textarea id='observaciones_i' name='observaciones_i' class='form-control' required ng-disabled='desabilitado'></textarea>
+            </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Validacion licencia de funcionamiento/resolucion administrativa:</label>
+            <div class='col-sm-8' align='left'>
+            <legend for='url' >{{datos.sub_validacion}}</legend>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Resultado revision:</label>
+            <div class='col-sm-8' align='left'>
+            <select id='firma' name='firma'></select>
+          </div>
+        </div>
+    </div>
+    <div class='col-sm-12' align='right'>
+        <div class='form-group' >
+        <label class='col-sm-4 control-label no-padding-right' for='url' >Observaciones:</label>
+            <div class='col-sm-8' align='left'>
+                <textarea id='observaciones' name='observaciones' class='form-control' required ng-disabled='desabilitado'></textarea>
+            </div>
+        </div>
+    </div>
+
+    
+            <button data-dismiss="modal" type="button" class="btn btn-danger fa fa-save" ng-disabled="false" ng-click="volver()"><span span class="textoAux"> CANCELAR </span></button>
+            <button ng-click="cargarDatos(datos);guardarData(datos);" data-dismiss="modal" type="button" class="btn btn-success fa fa-save" ng-disabled="false"><span span class="textoAux"> GUARDAR / CONTINUAR </span></button>
+
+        </div>
+</div>

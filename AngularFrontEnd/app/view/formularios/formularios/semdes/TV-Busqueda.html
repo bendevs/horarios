@@ -1,0 +1,185 @@
+<script>
+
+function frmAE10Controller($scope, $rootScope, $routeParams, $location, $http, Data, sessionService, CONFIG, LogGuardarInfo, DreamFactory,ngTableParams,$filter,sweet, $sce, registroLog,FileUploader, wsContribuyenteNatural,wsContribuyenteJuridico,wsLicencia, $window,wsRgistrarPubliciadad) {
+    var fecha= new Date();
+    var fechactual=fecha.getFullYear() + "-" + fecha.getMonth() + "-" + fecha.getDate() + " " + fecha.getHours() + ":" + fecha.getMinutes() + ":" + fecha.getSeconds();
+
+    $scope.getCasos = function(datos){
+        $.blockUI();
+        $scope.panelCasos=true;
+        var resDatos = {
+            "procedure_name":"sp_buscar_casos_antiguos",
+            "body":{
+                "params": [
+                    {
+                        "name": "ci",
+                        "value": datos.vci
+                    },
+                    {
+                        "name": "campo",
+                        "value": "G_CI"
+                    },
+                    {
+                        "name": "proceso",
+                        "value": 1
+                    }           
+                ]
+            }
+        };
+        var obj = DreamFactory.api[CONFIG.SERVICE].callStoredProcWithParams(resDatos);
+        obj.success(function (response) {
+            var data = response; 
+            if(data.length > 0){
+                console.log("DATA RESPUESTA: ", response);
+                $scope.datosGrilla = response;
+                $scope.conArchivo = "mostrar";
+                $scope.sinArchivo = null;
+            }else{
+			$scope.datosGrilla = [];
+                $scope.mensaje  =   "El C.I. no tiene trámites.";
+            }
+            $.unblockUI(); 
+        }).error(function(results){          
+            $.unblockUI();
+        });
+    }; 
+
+    $scope.guardarForm = function() { 		//	
+			//$scope.casoActual.G_CI = $scope.datos.vci;
+			//console.log($scope.casoActual);
+			if(typeof $scope.casoActual.casodata == 'object'){
+				var datajson = $scope.casoActual.casodata;
+			}else{
+				var datajson = JSON.parse($scope.casoActual.casodata);
+			}        
+			//var datajson = JSON.parse($scope.casoActual.casodata);
+			datajson.G_CI = $scope.datos.vci;
+			$scope.casoActual.casodata = JSON.stringify(datajson);
+			console.log($scope.casoActual);
+			$scope.guardarData($scope.datos);  
+			$scope.atenderCaso($scope.casoActual,"");	 
+    };
+	$scope.recuperarCaso = function(datos){
+        var resFormulario = {
+            procedure_name:"sp_importar_tramite",
+            body:{
+                "params": [
+                    {
+                        "name": "caso_id",
+						"value": datos.casoid
+                    },{
+                        "name": "caso_id_nuevo",
+                        "value": $scope.sIdCaso                        
+                    }
+                ]
+            }
+        };
+        var obj=DreamFactory.api[CONFIG.SERVICE].callStoredProcWithParams(resFormulario);
+        obj.success(function (data){
+            $scope.caso_recuperado= JSON.parse(data[0].sp_importar_tramite);
+			$scope.casoActual.casodata= JSON.stringify($scope.caso_recuperado[0].datos);
+			
+			$.blockUI();
+			setTimeout(function(){						
+				$scope.guardarForm();
+				sweet.show('', 'El caso '+ $scope.caso_recuperado[0].cas_nombre_caso+' se recupero satisfactoriamente', 'success');
+			$.unblockUI();
+			}, 600);  	
+        })
+        .error(function(data){
+            sweet.show('', "Caso no recuperado", 'error');
+            $scope.btnGuardar = false;
+        })
+    };
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////// FUNCIONES DE INICIO ///////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////// 
+	
+    $scope.$on('api:ready',function(){            
+	
+    });
+    $scope.inicioAE = function () {
+        if(DreamFactory.api[CONFIG.SERVICE]){
+        }
+    };
+}
+
+</script>
+<!-- ////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+<!-- //////////////////////////////////////// vista del formulario //////////////////////////////////////// -->
+<!-- ////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+
+<div class="wrap" ng-controller="frmAE10Controller" data-ng-init="inicioAE()">
+    <div class="wrap" ng-controller="frmAE10Controller"  >
+        <div >
+            <form name="formularioBuscar" >
+                <div class="row">
+                    <div class="col-md-1">
+                        <div class="form-group" >
+                            <label for="url" >Nro Cédula de Identidad : </label>
+                        </div>
+					</div>				
+                    <div class="col-md-2">
+                        <div class="form-group" >
+                            <input  ng-model="datos.vci" id="vci" name="vci" class="form-control" type="text" placeholder="Ingrese Nro. CI" size="20" onkeyup="deshabilita(this.form);valNumero(this);" required>						
+                        </div>
+					</div>
+					<div class="col-md-2">
+                        <div class="form-group" >                       
+							<button  name="btnBuscar" ng-click="getCasos(datos)" type="button" class="btn btn-primary" ng-disabled="formularioBuscar.vci.$invalid"><i class="glyphicon fa fa-search"></i> Buscar</button>     
+                        </div>						
+                    </div>
+                </div>
+            </form>
+        </div>
+        <br>
+
+        <div class="row"> 
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                   <h5>Lista de Casos</h5>
+                      <div ibox-tools></div>
+                </div>
+                <div class="ibox-content">
+                   <table class="table table-striped">
+                      <thead>
+                        <th>#&nbsp;</th>
+                        <th>Opciones</th>						
+                        <th>Código Trámite &nbsp;</th>
+                        <th>Tipo de viaje &nbsp;</th>
+                        <th>Destino&nbsp;</th>
+                        <th>Motivo&nbsp;</th>
+                        <th>Fecha de solicitud&nbsp;</th>
+                      </thead>
+                      <tbody>
+                         <tr class="column" ng-repeat="caso in datosGrilla">
+                            <td>{{$index+1}}</td>
+                            <td>
+                                        <li>
+											<a tooltip = "Recuperar Datos" class="btn-floating" ng-click="recuperarCaso(caso)"><i class="fa fa-newspaper-o"></i></a>
+											<!--a tooltip = "Imprimir"  target="_blank" ng-click="ImprimirProforma(caso.url)" data-toggle="modal" data-target="#divPopup4" class="ng-binding"><i class="fa fa-newspaper-o"></i></a-->
+                                        </li>
+                            </td>
+                            <td>{{caso.casnombrecaso}}</td>
+                            <td>{{caso.tipo_viaje}}</td>
+                            <td>{{caso.destino}}</td>
+                            <td>{{caso.motivo}}</td>
+                            <td>{{caso.fechaini}}</td>
+                          </tr>
+                      </tbody>
+                   </table>
+				   
+                </div>
+            </div>
+        </div>
+
+        <br>
+
+        <!-- ////////////////////////////////////////// -->
+        <!-- /////// botones guardar - cancelar /////// -->
+        <!-- ////////////////////////////////////////// -->
+            <a class="btn btn-primary" ng-click="volver()"><i class="glyphicon fa fa-times"></i> Cancelar </a>
+            <a class="btn btn-primary" ng-click="guardarForm()" ng-disabled="formularioBuscar.vci.$invalid"><i class="glyphicon fa fa-save"></i> Guardar / Continuar </a>
+	</div>
+</div>

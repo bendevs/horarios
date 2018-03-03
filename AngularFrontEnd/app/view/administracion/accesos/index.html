@@ -1,0 +1,127 @@
+<table>
+<td><tr>&nbsp;</tr></td>
+<td></td>
+</table>
+<div  ng-controller="accesosControler"   data-ng-init="inicioAccesos()">
+  <div class="ibox float-e-margins" style="margin-bottom: 10px;">
+                <div class="ibox-title" style="padding: 5px 20px 5px 20px !important; height: 75px !important;    border-color: #1AB394 !important;">
+                    <form role="form" class="form-inline">
+                        <div class="form-group">
+                           <label><h3>Roles:</h3> </label>
+                            <select id="Roles" ng-change="getAccesos(selecteIdi)" ng-model="selecteIdi" class="form-control"> 
+                              <option value="-1">Seleccione...</option>
+                              <option ng-repeat="rol in obtRoles" value="{{rol.rlsId}}">{{rol.rlsRol}}</option>
+                            </select>
+                        </div>
+                    </form>
+                    <H3> <label for="title">Administracion de Accesos</label> </H3>
+              </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-5">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>Opciones disponibles</h5>
+                <div ibox-tools></div>
+                    <div class="botones_inspinia_lmc">
+                      <div class="col-md-6">
+
+                        <div class="row">
+                          <div class="col-md-6">
+                          <label>Buscar:</label>
+                          </div>
+                          <div class="col-md-6">
+                          <input ng-model = "query" id ="busca1" class="form-control" placeholder="" >
+                          </div>
+                        </div>                      
+                        
+                      </div> 
+                    </div> 
+            </div>
+            <div class="ibox-content">
+              <table ng-table="tablaOpcion "   class="table table-hover table-striped todolist" >
+                <tr ng-repeat="opcion in Opciones  | filter:query   "  ng-class="{'colorInactivo': grupo.grpEstado == 'INACTIVO', 'colorBloqueado': grupo.grpEstado == 'BLOQUEADO'}"  >
+                  <td><input  type="checkbox" ng-model="checkboxes.items[opcion.opcId]" /> </td> 
+                  <td data-title="'GRUPO'" >{{opcion.grupo}}</td>
+                  <td data-title="'OPCION'">{{opcion.opcion}}</td>
+                  <td data-title="'CONTENIDO'">{{opcion.contenido}}</td>          
+                </tr>
+              </table>
+              <input ng-model="usuarioRol.usuarios_usr_id" ng-init="usuarioRol.usuarios_usr_id='1'" hidden id="GRUPO" name="GRUPO" type="text" value="1"> 
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="col-md-2">
+        <button ng-click="adicionar()" type="button" class="btn btn-primary" style="margin: 2px">AGREGAR <span class="glyphicon glyphicon-chevron-right"></button>
+        <button ng-click="retirar()"  type="button" class="btn btn-primary" style="margin: 2px">RETIRAR<span class="glyphicon glyphicon-chevron-left">&nbsp;</button>
+    </div>
+
+<!-- 
+    <div class="col-md-5">
+        <div class="panel panel-default">
+          <div class="panel-heading">ACCESOS  ASIGNADOS A ESTE ROL</div>
+          <div class="panel-body">
+            <div class="table-responsive"> 
+              <div class="col-md-3">Buscar:
+                <input ng-model = "query1" id ="busca2" class="form-control" placeholder="" >
+                <legend></legend>
+              </div>   
+              <table ng-table="tablaAccesos" class="table table-hover table-striped table-bordered todolist" >
+                <tr ng-repeat="accesosRol in obtAccesosRoles  | filter: query1 " ng-class="{'colorInactivo': grupo.grpEstado == 'INACTIVO', 'colorBloqueado': grupo.grpEstado == 'BLOQUEADO'}" >
+                  <td><input  type="checkbox" ng-model="checkboxes2.items[accesosRol.accid]" /> </td>
+                  <td data-title="'ROL'">{{accesosRol.rol }}</td>
+                  <td data-title="'OPCION'">{{accesosRol.opcion}}</td>
+                  <td data-title="'REGISTRADO'">{{accesosRol.registrado}}</td>
+                  <td data-title="'MODIFICADO'">{{accesosRol.modificado}}</td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+    </div> -->
+
+
+  <div class="col-md-5">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>Accesos asignados a este rol</h5>
+
+                <div ibox-tools></div>
+                    <div class="botones_inspinia_lmc">
+                         <div class="col-md-6">
+
+                        <div class="row">
+                          <div class="col-md-6">
+                          <label>Buscar:</label>
+                          </div>
+                          <div class="col-md-6">
+                          <input ng-model = "query1" id ="busca2" class="form-control" placeholder="" >
+                          </div>
+                        </div>                      
+                        
+                      </div> 
+                    </div>
+            </div>
+            <div class="ibox-content">
+              <table ng-table="tablaAccesos" class="table table-hover table-striped todolist" >
+                <tr ng-repeat="accesosRol in obtAccesosRoles  | filter: query1 " ng-class="{'colorInactivo': grupo.grpEstado == 'INACTIVO', 'colorBloqueado': grupo.grpEstado == 'BLOQUEADO'}" >
+                  <td><input  type="checkbox" ng-model="checkboxes2.items[accesosRol.accid]" /> </td>
+                  <td data-title="'ROL'">{{accesosRol.rol }}</td>
+                  <td data-title="'OPCION'">{{accesosRol.opcion}}</td>
+                  <td data-title="'REGISTRADO'">{{accesosRol.registrado}}</td>
+                  <td data-title="'MODIFICADO'">{{accesosRol.modificado}}</td>
+                </tr>
+              </table>
+            </div>
+        </div>
+    </div>
+
+
+
+
+  </div>
+</div>

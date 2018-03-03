@@ -1,0 +1,133 @@
+<script type="text/javascript">
+            // When the document is ready
+    function conMayusculas(field) {
+        field.value = field.value.toUpperCase()
+    };
+      //*** Este Codigo permite Validar que sea un campo Numerico
+    function soloNumerico(variable){
+        Numer=parseInt(variable);
+        if (isNaN(Numer)){
+            return "";
+        }
+        return Numer;
+    }
+    function valNumero(Control){
+        Control.value=soloNumerico(Control.value);
+    }
+    //*** Fin del Codigo para Validar que sea un campo Numerico       
+</script>
+
+<div  class="col-md-12" ng-controller="reportesController" data-ng-init="inicioReportes()">
+    
+    <div class="col-lg-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>Reportes</h5>
+                <div ibox-tools>
+                </div>                
+            </div>
+            <div class="ibox-content">                
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>Reportes</h5>
+                <div ibox-tools>
+                </div>
+                <div class="botones_inspinia_lmc">
+                    <a class="btn btn-primary" ng-click="limpiar()" data-toggle="modal" data-target="#registroReporte">
+                    <i class="glyphicon glyphicon-plus-sign"></i> Nuevo Reporte</a>
+                </div>
+            </div>
+            <div class="ibox-content">                
+                <table ng-table="tablaReportes" show-filter="true" class="table table-striped ">
+                    <tr ng-repeat="reporte in $data" >
+                        <td align="center" data-title="'OPCIONES'">
+                            <a tooltip = "Modificar Reporte" class="btn btn-info btn-circle"data-toggle="modal" data-target="#registroReporte" ng-click="modificarReporteCargar(reporte)"><i class="fa fa-pencil"></i></a>
+                            <a tooltip = "Eliminar Reporte" class="btn btn-info btn-circle"data-toggle="modal" data-target="#registroReporte" ng-click="eliminarReporteCargar(reporte)"><i class="fa fa-trash-o"></i></a>
+                        </td>
+                        <td data-title="'C&Oacute;DIGO'" sortable="'rid'" filter="{'rid':'text'}">{{reporte.rid}}</td>
+                        <td data-title="'REPORTE'" sortable="'rnombre'" filter="{'rnombre':'text'}">{{reporte.rnombre}}</td>
+                        <td data-title="'T&Iacute;TULO'" sortable="'rtitulo'" filter="{'rtitulo':'text'}">{{reporte.rtitulo}}</td>
+                        <td data-title="'T&Iacute;TULO COLUMNAS'" sortable="'rtitcolumnas'" filter="{'rtitcolumnas':'text'}">{{reporte.rtitcolumnas}}</td>                        
+                        <td data-title="'FILTRADO'" sortable="'rfiltrado'" filter="{'rfiltrado':'text'}">{{reporte.rfiltrado}}</td>
+                        <td data-title="'CONSULTA SQL'" sortable="'rconsultasql'" filter="{'rconsultasql':'text'}">{{reporte.rconsultasql}}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>    
+    <div class="modal fade" id="registroReporte" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Cerrar</span></button>
+                    <h4 class="modal-title" id="myModalLabel">{{titulo}}</h4>
+                </div>
+                <div class="modal-body" >
+                    <form name="formularioReportes" novalidate>                        
+                        <div class="form-group">
+                            <label for="url" >REPORTE:</label>
+                            <div class="controls">
+                                <input  ng-model="datosReporte.rnombre" name="rnombre" id="rnombre" class="form-control" type="text" placeholder="ingrese reporte" ng-disabled="only" ng-required="true" onkeyUp="return conMayusculas(this)">
+                                <span style="color:red" ng-show="formularioReportes.rnombre.$invalid">
+                                    <span ng-show="formularioReportes.rnombre.$error.required">Reporte es requerido.
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="url" >TITULO:</label>
+                            <div class="controls">
+                                <input  ng-model="datosReporte.rtitulo" name="rcodigo" id="rcodigo" class="form-control" type="text" placeholder="ingrese titulo" ng-disabled="only" ng-required="true" onkeyUp="return conMayusculas(this)">
+                                <span style="color:red" ng-show="formularioReportes.rtitulo.$invalid">
+                                    <span ng-show="formularioReportes.rtitulo.$error.required">Titulo es requerido.
+                                    </span>
+                                </span>
+                            </div>
+                        </div>                        
+                        <div class="form-group">
+                            <label for="url" >T&Iacute;TULO COLUMNAS:</label>
+                            <div class="controls">
+                                 <input  ng-model="datosReporte.rtitcolumnas" name="rtitcolumnas" id="rtitcolumnas" class="form-control" type="text" placeholder="ingrese subtitulo" ng-disabled="only">   
+                                <span style="color:red" ng-show="formularioReportes.rtitcolumnas.$invalid">
+                                    <span ng-show="formularioReportes.rtitcolumnas.$error.required">Campo es requerido.
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="url" >FILTRADO POR:</label>
+                            <div class="controls">
+                                <input  ng-model="datosReporte.rfiltrado" name="rfiltrado" id="rfiltrado" class="form-control" type="text" placeholder="ingrese subtitulo" ng-disabled="only">
+                                <span style="color:red" ng-show="formularioReportes.rfiltrado.$invalid">
+                                    <span ng-show="formularioReportes.rfiltrado.$error.required">Campo es requerido.
+                                    </span>
+                                </span>
+                            </div>
+                        </div>                        
+                        <div class="form-group">
+                            <label for="url" >CONSULTA SQL:</label>
+                            <div class="controls">
+                                <textarea ng-model="datosReporte.rconsultasql" id="rconsultasql" name="rconsultasql" class="form-control" style="resize:none; height:8em;" ng-disabled="only">
+                                </textarea> 
+                                <span style="color:red" ng-show="formularioReportes.rconsultasql.$invalid">
+                                    <span ng-show="formularioReportes.rconsultasql.$error.required">Campo es requerido.
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                  <button id= "btnCerrar" name ="btnCerrar" type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                  <button ng-click="validar(datosReporte)" type="button" class="btn btn-primary" ng-show="boton=='new'" ng-hide="boton=='upd' || boton=='del'" ng-disabled="formularioReportes.$invalid">Guardar</button>
+                  <button ng-click="modificarReporte(datosReporte)" data-dismiss="modal" type="button" class="btn btn-primary" ng-show="boton=='upd'" ng-hide="boton=='new' || boton=='del'" ng-disabled="formularioReportes.$invalid">Modificar</button>
+                  <button ng-click="eliminarReporte(datosReporte)" data-dismiss="modal" type="button" class="btn btn-primary" ng-show="boton=='del'" ng-hide="boton=='new' || boton=='upd'" >Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

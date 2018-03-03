@@ -1,0 +1,155 @@
+<div class="col-md-12" class="row" ng-controller="catalogo_bien_mueble" data-ng-init="inicioCrear()">
+    <table  width="100%">
+        <td><h3>CATALOGO DE BIEN MUEBLE</h3></td> 
+    </table>
+    <br/>
+ 
+
+
+
+     <div class="modal-body" >
+              
+<!-- carga de casos segun el caso que se haya presentado  -->
+
+             <!-- <div class="col-md-12"   >-->
+              <div class="col-md-7">
+                <div class="form-group">
+                    <label for="category" >Busqueda por:</label>
+                    <div class="controls">
+
+                        <select ng-model="datosCargar.campo" id="campo" name="campo" class="form-control"  ng-required="true" ng-change="cargarDatos(datosCargar.campo,198)" >
+                            <option style="display:none" value="">-- Elegir--</option>
+                        <option value = 'cas_nombre_caso'>CODIGO</option>
+                        <option value = '2'>NOMBRE</option>
+                        <option value = '3'>DESCRIPCIÓN</option> 
+                        <option value = '1'>PARTIDA</option>
+                        <option value = '4'>DEPRECIACIÓN</option>
+                                       
+                      </select>
+                        
+                    </div>
+                </div>
+            </div>
+
+              <div class="col-md-7 col-sm-12 col-xs-12" ng-if="datosCargar.campo==='1'  ">
+                      <!--select id="id" name="id" ng-model="datosCargar.id" class="form-control" ng-options="carga.valor as carga.dato for carga in cargas" ng-change="getTabla('DAG_CAT',datosCargar.id,'DAG_CAT_PARTIDA4')">
+                            <option style="display:none" value="">-- Opciones--</option>
+                      </select-->
+                       <div class="form-group">
+                        <label >Opciones: </label>                        
+                       <input  ng-value="&nbsp;" ng-model="datosCargar.id" name="wsnombre" id="wsnombre" class="form-control" type="text" placeholder="Ingrese Partida del Item" ng-disabled="only" ng-required="true"  ng-change="getTabla33('DAG_CAT',datosCargar.id)">
+                    </div>
+                              
+                    </div>
+                </div>
+
+                 <div class="col-md-7 col-sm-12 col-xs-12" ng-if="datosCargar.campo==='4'  ">
+                      <div class="form-group">
+                        <label >Opciones: </label>                        
+                       <input  ng-value="&nbsp;" ng-model="datosCargar.id" name="wsnombre" id="wsnombre" class="form-control" type="text" placeholder="Ingrese La Categoria de Item" ng-disabled="only" ng-required="true"  ng-change="getTabla44('DAG_CAT',datosCargar.id)">
+                    </div>
+                
+                 </div>
+         
+                <div class="col-md-7 col-sm-12 col-xs-12" ng-if="datosCargar.campo==='2' ">
+                    <div class="form-group">
+                        <label >Opciones: </label>                        
+                       <input  ng-value="&nbsp;" ng-model="datosCargar.id" name="wsnombre" id="wsnombre" class="form-control" type="text" placeholder="Ingrese Nombre de Item" ng-disabled="only" ng-required="true"  ng-change="getTabla('DAG_CAT',datosCargar.id,'DAG_CAT_ITEM')">
+                    </div>
+                </div>
+
+                  <div class="col-md-7 col-sm-12 col-xs-12" ng-if="datosCargar.campo==='3' ">
+                    <div class="form-group">
+                        <label >Opciones: </label>                        
+                       <input  ng-value="&nbsp;" ng-model="datosCargar.id" name="wsnombre" id="wsnombre" class="form-control" type="text" placeholder="Ingrese Nombre de Item" ng-disabled="only" ng-required="true"  ng-change="getTabla11('DAG_CAT',datosCargar.id)">
+                    </div>
+                </div>
+
+             <div class="col-md-7 col-sm-12 col-xs-12" ng-if="datosCargar.campo==='cas_nombre_caso' ">
+                    <div class="form-group">
+                        <label >Opciones: </label>                        
+                       <input  ng-value="&nbsp;" ng-model="datosCargar.id" name="wsnombre" id="wsnombre" class="form-control" type="text" placeholder="Ejemplo--> DAG_CAT5"placeholder="ingrese nombre de equipo" ng-disabled="only" ng-required="true"  ng-change="getTabla22('DAG_CAT',datosCargar.id)">
+                    </div>
+                </div>
+
+     
+            <br>
+            <br>
+                  
+   <!-- carga de casos segun el caso que se haya presentado  -->    
+
+
+   
+        <div class="col-md-12" >
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                       <h5>Datos </h5> 
+                       <div ibox-tools></div>
+                       <div align="right">
+                            <a class="btn btn-primary" ng-click="gettablavista()" >
+                                <i class="glyphicon fa fa-eye"></i>
+                                 Imprimir Listado
+                            </a>
+                        </div>
+                    </div>  
+                <div class="ibox-content" >
+                    <div class="table-responsive"> 
+                         <table  class="table table-striped"  >
+                            <thead>      
+                                <th>#&nbsp;</th>
+                                <th>Codigo &nbsp;</th>
+                                <th>Nombre</th>
+                                <th>Descripcion Item&nbsp;</th>
+                                <th>Partida&nbsp;</th>
+                        
+                                <th>Depreciación&nbsp;</th>
+                                <th>Observación&nbsp;</th>
+                            </thead>
+                    <tbody> 
+                  <tr ng-repeat="grupo in grupos" >
+                    <td>{{grupo.casid}}</td>
+                    <td>{{grupo.codigo}}</td>
+                    <td>{{grupo.nombre_item}}</td>
+                    <td>{{grupo.descripcion_item}}</td> 
+                    <td>{{grupo.categoria_item}}</td>
+                 
+                    <td>{{grupo.nombre_deprc}}</td>
+                    <td>{{grupo.obsser}}</td>
+
+           
+                  <td data-title="'VER'"><a  tooltip = "Imprimir" ng-click="getrep_catalogo(grupo.casid,198)" class="btn-floating"><i class="fa fa-print" ></i></a></td>
+
+      <!--td data-title="'VER'"><a  tooltip = "Imprimir" ng-click="convertImgToDataURLviaCanvas(grupo.casid,199)" class="btn-floating"><i class="fa fa-print" ></i></a></td-->
+
+
+
+                        <!--div class="fixed-action-btn">
+                                        <a >
+                                   
+                                        </a>
+                                        <ul class="horizontal">
+                                            <li>
+                                                <a  tooltip = "Imprimir" ng-click="convertImgToDataURLviaCanvas(grupo.cas_id,datosCarga.campo)" class="btn-floating"><i class="fa fa-print" ></i></a>
+                                            </li>
+                              
+                                            
+                                        </ul>
+                        </div-->
+                  
+                  </tr>
+
+
+                  </tbody>
+
+
+                </table>
+              </div>
+          </div>
+          </div>
+         </div>
+        </div>
+
+ </div>
+
+</div>

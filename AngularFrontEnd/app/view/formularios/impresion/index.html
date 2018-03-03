@@ -1,0 +1,132 @@
+<!-- IMPRESIONES -->
+<div ng-controller="impresionController" data-ng-init="inicioFormatoImpresion();">
+    <div class="row">
+        <div class="col-md-12">
+            <a  class="btn btn-primary" data-toggle="modal"  ng-click="actualizarFormImpresion();"  data-target="#registroImpresion">
+               <i class="glyphicon glyphicon-plus"></i>&nbsp;Formato Impresion</a>
+
+            <table ng-table="tablaImpresion" class="table table-striped" show-filter="true" >
+
+                    <tr ng-repeat="impresion in $data" >
+                        <td  data-title="'#'">{{$index+1}}</td>
+                        <td align="center" data-title="'Opciones'">
+                          <a tooltip = "Modificar Formato Impresion.." ng-click="modificarCargarFormatoImpresion(impresion)" class="btn btn-default btn-circle" data-toggle="modal" data-target="#registroImpresion" ><i class="fa   fa-pencil " style="color:#249FE6"></i> </a>&nbsp;&nbsp;&nbsp;&nbsp;
+                          <a tooltip = "Eliminar Formato Impresion" ng-click="eliminarCargarFormatoImpresion(impresion)" class="btn btn-default btn-circle"  data-toggle="modal" data-target="#registroImpresion">
+                        <i class="fa  fa-trash-o "  style="color:#249FE6">
+                        </a></td>
+                        <td data-title="'Descripcion'" sortable="'impdescripcion'" filter="{'impdescripcion':'text'}">{{impresion.impdescripcion}}</td>
+                        <td data-title="'Formato'" >{{impresion.imptipo_hoja}}</td>
+                        <td data-title="'Margenes'">{{impresion.impmargenes}}</td>
+                        <td data-title="'Vista Previa'">
+                        <a tooltip = "Vista Previa" ng-click="vistaFormatoImpresion(impresion)" class="btn btn-default btn-circle" data-target="#vista" data-toggle="modal">
+                          <i class="fa fa-eye" style="color:#249FE6"></i></a></td>
+                    </tr>
+            </table>
+        </div>
+        <div class="modal fade" id="registroImpresion" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialoglg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Cerrar</span></button>
+                        <h4 class="modal-title" id="myModalLabel">{{tituloImp}}</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form name="formularioImpresion"  readOnly="true" novalidate>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group" >
+                                        <div class="col-sm-12">
+                                            <input type="hidden" name="impid" class="form-control" ng-model="formatoImpresionData.impid">
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <div class="form-group" >
+                                        <label for="url" >Descripcion:</label>
+                                            <input ng-model="formatoImpresionData.impdescripcion" id="impdescripcion" name="impdescripcion" class="form-control" type="text" placeholder="ingrese Descripción" value="opciones.procnombre" ng-disabled="desabilitado">
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <div class="form-group" >
+                                        <label for="url" >Contenido:</label>
+                                            <div ng-cloak ng-hide="isReady" class="highlight">
+                                                Iniciando ...
+                                            </div>
+                                            <div ng-cloak ng-show="isReady">
+                                                <textarea style="width: 100px; height: 150px;" ckeditor="editorOptions" name="editor" ng-model="formatoImpresionData.impcontenido" ng-change="save();" ng-disabled="desabilitado"></textarea>
+                                            </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label for="url" >Formato Hoja: </label>
+                                            <select id="imptipo_hoja" name="imptipo_hoja" ng-model="formatoImpresionData.imptipo_hoja" class="form-control" ng-disabled="desabilitado">
+                                                <option value="0">CARTA</option>
+                                                <option value="1">OFICIO</option>
+                                            </select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <div class="form-group" >
+                                        <label for="category">Margenes:</label>
+                                        <input type="text" name="impmargenes" class="form-control" ng-model="formatoImpresionData.impmargenes" ng-disabled="desabilitado">
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                        <button ng-click="adicionarFormatoImpresion(formatoImpresionData)" data-dismiss="modal" type="button" class="btn btn-primary" ng-show="btnImprimir=='new'" ng-hide="btnImprimir=='upd' || btnImprimir=='del'" ng-disabled="formularioImpresion.$invalid">Guardar</button>
+                        <button ng-click="modificarFormatoImpresion(formatoImpresionData)" data-dismiss="modal" type="button" class="btn btn-primary" ng-show="btnImprimir=='upd'" ng-hide="btnImprimir=='new' || btnImprimir=='del'" ng-disabled="formularioImpresion.$invalid">Modificar</button>
+                        <button ng-click="eliminarFormatoImpresion(formatoImpresionData.impid)" data-dismiss="modal" type="button" class="btn btn-primary" ng-show="btnImprimir=='del'" ng-hide="btnImprimir=='new' || btnImprimir=='upd'" >Eliminar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="modal fade" id="vista" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialoglg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Cerrar</span></button>
+                    <h4 class="modal-title" id="myModalLabel">{{tituloImp}}</h4>
+                </div>
+                <div class="modal-body">
+                    <form name="vistap"  readOnly="true" novalidate>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="col-sm-4">
+
+                                  <label for="url" >Descripcion:</label>
+                                      <input ng-model="formatoImpresionData.impdescripcion" id="impdescripcion" name="impdescripcion" class="form-control" type="text" placeholder="ingrese Descripción" value="opciones.procnombre" ng-disabled="desabilitado">
+
+                                    <label for="url" >Formato Hoja: </label>
+                                          <select id="imptipo_hoja" name="imptipo_hoja" ng-model="formatoImpresionData.imptipo_hoja" class="form-control" ng-disabled="desabilitado">
+                                              <option value="0">CARTA</option>
+                                              <option value="1">OFICIO</option>
+                                    </select>
+                                    <label for="category">Margenes:</label>
+                                    <input type="text" name="impmargenes" class="form-control" ng-model="formatoImpresionData.impmargenes" ng-disabled="desabilitado">
+                                </div>
+                                <div class="col-sm-8" align="center">
+                                  <div class="form-group">
+                                      <div style="width:700px; height:792px; overflow: scroll;" ng-cloak ng-show="isReady">
+                                          <div id="impVistaPrevia">
+                                          </div>
+                                      </div>
+                                  </div>
+                                </div>
+                            </div>
+                      </div>
+                    </form>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+</div>
+</div>

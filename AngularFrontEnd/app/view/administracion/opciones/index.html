@@ -1,0 +1,91 @@
+<script type="text/javascript">
+            // When the document is ready
+      function conMayusculas(field) {
+        field.value = field.value.toUpperCase()
+      };
+  </script>
+<div  ng-controller="opcionesController" data-ng-init="inicioOpciones()">
+    <div class="col-lg-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>Opciones</h5>
+                <div ibox-tools></div>
+                <div class="botones_inspinia_lmc">
+                   <a  class="btn btn-primary" data-toggle="modal"  ng-click="limpiar()"  data-target="#registro"><i class="glyphicon glyphicon-plus-sign"></i> Nueva Opcion</a>
+                </div>
+            </div>
+            <div class="ibox-content">
+                <table ng-table="tablaOpciones" show-filter="true" class="table table-hover table-striped todolist" >
+                    <tr ng-repeat="opcion in $data " g-class="{'colorInactivo': grupo.grpEstado == 'INACTIVO', 'colorBloqueado': grupo.grpEstado == 'BLOQUEADO'}" >
+                        <td align="center" data-title="'Opciones'" style="width: 80px;">
+                            <a ng-click="modificarOpcionCargar(opcion)"  class="btn btn-info btn-circle" data-toggle="modal" data-target="#registro"  ng-disabled="desabilitado"><i class="fa   fa-pencil " ></i> </a>
+                            <a ng-click="eliminarOpcionCargar(opcion)"  class="btn btn-info btn-circle"  data-toggle="modal" data-target="#registro">
+                            <i class="fa  fa-trash-o "  >
+                            </a>
+                        </td>
+                        <td data-title="'GRUPO'" sortable="'opcGrp'" filter="{'opcGrp':'text'}">{{opcion.opcGrp}}</td>
+                        <td data-title="'OPCION'" sortable="'opcOpcion'" filter="{'opcOpcion':'text'}">{{opcion.opcOpcion}}</td>
+                        <td data-title="'CONTENIDO'" sortable="'opcContenido'" filter="{'opcContenido':'text'}">{{opcion.opcContenido}}</td>
+                        <td data-title="'REGISTRADO'">{{opcion.opcRegistrado}}</td>
+                        <td data-title="'MODIFICADO'">{{opcion.opcModificado}}</td>
+                        <td data-title="'ACTIVO'">{{opcion.opcEstado}}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+  <!-- modal -->
+    <div class="modal fade" id="registro" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Cerrar</span></button>
+                  <h4 class="modal-title" id="myModalLabel">{{titulo}}</h4>
+                </div>
+                <div class="modal-body" >
+                    <form name="formularioOpciones"  readOnly="true" novalidate>
+                        <div class="row">
+                            <div class="controls">
+                                <label for="category">Grupos</label>
+                                <div class="input-group" >
+                                    <div class="input-group-addon"><i class="glyphicon glyphicon-folder-open"></i></div>  
+                                    <select id="Grupos" required  class="form-control" ng-model="datosOpcion.opcGrpId"  id="opcGrpId" name="opcGrpId" ng-disabled="desabilitado">
+                                        <option ng-repeat="data in obtGrupos"  value="{{data.grpId}}">{{data.grpGrupo}}</option>
+                                    </select> 
+                                </div>
+                                <span style="color:red" ng-show="formularioOpciones.opcGrpId.$invalid">
+                                <span ng-show="formularioOpciones.opcGrpId.$error.required">el campo es requerido.
+                                </span></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="url">Opcion</label>
+                                <div class="input-group">
+                                    <div class="input-group-addon"><i class="glyphicon glyphicon-link"></i></div>
+                                    <input  required  ng-model="datosOpcion.opcOpcion" id="opcOpcion" name="opcOpcion" class="form-control" type="text" placeholder="ingrese Opcion" value="opciones.opcOpcion" ng-disabled="desabilitado" >
+                                </div>
+                                <span style="color:red" ng-show="formularioOpciones.opcOpcion.$invalid">
+                                <span ng-show="formularioOpciones.opcOpcion.$error.required">el campo es requerido.
+                                </span></span>
+                            </div>
+                            <div class="form-group" >
+                                <label for="category">contenido</label>
+                                <div class="input-group">
+                                    <div class="input-group-addon"><i class="glyphicon glyphicon-folder-open"></i></div>
+                                    <input  required ng-model="datosOpcion.opcContenido" id="opcContenido" name="opcContenido" class="form-control" type="text" placeholder="ingrese contenido" ng-disabled="desabilitado" >
+                                </div>
+                                <span style="color:red" ng-show="formularioOpciones.opcContenido.$invalid">
+                                <span ng-show="formularioOpciones.opcContenido.$error.required">el campo es requerido.</span></span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <button ng-click="adicionarOpciones(datosOpcion)" data-dismiss="modal" type="button" class="btn btn-primary" ng-show="boton=='new'" ng-hide="boton=='upd' || boton=='del'" ng-disabled="formularioOpciones.opcGrp.$invalid || formularioOpciones.opcOpcion.$invalid || formularioOpciones.opcContenido.$invalid">Guardar</button>
+                    <button ng-click="modificarOpciones(datosOpcion.opcId,datosOpcion)" data-dismiss="modal" type="button" class="btn btn-primary" ng-show="boton=='upd'" ng-hide="boton=='new' || boton=='del'" ng-disabled="formularioOpciones.opcGrpId.$invalid || formularioOpciones.opcOpcion.$invalid || formularioOpciones.opcContenido.$invalid">Modificar</button>
+                    <button ng-click="EliminarOpciones(datosOpcion.opcId)" data-dismiss="modal" type="button" class="btn btn-primary" ng-show="boton=='del'" ng-hide="boton=='new' || boton=='upd'" >Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,138 @@
+<script>
+    function frmCatalogoController($scope, $timeout, $route, $rootScope, $routeParams, $location, $http, Data, sessionService, CONFIG, LogGuardarInfo, DreamFactory, ngTableParams, $filter, sessionService, $filter, sweet, $sce, registroLog,FileUploader, wsContribuyenteNatural,wsLicencia, $window) {
+
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////// ARBOL DE CATALOGACION //////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        // llamada archivo del arbol para cargar en pantalla
+        $scope.jsonArbol = "";
+        $scope.arbolNodos = function () {
+            $.ajax({ 
+                data:{ } ,            
+                //url: 'http://192.168.17.144:88/dreamfactory/dist/storeArbolAjaxDAG.php',
+                url: 'http://192.168.5.248/dreamfactory/dist/dag/storeArbolAjaxDAG.php',
+                type: 'post', 
+                dataType: "json",
+                success: function (response) { 
+                    $timeout(function () {
+                        var tempJsonArbol = JSON.stringify(response);
+                        $scope.jsonArbol = JSON.parse(tempJsonArbol);
+                        $('#tree1').tree({
+                            data:  $scope.jsonArbol,
+                            closedIcon: $('<i class="fa fa-plus-circle"/>'),
+                            openedIcon: $('<i class="fa fa-minus-circle"/>'),
+                            autoOpen: 0
+                        });
+                    }, 1000);
+                }
+            });
+        }
+        // ojo no borrar la funcion q no hace nada
+        $scope.alestra = function () {
+        };
+
+        // cuando se selecciona un nodo
+        $('#tree1').bind(
+            'tree.select',
+            function(event) {
+                if (event.node) {
+                    // node was selected
+                    var node = event.node;
+                    // alert(node.name);
+                    $scope.datos.DAG_CAT_SOL_PADRE_ITEM = node.name;
+                    $scope.datos.DAG_CAT_SOL_PADRE_ITEM_ID = node.id;
+                    // console.log(node);
+                    $scope.$apply();
+                }
+                else {
+                    // event.node is null
+                    // a node was deselected
+                    // e.previous_node contains the deselected node
+                }
+            }
+        );
+        
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////// ARBOL  //////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+ 
+        $scope.$on('api:ready',function(){
+            // $scope.getPartidas();
+            // $scope.getDepre();
+            // $scope.descPartUBMfn($scope.datos.DAG_CAT_UBM_PARTIDA, $scope.datosPartidas);
+            $scope.arbolNodos();
+            // $scope.datos.DAG_CAT_PARTIDA4=parseInt($scope.datos.DAG_CAT_PARTIDA4);
+            // $scope.datos.DAG_CAT_PRESUP_PARTIDA=parseInt($scope.datos.DAG_CAT_PRESUP_PARTIDA);
+            // $scope.datos.DAG_CAT_UBM_PARTIDA=parseInt($scope.datos.DAG_CAT_PRESUP_PARTIDA);
+            // $scope.datos.DAG_CAT_UBM_ITEM=$scope.datos.DAG_CAT_PRESUP_ITEM;
+            // $scope.datos.DAG_CAT_UBM_FACDEP=parseInt($scope.datos.DAG_CAT_PRESUP_FACDEP);
+            // $scope.datos.DAG_CAT_UBM_DESC_ITEM=$scope.datos.DAG_CAT_PRESUP_DESC_ITEM;
+            // $scope.datos.DAG_CAT_UBM_DESC_PART=$scope.datos.DAG_CAT_PRESUP_DESC_PART;
+            // $scope.datos.INT_APLICA = '2';
+            // $scope.agregado = "false";
+            // if ($scope.datos.DAG_CAT_PRESUP_APLI=='2'){$scope.datos.INT_APLICA = '3';}
+            //console.log("RAEV ", jsonVar);
+        });
+        $scope.inicioCatalogo = function () {
+            if(DreamFactory.api[CONFIG.SERVICE]){
+                // $scope.getPartidas();
+                // $scope.getDepre();
+                // $scope.descPartUBMfn($scope.datos.DAG_CAT_UBM_PARTIDA, $scope.datosPartidas);
+                $scope.arbolNodos();
+                // $scope.datos.DAG_CAT_PARTIDA4=parseInt($scope.datos.DAG_CAT_PARTIDA4);
+                // $scope.datos.DAG_CAT_PRESUP_PARTIDA=parseInt($scope.datos.DAG_CAT_PRESUP_PARTIDA);
+                // $scope.datos.DAG_CAT_UBM_PARTIDA=parseInt($scope.datos.DAG_CAT_PRESUP_PARTIDA);
+                // $scope.datos.DAG_CAT_UBM_ITEM=$scope.datos.DAG_CAT_PRESUP_ITEM;
+                // //$scope.datos.DAG_CAT_UBM_FACDEP=parseInt($scope.datos.DAG_CAT_PRESUP_FACDEP);
+                // $scope.datos.DAG_CAT_UBM_DESC_ITEM=$scope.datos.DAG_CAT_PRESUP_DESC_ITEM;
+                // $scope.datos.DAG_CAT_UBM_DESC_PART=$scope.datos.DAG_CAT_PRESUP_DESC_PART;
+                // $scope.datos.INT_APLICA = '2';
+                // $scope.agregado = "false";
+                // if ($scope.datos.DAG_CAT_PRESUP_APLI=='2'){$scope.datos.INT_APLICA = '3';}
+                //console.log("RAEV ", jsonVar);
+            }
+        };
+    }
+</script>
+<div class="animated fadeInRight">
+<!-- begin form -->
+    <form class="form-horizontal" name="formulario" novalidate>
+        <div div class="wrap" ng-controller="frmCatalogoController" data-ng-init="inicioCatalogo(datos)">
+            <div class="ibox-title_2">
+                <h5>CONFIRMACION DE CATALOGACION DE ITEM:</h5>
+            </div>
+            <div class="hr-line-dashed"></div>
+            <!-- ---------------------------------------- Inicio Arbol -----------------------------------------------------  -->
+            <div class="form-group"><label class="col-sm-2 control-label" style="red">SELECCIONAR EL PADRE DEL NUEVO ITEM: <small class="m-l-sm" style="color: red">*</small></label>
+                <div class="col-md-10" style="height:200px;  overflow-y:scroll;">
+                    <div id="tree1" ng-click="alestra()"></div>
+                </div>
+            </div>
+            <!-- ------------------------------------------ Fin Arbol ------------------------------------------------------- -->
+            <div class="form-group"><label class="col-sm-2 control-label" style="red">PADRE DEL ITEM: <small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.DAG_CAT_SOL_PADRE_ITEM}}" class="form-control"></div>
+            </div>
+
+            <div class="form-group"><label class="col-sm-2 control-label" style="red">ITEM: <small class="m-l-sm" style="color: red">*</small></label>
+                <div class="col-sm-10"><input type="text" ng-model="datos.DAG_CAT_SOL_ITEM" class="form-control" value="{{datos.DAG_CAT_SOL_ITEM}}"></div>
+            </div>
+            <div class="form-group"><label class="col-sm-2 control-label" style="red">DESCRIPCION DEL ITEM: <small class="m-l-sm" style="color: red">*</small></label>
+                <div class="col-sm-10"><textarea ng-model="datos.DAG_CAT_SOL_DESC_ITEM" id="DAG_CAT_SOL_DESC_ITEM" name="DAG_CAT_SOL_DESC_ITEM" class="form-control" placeholder="Sin dato" ng-disabled="false" value="{{datos.DAG_CAT_SOL_DESC_ITEM}}"></textarea>
+                </div>
+            </div>
+            <div ng-show="datos.DAG_CAT_UBM_CRITERIO!=''">
+                <div class="form-group"><label class="col-sm-2 control-label" style="red">JUSTIFICACION: <small class="m-l-sm" style="color: red">*</small></label>
+                    <div class="col-sm-10"><textarea ng-model="datos.DAG_CAT_UBM_CRITERIO" id="DAG_CAT_UBM_CRITERIO" name="DAG_CAT_UBM_CRITERIO" class="form-control" placeholder="Sin dato" ng-disabled="false"></textarea>
+                    </div>
+                </div>
+            </div>
+            </div>
+            <div class="hr-line-dashed"></div>
+            <button type="button" class="btn btn-primary" ng-disabled="false" ng-click="volver()"> <i class="glyphicon fa fa-times"></i> Cancelar </button> 
+            <button type="button" class="btn btn-primary" ng-click="cargarDatos(datos);guardarData(datos)" ng-disabled="formulario.$invalid"> <i class="glyphicon fa fa-save"></i> Guardar / Continuar</button>
+        </div>        
+    </form>
+</div>
+

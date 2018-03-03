@@ -1,0 +1,420 @@
+<script>
+    function frmCatalogoController($scope, $timeout, $route, $rootScope, $routeParams, $location, $http, Data, sessionService, CONFIG, LogGuardarInfo, DreamFactory, ngTableParams, $filter, sessionService, $filter, sweet, $sce, registroLog,FileUploader, wsContribuyenteNatural,wsLicencia, $window) {
+        $scope.getPartidas= function(){
+            var resPartida = {
+                table_name:"dag.ubm_partidas_presupuestarias",
+                order:"ptp_nivel ASC"
+            };
+            var obj=DreamFactory.api[CONFIG.SERVICE].getRecords(resPartida);
+            obj.success(function(response){
+                $scope.datosPartidas = response.record;
+                //console.log("partidas:",response.record);
+            })
+            .error(function(response){
+                sweet.show('', 'Error: ', 'error');
+            })
+        }
+        $scope.getDepre= function(){
+            var resDepre = {
+                table_name:"dag.ubm_factores_depreciaciones",
+                order:"ftd_id ASC"
+            };
+            var obj=DreamFactory.api[CONFIG.SERVICE].getRecords(resDepre);
+            obj.success(function(response){
+                $scope.datosDepreciacion = response.record;
+                //console.log("depreciacion:",response.record);
+            })
+            .error(function(response){
+                sweet.show('', 'Error: ', 'error');
+            })
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////// ARBOL DE CATALOGACION //////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        // llamada para convertir el arbol en un archivo
+        $scope.actualizarArbol=function(){
+            $.blockUI();
+            var resRoles = {
+                "procedure_name":"dag.sp_dag_catalogo"
+            };
+            //servicio listar roles 
+            var obj=DreamFactory.api[CONFIG.SERVICE].callStoredProcWithParams(resRoles);
+            obj.success(function (response) {
+                $scope.obtArbol = response;
+                var obtArbol=JSON.stringify($scope.obtArbol);
+                //console.log(obtArbol);
+                var parametros = {
+                    "NODOS" : obtArbol,
+                    "TARBOL" : "dataCatalogo.json"
+                };
+                $.ajax({
+                    data: parametros,
+                    //url: 'http://192.168.17.144:88/dreamfactory/dist/generaArbolAjaxDAG.php',
+                    url: 'http://192.168.5.248/dreamfactory/dist/dag/generaArbolAjaxDAG.php',
+                    //url: [CONFIG.DSP]+'192.168.17.144:88/dreamfactory/dist/generaArbolAjax.php',
+                    type: 'POST',
+                    error: function (response) {
+                    $.unblockUI();
+                    //sweet.show('Exito', 'Se realizó la actualización correctamente', 'success');
+                    }
+                });
+            })
+            obj.error(function(error) {
+                $.unblockUI();
+                sweet.show('', 'Actualización no realizada, intentelo nuevamente', 'warning');
+            });
+        }
+
+        // llamada archivo del arbol para cargar en pantalla
+        $scope.jsonArbol = "";
+        $scope.arbolNodos = function () {
+            $.ajax({ 
+                data:{ } ,            
+                //url: 'http://192.168.17.144:88/dreamfactory/dist/storeArbolAjaxDAG.php',
+                url: 'http://192.168.5.248/dreamfactory/dist/dag/storeArbolAjaxDAG.php',
+                type: 'post', 
+                dataType: "json",
+                success: function (response) { 
+                    $timeout(function () {
+                        var tempJsonArbol = JSON.stringify(response);
+                        $scope.jsonArbol = JSON.parse(tempJsonArbol);
+                        $('#tree1').tree({
+                            data:  $scope.jsonArbol,
+                            closedIcon: $('<i class="fa fa-plus-circle"/>'),
+                            openedIcon: $('<i class="fa fa-minus-circle"/>'),
+                            autoOpen: 0
+                        });
+                    }, 1000);
+                }
+            });
+        }
+        // ojo no borrar la funcion q no hace nada
+        $scope.alestra = function () {
+        };
+
+        // cuando se selecciona un nodo
+        $('#tree1').bind(
+            'tree.select',
+            function(event) {
+                if (event.node) {
+                    // node was selected
+                    var node = event.node;
+                    // alert(node.name);
+                    // $scope.nodoAr = node;
+                    // $scope.datos.DAG_CAT_PADRE_ITEM = $scope.nodoAr.name;
+                    $scope.datos.DAG_CAT_UBM_PADRE_ITEM=node.name;
+                    $scope.MostrarInformacion(node.id);
+                    // console.log(node);
+                    // $scope.datos.DAG_CAT_PADRE_ITEM = $scope.nodoAr.name;
+                    //$scope.$apply();
+                }
+                else {
+                    // event.node is null
+                    // a node was deselected
+                    // e.previous_node contains the deselected node
+                }
+            }
+        );
+        
+        $scope.addNode = function() {
+            if ($scope.agregado == "false") {
+                var nameNode = $scope.datos.DAG_CAT_PRESUP_ITEM;
+                var idNode = parseInt($scope.nodoAr.children.length) + 1;
+                var padreNode = parseInt($scope.nodoAr.id);
+                //console.log(nameNode, " ", idNode);
+                $('#tree1').tree(
+                    'appendNode', 
+                    { 
+                        name: nameNode, 
+                        id: idNode,
+                        padre : padreNode
+                    }, 
+                    $scope.nodoAr
+                );
+                $scope.agregado = "true";
+                alert("Item agregado como hijo de: " + padreNode);
+            }
+            else{
+                alert("Solo se puede agregar una vez");
+            };
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////// ARBOL  //////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        ///////////////////////////////////// GUARDAR ////////////////////////////////////////////////////////////
+
+        $scope.guardarItem = function (){
+            //console.log("aplica", $scope.datos.INT_APLICA);
+            if ($scope.datos.INT_APLICA == '1'){
+                var node = $('#tree1').tree('getSelectedNode');
+                if (node != false){
+                    //console.log(node);
+                    var nuevoItem = node.name;
+                    var nodo_nivel = parseInt(node.children.length) + 1;
+                    var nodo_padre = node.id;
+                    var nodo_nombre = $scope.datos.DAG_CAT_UBM_ITEM;
+                    var size = Object.keys($scope.caracteristicas).length;
+                    var nodo_carac = Array();
+                    var xi = 0;
+                    for(var j=0; j<size; j++){
+                        if ($scope.caracteristicas[j].name != ""){
+                            nodo_carac[xi] = $scope.caracteristicas[j].name
+                            xi++;
+                        }
+                    }
+                    var partida = 0;
+                    for (part in $scope.datosPartidas) {
+                        //console.log($scope.datos.DAG_CAT_UBM_PARTIDA,"<>",$scope.datosPartidas[part].ptp_id + ' ' + $scope.datosPartidas[part].ptp_nombre);
+                        if ($scope.datos.DAG_CAT_UBM_PARTIDA == $scope.datosPartidas[part].ptp_codigo + ' ' + $scope.datosPartidas[part].ptp_nombre){
+                            partida = $scope.datosPartidas[part].ptp_codigo;
+                            //console.log("partidas:",partida);
+                        }
+                        //console.log("Descripcion1: ", datospartida[part].ptp_id ," Descripcion2:", id);
+                    }
+                    //alert("guardar:" + nodo_nivel + ', ' + nodo_padre + ', ' + nodo_nombre + ', ' + $scope.datos.DAG_CAT_UBM_DESC_ITEM + ', ' + partida + ', ' + nodo_carac);
+                    var datosImpresion = {
+                        "procedure_name":"dag.sp_dag_inscatalogo",
+                        "body":{
+                            "params": [                                
+                                {
+                                    "name": "pdag_cat_nivel",
+                                    "value": nodo_nivel
+                                },
+                                {
+                                    "name": "pdag_cat_padre",
+                                    "value": nodo_padre
+                                },
+                                {
+                                    "name": "pdag_cat_nombre",
+                                    "value": nodo_nombre
+                                },
+                                {
+                                    "name": "pdag_cat_descripcion",
+                                    "value": $scope.datos.DAG_CAT_UBM_DESC_ITEM
+                                },
+                                {
+                                    "name": "pdag_cat_partida",
+                                    "value": partida
+                                },
+                                {
+                                    "name": "pdag_cat_fdepreciacion",
+                                    "value": $scope.datos.DAG_CAT_UBM_FACDEP
+                                },
+                                {
+                                    "name": "pdag_cat_caracteristicas",
+                                    "value": JSON.stringify(nodo_carac)
+                                },
+                                {
+                                    "name": "pdag_cat_imagen",
+                                    "value": $scope.datos.DAG_CAT_SOL_IMG
+                                },
+                                {
+                                    "name": "pae_nro_caso",
+                                    "value": $scope.datos.AE_NRO_CASO
+                                },
+                            ]
+                        }
+                    };
+                    DreamFactory.api[CONFIG.SERVICE].callStoredProcWithParams(datosImpresion).success(function (response){
+                        $scope.impresion = response;
+                        $scope.cargarDatos($scope.datos);
+                        $scope.guardarData($scope.datos);
+                        $scope.actualizarArbol();
+                    })
+                    .error(function(data){
+                        sweet.show('', 'Error al guardar la informacion: ', 'error');
+                    });
+                }
+                else {
+                    sweet.show('', 'Debe seleccionar nodo en el arbol para asignar', 'error');
+                }
+            }
+            else
+            {
+                $scope.guardarItem($scope.datos);
+                $scope.guardarData($scope.datos);
+            }
+        }
+        
+        ////////////////////////////////// FIN GUARDAR ////////////////////////////////////////////////////////////
+        $scope.PosicionarArbol = function(){
+            console.log($scope.datos.DAG_CAT_SOL_PADRE_ITEM_ID);
+            var node = $('#tree1').tree('getNodeById', parseInt($scope.datos.DAG_CAT_SOL_PADRE_ITEM_ID));
+            $('#tree1').tree('scrollToNode', node);
+            $('#tree1').tree('selectNode', node);
+        };
+        
+        $scope.caracteristicas = [{name:"DETALLE"}];
+        $scope.elimCaracteristica = function () {
+            var size = Object.keys($scope.caracteristicas).length;
+            if(size >= 2 ){
+                $scope.caracteristicas.pop();
+            }
+            else
+            {
+                alert("No se puede eliminar la caracteristica DETALLE");
+                console.log("No se puede eliminar la caracteristica DETALLE");
+            }
+        }
+        $scope.addCaracteristica = function () {
+            $scope.caracteristicas.push({ 
+                name: ""
+            });
+            //console.log("Caracteristicas",$scope.caracteristicas);
+        }
+
+        $scope.MostrarInformacion = function (id_item) {
+            var datosImpresion = {
+                "procedure_name":"dag.sp_dag_cat_desc_item",
+                "body":{
+                    "params": [                                
+                        {
+                            "name": "id_item",
+                            "value": id_item
+                        }
+                    ]
+                }
+            };
+            DreamFactory.api[CONFIG.SERVICE].callStoredProcWithParams(datosImpresion).success(function (response){
+                var DetItem = response;
+                if (Object.keys(DetItem).length == 1){
+                    $scope.datos.DAG_CAT_UBM_PARTIDA = DetItem[0].partida;
+                    $scope.datos.DAG_CAT_UBM_FACDEP = DetItem[0].porcendepre;
+                    $scope.caracteristicas1 = JSON.parse(DetItem[0].caracteristicas);
+                    $scope.datos.DAG_CAT_SOL_IMG = DetItem[0].imagen;
+                    //console.log($scope.datos.DAG_CAT_SOL_IMG);
+                    var size = Object.keys($scope.caracteristicas1).length;
+                    //console.log("tamaño:",size);
+
+                    $scope.caracteristicas = [{name:"DETALLE"}];
+                    for(var j=1; j<size; j++){
+                        //console.log($scope.caracteristicas1[j]);
+                        $scope.caracteristicas.push({ 
+                            name: $scope.caracteristicas1[j]
+                        });
+                    }
+                    //$scope.$apply();
+                }
+            })
+            .error(function(data){
+                sweet.show('', 'Error al cargar la informacion del item: ', 'error');
+            });
+        };
+
+        $scope.$on('api:ready',function(){
+            $scope.arbolNodos();
+            $scope.getPartidas();
+            $scope.datos.DAG_CAT_UBM_ITEM = $scope.datos.DAG_CAT_SOL_ITEM;
+            $scope.datos.DAG_CAT_UBM_DESC_ITEM = $scope.datos.DAG_CAT_SOL_DESC_ITEM;
+            $scope.datos.DAG_CAT_UBM_PADRE_ITEM = $scope.datos.DAG_CAT_SOL_PADRE_ITEM;
+            $scope.MostrarInformacion($scope.datos.DAG_CAT_SOL_ITEM_ID);
+            $scope.PosicionarArbol();
+            //$scope.$apply();
+            //console.log("RAEV ", jsonVar);
+        });
+        $scope.inicioCatalogo = function () {
+            if(DreamFactory.api[CONFIG.SERVICE]){
+                $scope.arbolNodos();
+                $scope.getPartidas();
+                $scope.datos.DAG_CAT_UBM_ITEM = $scope.datos.DAG_CAT_SOL_ITEM;
+                $scope.datos.DAG_CAT_UBM_DESC_ITEM = $scope.datos.DAG_CAT_SOL_DESC_ITEM;
+                $scope.datos.DAG_CAT_UBM_PADRE_ITEM = $scope.datos.DAG_CAT_SOL_PADRE_ITEM;
+                $scope.MostrarInformacion($scope.datos.DAG_CAT_SOL_ITEM_ID);
+                $scope.PosicionarArbol();
+                //$scope.$apply();
+                //console.log("RAEV ", jsonVar);
+            }
+        };
+    }
+</script>
+<div class="animated fadeInRight">
+<!-- begin form -->
+    <form class="form-horizontal" name="formulario" novalidate>
+        <div div class="wrap" ng-controller="frmCatalogoController" data-ng-init="inicioCatalogo(datos)">
+            <div class="ibox-title_2">
+                <h5>CONFIRMACION DE CATALOGACION DE ITEM:</h5>
+            </div>
+            <div class="hr-line-dashed"></div>
+            <div class="ibox-title_2">
+                <h5>Datos de la solicitud</h5>
+            </div>
+            <div class="form-group"><label class="col-sm-2 control-label" style="red">PADRE DEL ITEM: <small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.DAG_CAT_SOL_PADRE_ITEM}}" class="form-control" ng-disabled="true"></div>
+            </div>
+
+            <div class="form-group"><label class="col-sm-2 control-label" style="red">ITEM: <small class="m-l-sm" style="color: red"></small></label>
+                <div class="col-sm-10"><input type="text" ng-model="datos.DAG_CAT_SOL_ITEM" class="form-control" value="{{datos.DAG_CAT_SOL_ITEM}}" ng-disabled="true"></div>
+            </div>
+            <div class="form-group"><label class="col-sm-2 control-label" style="red">DESCRIPCION DEL ITEM: <small class="m-l-sm" style="color: red"></small></label>
+                <div class="col-sm-10"><textarea ng-model="datos.DAG_CAT_SOL_DESC_ITEM" id="DAG_CAT_SOL_DESC_ITEM" name="DAG_CAT_SOL_DESC_ITEM" class="form-control" placeholder="Sin dato" ng-disabled="true" value="{{datos.DAG_CAT_SOL_DESC_ITEM}}"></textarea>
+                </div>
+            </div>
+
+            <div class="hr-line-dashed"></div>
+            <div class="ibox-title_2">
+                <h5>Criterio emitido por la Unidad de Bienes Muebles</h5>
+            </div>
+            <!-- ---------------------------------------- Inicio Arbol -----------------------------------------------------  -->
+            <!-- <div class="col-md-12">
+                <button class="btn btn-primary" ng-click="addNode()"> <i></i>NODO</button>
+            </div> --> 
+            <div class="form-group"><label class="col-sm-2 control-label" style="red">SELECCIONAR EL PADRE DEL NUEVO ITEM: <small class="m-l-sm" style="color: red">*</small></label>
+                <div class="col-md-10" style="height:200px;  overflow-y:scroll;">
+                    <div id="tree1" ng-click="alestra()"></div>
+                </div>
+            </div>
+            <!-- ------------------------------------------ Fin Arbol ------------------------------------------------------- -->
+            
+            <div class="form-group"><label class="col-sm-2 control-label" style="red">PADRE DEL ITEM: <small class="m-l-sm" style="color: red"></small></label>
+            <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.DAG_CAT_UBM_PADRE_ITEM}}" class="form-control" ng-disabled="true"></div>
+            </div>
+
+            <div class="form-group"><label class="col-sm-2 control-label" style="red">ITEM: <small class="m-l-sm" style="color: red">*</small></label>
+                <div class="col-sm-10"><input type="text" ng-model="datos.DAG_CAT_UBM_ITEM" class="form-control" value="{{datos.DAG_CAT_UBM_ITEM}}" ng-disabled="false"></div>
+            </div>
+            <div class="form-group"><label class="col-sm-2 control-label" style="red">DESCRIPCION DEL ITEM: <small class="m-l-sm" style="color: red">*</small></label>
+                <div class="col-sm-10"><textarea ng-model="datos.DAG_CAT_UBM_DESC_ITEM" id="DAG_CAT_UBM_DESC_ITEM" name="DAG_CAT_UBM_DESC_ITEM" class="form-control" placeholder="Sin dato" ng-disabled="false" value="{{datos.DAG_CAT_UBM_DESC_ITEM}}"></textarea>
+                </div>
+            </div>
+
+            <div class="col-md-12">
+                <button class="btn btn-primary" ng-click="addCaracteristica()"> <i class="glyphicon fa fa-plus"></i> Adicionar caracteristica</button>
+                <button class="btn btn-primary" ng-click="elimCaracteristica()"> <i class="glyphicon fa fa-minus"></i> Eliminar ultima caracteristica</button>
+            </div>
+            <div class="hr-line-dashed"></div>
+            <div ng-repeat="caracteristica in caracteristicas" class="form-group">
+                <label class="col-sm-2 control-label" style="red">CARACTERISTICA</label>
+                <div class="col-sm-10">
+                    <div class="input-group" >
+                        <input type="text" class="form-control" placeholder="" ng-model="caracteristica.name" onkeyUp="return conMayusculas(this);" ng-change="descCaractfn(caracteristicas)">
+                    </div>                
+                </div>
+            </div>
+            <div class="form-group"><label class="col-sm-2 control-label">INCORPORAR?:</label>
+                <div class="col-sm-10">
+                    <select id="INT_APLICA" name="INT_APLICA" class="form-control"  ng-model="datos.INT_APLICA" placeholder="-- Seleccione --" required>
+                        <option value="1">Incorporar</option>
+                        <option value="2">Devolver</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group"><label class="col-sm-2 control-label" style="red">JUSTIFICACION: <small class="m-l-sm" style="color: red">*</small></label>
+                <div class="col-sm-10"><textarea ng-model="datos.DAG_CAT_UBM_CRITERIO" id="DAG_CAT_UBM_CRITERIO" name="DAG_CAT_UBM_CRITERIO" class="form-control" placeholder="Sin dato" ng-disabled="false" required></textarea>
+                <span style="color:red" ng-show="formulario.DAG_CAT_UBM_CRITERIO.$invalid">
+                        <span ng-show="formulario.DAG_CAT_UBM_CRITERIO.$error.required">Es requerido.
+                        </span>
+                    </span>
+                </div>
+            </div>
+
+            <div class="hr-line-dashed"></div>
+            <button type="button" class="btn btn-primary" ng-disabled="false" ng-click="volver()"> <i class="glyphicon fa fa-times"></i> Cancelar </button> 
+            <button type="button" class="btn btn-primary" ng-click="guardarItem()" ng-disabled="formulario.$invalid"> <i class="glyphicon fa fa-save"></i> Guardar / Continuar</button>
+        </div>        
+    </form>
+</div>
+

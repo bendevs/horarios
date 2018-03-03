@@ -1,0 +1,1406 @@
+<div class="wrap" ng-controller="cancelacion01Controller">
+    <legend>  </legend>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Formulario de Renovaci&oacute;n de Licencia de Funcionamiento:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.tit_for_ren_lic}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Datos Generales:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.sub_ren_lic}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>PMC:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.num_pmc}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>ID Actividad Econ&oacute;mica:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.id_actividad_economica}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Tipo de Persona:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.tipo_per}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>  Datos del Contribuyente: </label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.sub_dat_con}}</label>
+              </div>
+          </div>
+        </div>
+
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font> Nit: </label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.nit_prop}}</label>
+              </div>
+          </div>
+        </div>
+
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Tipo de Documento:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.tip_doc_prop}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>N&uacute;mero de Documento:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.num_dos_prop}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Expedido:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.expedido_prop}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Primer Nombre:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.pri_nom_prop}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Segundo Nombre:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.seg_nom_prop}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font> Tercer Nombre: </label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.ter_nom_prop}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Apellido Paterno:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.ape_pat_prop}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Apellido Materno: </label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.ape_mat_prop}}</label>
+              </div>
+          </div>
+        </div>
+
+
+
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Apellido de Casada:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.ape_cas_prop}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font> Celular:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.cel_prop}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Tel&eacute;fono:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.telef_prop}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Correo Electr&oacute;nico:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.email_prop}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Casilla:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.casilla}}</label>
+              </div>
+          </div>
+        </div>
+
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Direcci&oacute;n del Contribuyente:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.sub_dir_con}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font> Zona: </label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.zon_prop}}</label>
+              </div>
+          </div>
+        </div>
+
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font> Tipo de V&iacute;a: </label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.tip_via_prop}}</label>
+              </div>
+          </div>
+        </div>
+
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Nombre de V&iacute;a:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.nom_via_prop}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>N&uacute;mero:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.num_prop}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Nombre de Edificio:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.nom_edi_prop}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Bloque:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.bloq_prop}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Piso: </label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.piso_prop}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Departamento:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.depa_prop}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Direcci&oacute;n Detallada: </label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.dir_det_prop}}</label>
+              </div>
+          </div>
+        </div>
+
+
+
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Identificaci&oacute;n de la Empresa:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.sub_ide_emp}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Nit:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.num_doc_per_jur}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Raz&oacute;n Social:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.raz_soc_per_jur}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Datos del Representante Legal:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.sub_dat_rep_leg}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font> Tipo de Documento: </label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.tip_doc_rep}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>N&uacute;mero de Documento:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.num_doc_rep}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font> Expedido: </label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.expedido_rep}}</label>
+              </div>
+          </div>
+        </div>
+
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font> Primer Nombre: </label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.pri_nom_rep}}</label>
+              </div>
+          </div>
+        </div>
+
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font> Segundo Nombre:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.seg_nom_rep}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Tercer Nombre:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.ter_nom_rep}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Apellido Paterno</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.ape_pat_rep}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font> Apellido Materno:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.ape_mat_rep}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Apellido de Casada: </label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.ape_cas_rep}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Tel&eacute;fono:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.telef_rep}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font> Celular: </label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.cel_rep}}</label>
+              </div>
+          </div>
+        </div>
+
+
+
+
+
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Correo Electr&oacute;nico:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.email_rep}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Nº de Poder Notarial:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.num_pod_leg}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Gesti&oacute;n de Vigencia del Poder Notarial :</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.ges_vig_pod}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Nº de Notaria:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.num_not}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font> Datos T&eacute;cnicos de la Actividad Econ&oacute;mica: </label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.sub_dat_tec}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Nit:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.nit}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font> Denominaci&oacute;n: </label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.raz_soc}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font> Sucursal: </label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.num_actividad_MatrSuc}}</label>
+              </div>
+          </div>
+        </div>
+
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font> Superficie M2:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.sup}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Capacidad Aproximada:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.cap_aprox}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>El establecimiento es:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.estab_es}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Horario de Inicio de Atenci&oacute;n :</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.de_hor}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Horario de Fin de Atenci&oacute;n: </label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.a_hor}}</label>
+              </div>
+          </div>
+
+        </div>
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Productos Elaborados: </label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.productosElaborados}}</label>
+              </div>
+          </div>
+        </div>
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Actividades Secundarias: </label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.actividadesSecundarias}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Fecha de Inicio de la Actividad:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.fecha_ini_act}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font> Ubicaci&oacute;n de la Actividad Econ&oacute;mica: </label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.sub_ubi_act_eco}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Macrodistrito:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.macro_act_descrip}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font> Distrito: </label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.dist_act}}</label>
+              </div>
+          </div>
+        </div>
+
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font> Zona: </label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.zona_act}}</label>
+              </div>
+          </div>
+        </div>
+
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font> Tipo de V&iacute;a:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.tip_via_act}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Nombre de V&iacute;a:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.nom_via_act}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>N&uacute;mero</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.num_act}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font> Edificio:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.edificio_act}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Bloque: </label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.bloque_act}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Piso:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.piso_act}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font> DPTO./OF./Local: </label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.dpto_of_loc}}</label>
+              </div>
+          </div>
+        </div>
+
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Tel&eacute;fono:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.tel_act}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Cuenta Energ&iacute;a El&eacute;ctrica:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.cod_luz}}</label>
+              </div>
+          </div>
+        </div>
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font> Clasificaci&oacute;n de la Actividad Econ&oacute;mica: </label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.sub_req_sol_cat}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font> Tipo de Actividad: </label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.tip_act_eco}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font> Tipo de licencia: </label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.tipo_lic_descrip}}</label>
+              </div>
+          </div>
+        </div>
+
+         
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font> Actividad desarrollada: </label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.categoria_descrip}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font> Revisi&oacute;n de antecedentes: </label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.sub_rev_ant}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>La Solicitud:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.ant}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font> Informe de Antecedentes: </label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.sub_inf_ant_obs}}</label>
+              </div>
+          </div>
+        </div>
+
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font> editor....:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.inf_obs}}</label>
+              </div>
+          </div>
+        </div>
+
+
+
+
+      
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font> foliado y descripci&Oacute;n-antecedentes:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.sub_fol_des}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>N&uacute;mero de Hojas Recibidas del Tramite:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.num_de_hoj}}</label>
+              </div>
+          </div>
+        </div>
+
+
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Descripci&oacute;n:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.des}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Elaboraci&oacute;n de informe T&Eacute;cnico UDE:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.sub_ela_de_inf}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font> La Solicitud es:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.res_solicitud_upaee}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Solicitud Aprobada:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.sub_apr}}</label>
+              </div>
+          </div>
+        </div>
+
+      
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font> Nro Orden Form 402: </label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.nro_orden}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Fecha Impresi&oacute;n:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.fecha_imp}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font> Fecha Vencimiento: </label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.fecha_fin_act}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Informe de Observaci&oacute;n o Rechazo:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.sub_rec}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font> editor....: </label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.inf_rechazo}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font> Foliado y Descripci&oacute;n Renovaci&oacute;n de Licencia: </label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.sub_foliado}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font> N&uacute;mero de Hojas Adjuntas al Tramite:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.hojas_recibidas}}</label>
+              </div>
+          </div>
+        </div>
+
+
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Descripci&oacute;n:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.observaciones_i}}</label>
+              </div>
+          </div>
+        </div>
+
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Foliado y Descripci&oacute;n Resoluci&oacute;n:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.sub_foliado}}</label>
+              </div>
+          </div>
+        </div>
+
+
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>N&Uacute;mero de Hojas Adjuntas al Tramite:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.hojas_recibidas}}</label>
+              </div>
+          </div>
+        </div>
+
+
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Descripci&oacute;n:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.observaciones_i}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Remisi&oacute;n para Correcci&oacute;n:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.sub_correccion_impresion}}</label>
+              </div>
+          </div>
+        </div>
+       
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Envio a la UDE para Correcci&oacute;n de Licencia:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.correccion_impresion}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Falta de Seguimiento del Ciudadano:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.sub_falta_seg}}</label>
+              </div>
+          </div>
+        </div>
+
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Remitir el Tratamiento a Archivo por Falta de Seguimiento del Ciudadano:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.falta_seg}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Documentos Enviados  a Archivo :</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.sub_req_arch}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Licencia de Funcionamiento Original:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.lic_orig}}</label>
+              </div>
+          </div>
+        </div>
+        
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Formulario 401/402 Original:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.form_arch}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Carpeta Completa:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.carp_comp}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Requisitos Entregados al Solicitante:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.sub_req_sol_apr}}</label>
+              </div>
+          </div>
+        </div>
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Licencia de Funcionamiento Renovada:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.lic_de_fun_ren}}</label>
+              </div>
+          </div>
+        </div>
+
+
+
+
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Formulario 402:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.form_401_402}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Requisitos Entregado al Solicitante:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.sub_req_sol_rech}}</label>
+              </div>
+          </div>
+        </div>
+       
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Resoluci&oacute;n Administrativa:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.adm_adm}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Informe de Rechazo:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.dev_sol_np}}</label>
+              </div>
+          </div>
+        </div>
+
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Requisitos Entregados al Solicitante:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.sub_dev_sol_np}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Detalle de Observaciones a la Solicitud:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.dev_sol_np_obs}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Requisitos Entregados al Solicitante:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.sub_dev_sol_obs}}</label>
+              </div>
+          </div>
+        </div>
+        
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Formulario de Inspecci&oacute;n  Con Observaciones/Detalle de observaciones a la solicitud:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.dev_sol_obs}}</label>
+              </div>
+          </div>
+        </div>
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Requisito Entregados al Solicitante:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.sub_obs_com_serv_n}}</label>
+              </div>
+          </div>
+        </div>
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>checkbox.....:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.com_serv_n}}</label>
+              </div>
+          </div>
+        </div>
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Requisito Entregados al Solicitante:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.sub_obs_com_serv_j}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font> checkbox.....: </label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.com_serv_j}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Requisito Entregados al Solicitante:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.sub_obs_alim_beb_n}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font> checkbox.......: </label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.alim_beb_nat}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Requisito Entregados al Solicitante: </label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.sub_obs_alim_beb_j}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font> checkbox:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.alim_beb_jur}}</label>
+              </div>
+          </div>
+        </div>
+
+
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Requisito Entregados al Solicitante:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.sub_obs_jue_cent_n}}</label>
+              </div>
+          </div>
+        </div>
+
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>checkbox....:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.jue_cent_n}}</label>
+              </div>
+          </div>
+        </div>
+
+
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Requisito Entregados al Solicitante:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.sub_obs_jue_cent_j}}</label>
+              </div>
+          </div>
+        </div>
+
+
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>checkbox......:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.jue_cent_j}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Requisito Entregados al Solicitante:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.sub_obs_act_ind_n}}</label>
+              </div>
+          </div>
+        </div>
+
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>checkbox......:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.act_ind_n}}</label>
+              </div>
+          </div>
+        </div>
+
+
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Requisito Entregados al Solicitante:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.sub_obs_act_ind_j}}</label>
+              </div>
+          </div>
+        </div>
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>checkbox......:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.act_ind_j}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Requisitos Enviados a Archivo:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.sub_req_arc_apr}}</label>
+              </div>
+          </div>
+        </div>
+
+       
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Copia de Licencia de Funcionamiento Renovada con Firma de Constancia:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.cop_de_lic_de}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Copia de Formulario 402 Firmado:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.form_401_402_arch}}</label>
+              </div>
+          </div>
+        </div>
+
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Carpeta Completa:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.carp_comp_arch}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Requisitos Enviados A archivo:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.sub_req_arc_rech}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Copia de la Resolucion Administrativa con Firma de Constancia:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.cop_de_la_res}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Carpeta Completa:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.carp_comp_arch_rech}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Documento Enviado a Archivo</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.sub_arch_dev_np}}</label>
+              </div>
+          </div>
+        </div>
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Copia del Detalle de observaciones a la solicitud:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.arch_dev_np_obs}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Documento Enviado a Archivo:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.sub_arch_dev_obs}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Copia Formulario de Inspecci&oacute;n con Observaciones Firmada/Copia del Detalle  de Observaciones a la Solicitud:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.arch_dev_obs}}</label>
+              </div>
+          </div>
+        </div>
+       
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Fecha de Entrega y Remision de Documentos:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.sub_fech_desg}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Fecha de Entrega y Remisi&oacute;n :</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.fech_desg}}</label>
+              </div>
+          </div>
+        </div>
+
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Foliado y Descripci&oacute;n Desgloce:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.sub_fol_y_des}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Numero de Hojas de Tramite:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.hojas_recibidas}}</label>
+              </div>
+          </div>
+        </div>
+
+        <div class="col-sm-12" align="right">
+          <div class="form-group" >
+              <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Descripci&oacute;n:</label>
+              <div class="col-sm-8" align="left">
+                  <label for="url" >{{datos.observaciones_i}}</label>
+              </div>
+          </div>
+        </div>
+        
+        
+
+
+      <!--   <div class="modal-footer">
+            <button data-dismiss="modal" type="button" class="btn btn-danger fa fa-save" ng-disabled="false" ng-click="volver()"><span span class="textoAux"> CANCELAR </span></button>
+            <button ng-click="cargarDatos(datos);guardarData(datos);" data-dismiss="modal" type="button" class="btn btn-success fa fa-save" ng-disabled="false"><span span class="textoAux"> GUARDAR / CONTINUAR </span></button>
+        </div> -->
+</div>
+
+
+

@@ -1,0 +1,201 @@
+<script type="text/javascript">
+    $('.spin-icon').click(function (){
+        $(".theme-config-box_2").toggleClass("show");
+    });
+</script>
+<script type="text/javascript">
+    $('.spin-icon_3').click(function (){
+        $(".theme-config-box_3").toggleClass("show");
+    });
+</script>
+<script type="text/javascript">
+    $(function() {
+    $( "#accordion" ).accordion();
+  });
+</script>
+<div class="col-md-12" class="row" ng-controller="resumenController" data-ng-init="inicioCrear()">
+    <div class="ibox-content" ng-show="panelbuscador">
+        <div class="ibox-title">
+            <h5>Buscador</h5>
+        </div>
+        <div class="modal-body" >
+            <div>
+                <div class="ng-binding">
+                    <div class="row"> 
+                        <form name="formularioImpresion"  readOnly="true" novalidate>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Proceso: </label>
+                                    <select id="proceso" ng-change="datoscampos(datos.espacio)" ng-model="datos.espacio" class="form-control" ng-required="true">
+                                        <option value="-3">Seleccione...</option>
+                                        <option ng-repeat="rol in getFractividad" value="{{rol.id}}">{{rol.nompro}}</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Actividad: </label>
+                                    <select id="actividad" ng-change="datosactividad(datos.actividad)" ng-model="datos.actividad" class="form-control" ng-required="true">
+                                        <option value="-3">Seleccione...</option>
+                                        <option ng-repeat="actividad in actividades" value="{{actividad.act_id}}">{{actividad.act_nombre}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label >Campo : </label>   
+                                    <select ng-change="getAccesos(selecteIdi)" name="campo" id="campo" ng-model="datos.campo" class="form-control" ng-required="true">
+                                    <option value="-3">Seleccione...</option>
+                                     <option ng-repeat="rol in getbsq" value="{{rol.bsq_campo}}">{{rol.bsq_nombre}}</option>
+                                  </select>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label >Valor : </label>   
+                                    <input  ng-value="&nbsp;"  name="valor" id="valor" ng-model="datos.valor" class="form-control" type="text" placeholder="Ingrese valor a buscar" ng-required="true">
+                                </div>
+                            </div>
+                        </form>
+                        <div class="modal-footer">
+                            <button data-dismiss="modal" ng-click="getcasos10(datos)" type="button" class="btn btn-primary" ng-disabled="formularioImpresion.$invalid">Buscar</button>
+                        </div>
+                        <!-- /////////////////////////////////////////////////////-->
+                        <div ng-controller="misCasosController" class="ibox-content" ng-show="panelCasos" style="z-index: 999">
+                            <div class="col-lg-12">
+                                <div class="ibox float-e-margins">
+                                    <div class="ibox-title">
+                                        <h5>Lista de trámites</h5>
+                                        <div ibox-tools></div>
+                                    </div>
+                                    <div class="ibox-content" ng-show="conArchivo != null">
+                                        <table ng-table="tablaBandeja" show-filter="true" class="table table-striped">
+                                            <tr class="column" ng-repeat="caso in datosGrilla">
+                                                <td data-title="'#'">{{$index+1}}</td>
+                                                <td data-title="'Opciones'" style="width:200px">
+                                                    <div class="fixed-action-btn" >
+                                                        <ul class="horizontal">
+                                                            <li>
+                                																<a tooltip = "Clonar Caso" class="btn-floating" ng-click="clonarCaso(caso,'ACTIVIDAD')" ng-show="wsId != 1"><i class="fa fa-copy"></i></a>
+                                                                <a tooltip = "Resumen Caso" class="btn-floating" ng-click="busquedaAtenderCaso(caso,'ACTIVIDAD')" ng-show="wsId != 1"><i class="fa fa-newspaper-o"></i></a>
+                                																<a tooltip = "Imprimir Formulario" class="btn-floating" ng-click="ImprimirProforma(caso.url)" data-toggle="modal" data-target="#divPopup4" ng-if="caso.url != null" ng-show="wsId != 1"><i class="fa fa-file-text-o"></i></a>
+                                																<a tooltip = "Ver Adjuntos" class="btn-floating" ng-click="getArchivosAdjuntos(caso)" data-toggle="modal" data-target="#divPopup5"ng-show="wsId != 1"><i class="fa fa-folder-open-o"></i></a>
+                                                                <a tooltip = "Todos los Archivos" class="btn-floating" ng-click="getArchivosSalida(caso)" data-toggle="modal" data-target="#divPopup5"><i class="fa fa-folder-open-o"></i></a>
+                                                                <a tooltip = "Ver Historico" class="btn-floating" ng-click="mostrarHistorico(caso);" data-toggle="modal" data-target="#divPopup6"><i class="fa fa-history"></i></a>
+
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </td>
+                                                <td data-title="'Nro Trámite &nbsp;'" sortable="'casnrocaso'" >{{caso.casnrocaso}}</td>
+                                                <td data-title="'Código Trámite &nbsp;'" sortable="'casnombrecaso'" >{{caso.casnombrecaso}}</td>
+                                                <td data-title="'Detalle complementario &nbsp;'" sortable="'casnombrecaso'" >{{caso.descripcion}}</td>
+                                                <td data-title="'Fecha &nbsp;'" sortable="'casnombrecaso'" >{{caso.fechaini}}</td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </div>
+    </div>
+
+	    <div class="modal fade" id="divPopup4" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+             <div class="modal-dialog" style="width:700px">
+                 <div class="modal-content">
+                     <div class="modal-header">
+                         <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Cerrar</span></button>
+                     </div>
+                     <div class="modal-body">
+                         <!--pdf-->
+                         <div id="visorFum" ng-show="archpdf">
+                             <object data="" type="application/pdf" width="650" height="500"></object>
+                         </div>
+                         <!--imagen-->
+                         <div ng-show="archotro">
+                              <img id="imgSalida" ng-src="{{archivoP}}" width="100%" height="100%">
+                         </div>
+                     </div>
+                     <div class="modal-footer">
+                         <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                     </div>
+                 </div>
+             </div>
+        </div>
+
+        <div class="modal fade" id="divPopup5" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog" style="width:700px">
+              <div class="modal-content">
+                <div class="modal-header">
+                   <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Cerrar</span></button>
+                 </div>            
+                 <div class="modal-body">
+                  <table class="table table-striped table-bordered">
+                    <thead>
+                      <th>#&nbsp;</th>
+                      <th>Opciones&nbsp;</th>
+                      <th>Descripción&nbsp;</th>
+                      <th>Nombre&nbsp;</th>
+                    </thead>
+                    <tbody>
+                      <tr class="column" ng-repeat="archivo in obtArchivosAdjuntos">
+                        <td>{{$index+1}}</td>
+                        <td>
+                        <!--a target="_blank" tooltip = "Ver" ng-click="imprimirArchivo(archivo.doc_url_logica)" class="btn btn-default btn-circle" data-toggle="modal"><i class="fa fa-eye" style="color:#249FE6"></i></a-->
+                        <a href="{{archivo.doc_url_logica}}" tooltip = "Ver" target="_blank"><i class="fa fa-eye" style="color:#249FE6"></i></a>
+                        </td>
+                        <td>{{archivo.doc_datos}}</td>
+                        <td>{{archivo.doc_nombre}}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                 </div>
+                 <div class="modal-footer">
+                   <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                 </div>          
+              </div>
+            </div>
+        </div>
+        <div class="modal fade" id="divPopup6" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+          <div class="modal-dialog" style="width:900px">
+            <div class="modal-content">
+					     <div class="modal-header">
+							     <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Cerrar</span></button>
+                    <h4 class="modal-title" id="myModalLabel">HISTORICO {{titulo}}</h4>
+						    </div>						 
+						    <div class="modal-body">
+							    <table class="table table-striped table-bordered">
+    								<thead>
+                        <th>#&nbsp;</th>
+                        <!--th>Proceso&nbsp;</th-->
+                        <th>Actividad&nbsp;</th>
+                        <!--th>Nodo&nbsp;</th-->
+                        <th>Usuario&nbsp;</th>
+                        <th>Fecha Atención&nbsp;</th>
+                        <!--th>Fecha Limite&nbsp;</th-->
+                    </thead>
+    						     <tbody>
+                        <tr class="column" ng-repeat="historico in obtHistorico">
+                            <td>{{$index+1}}</td>
+                            <!--td>{{historico.prcnombre}}</td-->
+                            <td>{{historico.actividad}}</td>
+                            <!--td>{{historico.nodonombre}}</td-->
+                            <td>{{historico.usuario}}</td>
+                            <td>{{historico.fechaini}}</td>
+                            <!--td>{{historico.fechalim}}</td-->
+                        </tr>
+                    </tbody>
+							    </table>
+						    </div>
+  						  <div class="modal-footer">
+  							   <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+  						  </div>					 
+            </div>
+          </div>
+      </div>
+    </div>		 
+</div>

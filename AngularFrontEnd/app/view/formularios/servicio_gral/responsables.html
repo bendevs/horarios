@@ -1,0 +1,107 @@
+
+<script type="text/javascript">
+            // When the document is ready
+      function conMayusculas(field) {
+        field.value = field.value.toUpperCase()
+      };
+      //*** Este Codigo permite Validar que sea un campo Numerico
+            function soloNumerico(variable){
+                Numer=parseInt(variable);
+                if (isNaN(Numer)){
+                    return "";
+                }
+                return Numer;
+            }
+            function valNumero(Control){
+                Control.value=soloNumerico(Control.value);
+            }
+            //*** Fin del Codigo para Validar que sea un campo Numerico
+</script>
+<div  class="col-md-12" ng-controller="responsableController" data-ng-init="inicioResponsables()">
+    <div class="col-lg-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>Responsables de Limpieza</h5>
+
+                <div ibox-tools></div>
+                    <div class="botones_inspinia_lmc">
+                        <a class="btn btn-primary" ng-click="limpiar()" data-toggle="modal" data-target="#registro"><i class="glyphicon glyphicon-plus-sign"></i>Nuevo Responsable</a>
+                    </div>
+            </div>
+            <div class="ibox-content">
+                <table ng-table="tablaResponsables" show-filter="true" class="table table-striped">
+                    <tr ng-repeat="responsable in $data" ng-class="{'colorInactivo': responsable.est == 'INACTIVO'}">
+                        <td align="center" data-title="'Opciones'" style="width: 80px;">
+                            <a class="btn btn-info btn-circle" data-toggle="modal" data-target="#registro" ng-click="modificarResponsableCargar(responsable)"><i class="fa fa-pencil"></i></a>
+                            <a class="btn btn-info btn-circle" onclick="" data-toggle="modal" data-target="#registro" ng-click="eliminarResponsableCargar(responsable)"><i class="fa fa-trash-o"></i></a>
+                        </td>
+                        <!--td data-title="'ID'">{{rol.rlsId}}</td-->
+                       <td data-title="'Paterno'" sortable="'paterno'" filter="{'paterno':'text'}">{{responsable.paterno}}</td>
+                        <td data-title="'Materno'" sortable="'materno'" filter="{'materno':'text'}">{{responsable.materno}}</td>
+                        <td data-title="'Nombres'" sortable="'nombres'" filter="{'nombres':'text'}">{{responsable.nombres}}</td>
+                        <td data-title="'Direccion'" sortable="'dir'" filter="{'dir':'text'}">{{responsable.dir}}</td>
+                        <td data-title="'Telefono'" sortable="'tel'" filter="{'tel':'text'}">{{responsable.tel}}</td>
+                        <td data-title="'Celular'" sortable="'cel'" filter="{'cel':'text'}">{{responsable.cel}}</td>
+                        <td data-title="'Correo'" sortable="'correo'" filter="{'correo':'text'}">{{responsable.correo}}</td>
+                        <td data-title="'Registrado'" sortable="'registro'" filter="{'registro':'text'}">{{responsable.registro}}</td>
+                        <td data-title="'Modificado'" sortable="'modificado'" filter="{'modificado':'text'}">{{responsable.modificado}}</td>
+                        <td data-title="'Estado'" sortable="'est'" filter="{'est':'text'}">{{responsable.est}}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!-- MODAL -->
+   <div class="modal fade" id="registro" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Cerrar</span></button>
+                    <h4 class="modal-title" id="myModalLabel">{{titulo}}</h4>
+                </div>
+                <div class="modal-body" >
+                    <form name="formularioResponsables" novalidate>
+                        <div class="form-group">
+                            <label for="url" >Apellido Materno del Responsable:</label>
+                            <div class="controls">
+                                <input  ng-value="&nbsp;" ng-model="datosResponsable.paterno" name="paterno" id="paterno" class="form-control" type="text" placeholder="Ingrese apellido paterno" ng-disabled="only" ng-required="true" onkeyUp="return conMayusculas(this)">
+                            </div>
+                            <label for="url" >Apellido Paterno del Responsable:</label>
+                            <div class="controls">
+                                <input  ng-value="&nbsp;" ng-model="datosResponsable.materno" name="materno" id="materno" class="form-control" type="text" placeholder="Ingrese apellido materno" ng-disabled="only" ng-required="true" onkeyUp="return conMayusculas(this)">                           
+                            </div>
+                            <label for="url" >Nombres del Responsable:</label>
+                              <div class="controls">
+                                <input  ng-value="&nbsp;" ng-model="datosResponsable.nombres" name="nombres" id="nombres" class="form-control" type="text" placeholder="Ingrese nombres" ng-disabled="only" ng-required="true" onkeyUp="return conMayusculas(this)">
+                                                         </div>
+                            <label for="url" >Direccion del Responsable:</label>
+                            <div class="controls">
+                                <input  ng-value="&nbsp;" ng-model="datosResponsable.dir" name="dir" id="dir" class="form-control" type="text" placeholder="ingrese direccion del responsable " ng-disabled="only" ng-required="true" onkeyUp="return conMayusculas(this)">
+                            </div>
+                            <label for="url" >Telefono del Responsable:</label>
+                             <div class="controls">
+                                <input  ng-value="&nbsp;" ng-model="datosResponsable.tel" name="tel" id="tel" class="form-control" type="text" placeholder="ingrese el telefono del responsable" ng-disabled="only" ng-required="true" onkeyUp="return conMayusculas(this)">
+                            </div>
+                            <label for="url" >Celular del Responsable:</label>
+                             <div class="controls">
+                                <input  ng-value="&nbsp;" ng-model="datosResponsable.cel" name="cel" id="cel" class="form-control" type="text" placeholder="ingrese el celular del responsable" ng-disabled="only" ng-required="true" onkeyUp="return conMayusculas(this)">
+                            </div>
+                            <label for="url" >Correo del Responsable:</label>
+                             <div class="controls">
+                                <input  ng-value="&nbsp;" ng-model="datosResponsable.correo" name="correo" id="correo" class="form-control" type="text" placeholder="ingrese el correo del responsable" ng-disabled="only" ng-required="true" onkeyUp="return conMayusculas(this)">
+                            </div>
+                            </div>
+                             
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <button data-dismiss="modal" ng-click="adicionarResponsable(datosResponsable)" type="button" class="btn btn-primary" ng-show="boton=='new'" ng-hide="boton=='upd' || boton=='del'" ng-disabled="formularioResponsable.nombres.$invalid">Guardar</button>
+                    <button ng-click="modificarResponsable(datosResponsable.id,datosResponsable)" data-dismiss="modal" type="button" class="btn btn-primary" ng-show="boton=='upd'" ng-hide="boton=='new' || boton=='del'" ng-disabled="formularioResponsable.nombres.$invalid">Modificar</button>
+                    <button ng-click="eliminarResponsable(datosResponsable.id)" data-dismiss="modal" type="button" class="btn btn-primary" ng-show="boton=='del'" ng-hide="boton=='new' || boton=='upd'">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

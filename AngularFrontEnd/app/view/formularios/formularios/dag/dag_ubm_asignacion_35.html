@@ -1,0 +1,545 @@
+<script>
+    function frm_DAG_UBM_Asig_35_Controller($scope,  $rootScope, DreamFactory, CONFIG, sessionService, sweet) {
+        // cargo funcionarios para asignar
+        $scope.ListFuncionarios = "";
+        $scope.Cargarfuncionarios = function () {
+            var datosFuncionarios = {
+                "procedure_name":"dag.sp_dag_ubm_funcionarioreponsable",
+            };
+            DreamFactory.api[CONFIG.SERVICE].callStoredProcWithParams(datosFuncionarios).success(function (response){
+                var tmpListFuncionarios = JSON.stringify(response);
+                $scope.ListFuncionarios = JSON.parse(tmpListFuncionarios);
+            })
+            .error(function(data){
+                sweet.show('', 'Error al cargar la informacion de los funcionarios: ', 'error');
+            });
+        };
+
+
+    //   dag.dag_ubm_asignacioncabecera
+    //   dag_ubm_ac_gestion smallint NOT NULL, -- gestion del formulario
+    //   dag_ubm_ac_tipo_trans character(1) NOT NULL, -- tipo de transaccion "A" asignacion, "D" devolucion
+    //   dag_ubm_ac_s smallint NOT NULL, -- sector del formulario
+    //   dag_ubm_ac_da smallint NOT NULL, -- direccion administrativa del formulario
+    //   dag_ubm_ac_ue smallint, -- unidad ejecutora del formulario
+    //   dag_ubm_ac_oficina smallint, -- oficina del formulario
+    //   dag_ubm_ac_form character varying(10) NOT NULL, -- numero del formulario ej. "15/16"
+    //   dag_ubm_ac_num_form integer NOT NULL, -- numero de formulario ej "15"
+    //   dag_ubm_ac_fecha_trans timestamp without time zone, -- fecha de la transaccion
+    //   dag_ubm_ac_codigo_responsable text, -- codigo del funcionario al que se le hace el formulario
+    //   dag_ubm_ac_detalle_trans text, -- detalle u observacion de la transaccion
+    //   dag_ubm_ac_cimembercontrol text,
+    //   dag_ubm_ac_fechacontrol 
+        $scope.getFAD = function(){
+            // $scope.datos.FormulariosGenerados;
+            var filtro = '';
+            for (i in $scope.datos.FormulariosGenerados) {
+                if (i>0){
+                    filtro = filtro + ' or ';
+                }
+                if ($scope.datos.FormulariosGenerados[i].s != undefined) {
+                    filtro = filtro + "(dag_ubm_ac_s=" + $scope.datos.FormulariosGenerados[i].s + " and dag_ubm_ac_da=" + $scope.datos.FormulariosGenerados[i].da + " and dag_ubm_ac_form='" +$scope.datos.FormulariosGenerados[i].form + "' and dag_ubm_ac_tipo_trans='" + $scope.datos.FormulariosGenerados[i].tipotrans + "')";
+                }
+            }
+            console.log("filtro:",filtro);
+
+            var resUO= {
+            table_name:"dag.dag_ubm_asignacioncabecera",
+                order:"dag_ubm_ac_gestion DESC, dag_ubm_ac_tipo_trans ASC, dag_ubm_ac_s ASC, dag_ubm_ac_da ASC, dag_ubm_ac_ue ASC, dag_ubm_ac_oficina ASC, dag_ubm_ac_num_form ASC",
+                filter: filtro
+                // filter:"dag_ubm_ac_gestion=2013 and dag_ubm_ac_s=1 and dag_ubm_ac_da=4 and dag_ubm_ac_ue>0"
+            };
+            var obj=DreamFactory.api[CONFIG.SERVICE].getRecords(resUO);
+            obj.success(function(response){
+                $scope.datosAsig = response.record;
+            })
+            .error(function(response){
+                sweet.show('', 'Error: ', 'error');
+            })
+        }
+
+        $scope.selectedRow = null;
+        $scope.setClickedRow = function(index){
+            $scope.selectedRow = index ;
+            // var archivo = $scope.datosAsig[$scope.selectedRow].dag_ubm_ac_s +'-'+ $scope.datosAsig[$scope.selectedRow].dag_ubm_ac_da +'-'+ $scope.datosAsig[$scope.selectedRow].dag_ubm_ac_form;
+            // sweet.show({
+            //     title: 'Imprimir',
+            //     text: 'Desea imprimir el formulario ' + archivo + '?',
+            //     type: 'warning',
+            //     showCancelButton: true,
+            //     confirmButtonColor: '#DD6B55',
+            //     confirmButtonText: 'SI',
+            //     closeOnConfirm: false
+            // }, function() {
+            //     sweet.close();
+                $scope.ImpresionFormAsigDev($scope.datosAsig[$scope.selectedRow].dag_ubm_ac_s,$scope.datosAsig[$scope.selectedRow].dag_ubm_ac_da,$scope.datosAsig[$scope.selectedRow].dag_ubm_ac_form,$scope.datosAsig[$scope.selectedRow].dag_ubm_ac_tipo_trans);
+            // });
+        }
+
+        $scope.ImpresionFormAsigDev = function (s,da,form,tipoform) {
+            var resDatos = {
+                "procedure_name":"dag.sp_dag_ubm_formasigdevo",
+                "body":{
+                "params": [                                
+                    {
+                        "name": "ps",
+                        "value": s
+                    },
+                    {
+                        "name": "pda",
+                        "value": da
+                    },
+                    {
+                        "name": "pform",
+                        "value": form
+                    },
+                    {
+                        "name": "ptipoform",
+                        "value": tipoform
+                    }
+                ]
+            }
+            };
+            obj=DreamFactory.api[CONFIG.SERVICE].callStoredProcWithParams(resDatos);
+            obj.success(function (response) {
+                $scope.datos=response;
+                if ($scope.datos[0].fitem == null) {fitem = "";} else {fitem = $scope.datos[0].fitem};
+                if ($scope.datos[0].fpat == null) {fpat = "";} else {fpat = $scope.datos[0].fpat;}; 
+                if ($scope.datos[0].fmat == null) {fmat = "";} else {fmat = $scope.datos[0].fmat;};
+                if ($scope.datos[0].fnombre == null) {fnombre = "";} else {fnombre = $scope.datos[0].fnombre;};
+                if ($scope.datos[0].s == null) {s = "";} else {s = $scope.datos[0].s;};
+                if ($scope.datos[0].da == null) {da = "";} else {da = $scope.datos[0].da;};
+                if ($scope.datos[0].ue == null) {ue = "";} else {ue = $scope.datos[0].ue;};
+                if ($scope.datos[0].uo == null) {uo = "";} else {uo = $scope.datos[0].uo;};
+                if ($scope.datos[0].obstrans == null) {obstrans = "";} else {obstrans = $scope.datos[0].obstrans;};
+                if ($scope.datos[0].d_s == null) {d_s = "";} else {d_s = $scope.datos[0].d_s;};
+                if ($scope.datos[0].d_da == null) {d_da = "";} else {d_da = $scope.datos[0].d_da;};
+                if ($scope.datos[0].d_ue == null) {d_ue = "";} else {d_ue = $scope.datos[0].d_ue;};
+                if ($scope.datos[0].d_uo == null) {d_uo = "";} else {d_uo = $scope.datos[0].d_uo;};
+                if ($scope.datos[0].tecnico == null) {tecnico = "";} else {tecnico = $scope.datos[0].tecnico;};
+                var doc = new jsPDF('p', 'pt', [612,  935]); // 'legal':[612,  1008] 935
+
+                var totalPagesExp = "{total_pages_count_string}";
+                var header = function (data) {
+                    var escudo = new Image();
+                    escudo.src = '../../view/formularios/formularios/dag/escudo_lpz.jpg';
+                    doc.addImage(escudo, 'JPEG', 35, 15, 80, 68);
+                    var logo = new Image();
+                    logo.src = '../../view/formularios/formularios/dag/logo_gestion.jpg';
+                    doc.addImage(logo, 'JPEG', 540, 15, 57, 60);
+                    doc.setTextColor(0);
+                    doc.setFontSize(5);
+                    doc.setFontStyle('normal');
+                    if ($scope.datos[0].tipotrans == 'A') {
+                        doc.text('F-UBM-M02',540,81);
+                        doc.text('V:2.0',585,81);
+                        doc.setFontStyle('bold');
+                        doc.setFontSize(11);
+                        doc.text('                      FORMULARIO I (ASIGNACIÓN)\nINVENTARIO INDIVIDUALIZADO DE BIENES DE USO',200,25);
+                    }
+                    else
+                    {
+                        doc.text('F-UBM-M03',540,81);
+                        doc.text('V:2.0',570,81);
+                        doc.setFontStyle('bold');
+                        doc.setFontSize(11);
+                        doc.text('                      FORMULARIO I (DEVOLUCIÓN)\nINVENTARIO INDIVIDUALIZADO DE BIENES DE USO',200,25);
+                    }
+                    
+                    doc.setFontStyle('normal');
+                    doc.setDrawColor(0);
+                    doc.rect(260, 43, 170, 12);
+                    doc.text('S:'+ $scope.datos[0].s +' DA:' + $scope.datos[0].da +' FORM:' + $scope.datos[0].form,270,53);
+                    var str = data.pageCount;
+                    if (typeof doc.putTotalPages === 'function') {
+                        str = str + "/" + totalPagesExp;
+                    }
+                    $scope.PDFfecha(540,100,doc,str);
+
+                    doc.setFontSize(9);
+                    doc.setFontStyle('bold');
+                    doc.text('DATOS RESPONSABLE:',130,65);
+                    doc.setFontSize(7);
+                    doc.setFontStyle('normal');
+                    doc.text('CI: '+ $scope.datos[0].codresponsable,135,75);
+                    doc.text('NOMBRE: '+ fpat + ' ' + fmat + ', ' + fnombre,190,75);
+                    doc.text('ITEM: '+ fitem,135,85);
+
+                    doc.setFontSize(9);
+                    doc.setFontStyle('bold');
+                    doc.text('DATOS ASIGNACION:',30,95);
+                    doc.setFontSize(7);
+                    doc.setFontStyle('normal');
+                    doc.text('SECTOR: ' + s + ' ' + d_s,35,105);
+                    doc.text('DIRECCION ADMINISTRATIVA: '+ da + ' ' + d_da,35,113);
+                    doc.text('UNIDAD EJECUTORA: '+ ue + ' ' + d_ue,35,121);
+                    doc.text('UNIDAD ORGANIZACIONAL: '+ uo + ' ' + d_uo,35,130);
+                    doc.text('OBSERVACIONES DE LA ASIGNACIÓN: '+ obstrans,35,139);
+                    doc.setLineWidth(2);
+                    doc.line(15, 147, 597, 147);
+                };
+                var footer = function (data) {
+
+                    var f = new Date();
+                    var dia=parseInt(f.getDate());
+                    if(dia<10) {
+                        dia='0'+f.getDate();
+                    } else {
+                        dia=f.getDate();
+                    }
+                    if(parseInt(f.getMonth() +1)<10){
+                        mes='0'+(f.getMonth() +1);
+                    }else{
+                        mes=(f.getMonth() +1);
+                    }
+                    fecha = dia + '/' + mes + '/' + f.getFullYear();
+
+                    doc.setFontSize(8);
+                    doc.setFontStyle('normal');
+                    doc.text("Elaborado por: " + tecnico, 35, doc.internal.pageSize.height - 35);
+                    var fechimpre = "Fecha de impresión: " + fecha;
+                    doc.text(fechimpre, doc.internal.pageSize.width - 120, doc.internal.pageSize.height - 35);                
+                };
+
+                var getColumns = function () {
+                    return [
+                        {title: "ID", dataKey: "id"},
+                        {title: "CODIGO", dataKey: "codigoaf"},
+                        {title: "DESCRIPCION", dataKey: "descripcion"},
+                        {title: "OTR. CODIGOS", dataKey: "codigos"},
+                        {title: "OBSERVACIONES", dataKey: "observeciones"},
+                    ];
+                };
+
+                // Uses the faker.js library to get random data.
+                function getData() {
+                    var size = Object.keys($scope.datos).length;
+                    var data = [];
+                    for (var j=0; j<size; j++) {
+                        var desc = JSON.stringify($scope.datos[j].descripcion);
+                        //console.log(desc);
+                        //var result = desc.replace(/[&\/\\#,+()$~%.'":*?<>{}]/g, '');
+                        var result = desc.replace(/[\"\\]/g, '');
+                        //console.log(result);
+                        data.push({
+                            id: j+1,
+                            codigoaf: $scope.datos[j].codigoaf,
+                            descripcion: $scope.datos[j].tipoactivo + ': ' + result,
+                            codigos: $scope.datos[j].codigo + ', ' + $scope.datos[j].codigoold,
+                            observeciones: $scope.datos[j].obsact,
+                        });
+                    }
+                    return data;
+                }
+
+                doc.autoTable(
+                    getColumns(), 
+                    getData(), 
+                    {
+                        tableWidth: 612,
+                        beforePageContent: header,
+                        afterPageContent: footer,
+                        margin:{left:40,right:15,top:150,bottom:60},
+                        headerStyles: {
+                            font: 'tahoma',
+                            rowHeight: 10, 
+                            fontSize: 8, 
+                            valign: 'middle', 
+                            halign: 'middle', 
+                            textColor: 0, 
+                            fillColor: [255, 255, 0]
+                        },
+                        bodyStyles: {
+                            rowHeight: 10, 
+                            fontSize: 7.695652173913,
+                            valign: 'top'
+                        },
+                        theme:'grid',
+                        styles: {
+                            overflow:'linebreak',
+                            cellPadding: 2,
+                            lineColor: 0,
+                        },
+                    }
+                );
+
+                $scope.PDFfirmas(180,doc);
+
+                if (typeof doc.putTotalPages === 'function') {
+                    doc.putTotalPages(totalPagesExp);
+                }
+                //$scope.PDFregla(doc.internal.pageSize.height - 170 ,doc.internal.pageSize.height - 165,doc);
+                doc.setDrawColor('normal');
+                doc.save(s+'-'+da+'-'+form+'.pdf');
+            });
+            obj.error(function(error) {  
+            });
+        }
+
+        $scope.PDFfecha = function (x,y,doc,str) {
+            // RECUADROS
+            doc.rect(x, y, 19, 10);
+            doc.rect(x+19, y, 19, 10);
+            doc.rect(x+38, y, 19, 10);
+            doc.rect(x, y+10, 19, 10);
+            doc.rect(x+19, y+10, 19, 10);
+            doc.rect(x+38, y+10, 19, 10);
+
+            doc.rect(x, y+22, 28, 9);
+            doc.rect(x+28, y+22, 29, 9);
+            
+            //DIVIDO LA FECHA DE ASIGNACION POR PARTES
+            doc.setFontSize(6);
+            doc.setFontStyle('normal');
+            doc.text('FECHA ASIGNACIÓN',x,y-1);
+            var f = $scope.datos[0].fecha_trans;
+            var anio = f.substr(6, 4);
+            var mes = f.substr(3, 2);
+            var dia = f.substr(0, 2);
+            doc.setFontSize(7);
+            doc.setFontStyle('normal');
+            doc.text('DIA',x+2,y+8);
+            doc.text('MES',x+20,y+8);
+            doc.text('AÑO',x+39,y+8);
+            doc.text(dia,x+5,y+18);
+            doc.text(mes,x+24,y+18);
+            doc.text(anio,x+39,y+18);
+            doc.setFontSize(6);
+            doc.text('PAGINA',x+2,y+29);
+
+            doc.text(str, x+31, y+29);
+        }
+        $scope.PDFregla = function (x,y,doc) {
+            doc.setLineWidth(0.5);
+            doc.rect(15, x, 10, 10);
+            doc.rect(25, x, 10, 10);
+            doc.rect(35, x, 10, 10);
+            doc.rect(45, x, 10, 10);
+            doc.rect(55, x, 10, 10);
+            doc.rect(65, x, 10, 10);
+            doc.rect(75, x, 10, 10);
+            doc.rect(85, x, 10, 10);
+            doc.rect(95, x, 10, 10);
+            doc.rect(105, x, 10, 10);
+            doc.rect(115, x, 10, 10);
+            doc.rect(125, x, 10, 10);
+            doc.rect(135, x, 10, 10);
+            doc.rect(145, x, 10, 10);
+            doc.rect(155, x, 10, 10);
+            doc.rect(165, x, 10, 10);
+            doc.rect(175, x, 10, 10);
+            doc.rect(185, x, 10, 10);
+            doc.rect(195, x, 10, 10);
+            doc.rect(105, x, 10, 10);
+            doc.rect(215, x, 10, 10);
+            doc.rect(225, x, 10, 10);
+            doc.rect(235, x, 10, 10);
+            doc.rect(245, x, 10, 10);
+            doc.rect(255, x, 10, 10);
+            doc.rect(265, x, 10, 10);
+            doc.rect(275, x, 10, 10);
+            doc.rect(285, x, 10, 10);
+            doc.rect(295, x, 10, 10);
+            doc.rect(205, x, 10, 10);
+            doc.rect(315, x, 10, 10);
+            doc.rect(325, x, 10, 10);
+            doc.rect(335, x, 10, 10);
+            doc.rect(345, x, 10, 10);
+            doc.rect(355, x, 10, 10);
+            doc.rect(365, x, 10, 10);
+            doc.rect(375, x, 10, 10);
+            doc.rect(385, x, 10, 10);
+            doc.rect(395, x, 10, 10);
+            doc.rect(305, x, 10, 10);
+            doc.rect(415, x, 10, 10);
+            doc.rect(425, x, 10, 10);
+            doc.rect(435, x, 10, 10);
+            doc.rect(445, x, 10, 10);
+            doc.rect(455, x, 10, 10);
+            doc.rect(465, x, 10, 10);
+            doc.rect(475, x, 10, 10);
+            doc.rect(485, x, 10, 10);
+            doc.rect(495, x, 10, 10);
+            doc.rect(405, x, 10, 10);
+            doc.rect(515, x, 10, 10);
+            doc.rect(525, x, 10, 10);
+            doc.rect(535, x, 10, 10);
+            doc.rect(545, x, 10, 10);
+            doc.rect(555, x, 10, 10);
+            doc.rect(565, x, 10, 10);
+            doc.rect(575, x, 10, 10);
+            doc.rect(585, x, 10, 10);
+            doc.rect(595, x, 10, 10);
+            doc.rect(505, x, 10, 10);
+            doc.rect(615, x, 10, 10);
+            doc.setFontSize(5);
+            doc.text('15',15,y);
+            doc.text('25',25,y);
+            doc.text('35',35,y);
+            doc.text('45',45,y);
+            doc.text('55',55,y);
+            doc.text('65',65,y);
+            doc.text('75',75,y);
+            doc.text('85',85,y);
+            doc.text('95',95,y);
+            doc.text('105',105,y);
+            doc.text('115',115,y);
+            doc.text('125',125,y);
+            doc.text('135',135,y);
+            doc.text('145',145,y);
+            doc.text('155',155,y);
+            doc.text('165',165,y);
+            doc.text('175',175,y);
+            doc.text('185',185,y);
+            doc.text('195',195,y);
+            doc.text('205',205,y);
+            doc.text('215',215,y);
+            doc.text('225',225,y);
+            doc.text('235',235,y);
+            doc.text('245',245,y);
+            doc.text('255',255,y);
+            doc.text('265',265,y);
+            doc.text('275',275,y);
+            doc.text('285',285,y);
+            doc.text('295',295,y);
+            doc.text('305',305,y);
+            doc.text('315',315,y);
+            doc.text('325',325,y);
+            doc.text('335',335,y);
+            doc.text('345',345,y);
+            doc.text('355',355,y);
+            doc.text('365',365,y);
+            doc.text('375',375,y);
+            doc.text('385',385,y);
+            doc.text('395',395,y);
+            doc.text('405',405,y);
+            doc.text('415',415,y);
+            doc.text('425',425,y);
+            doc.text('435',435,y);
+            doc.text('445',445,y);
+            doc.text('455',455,y);
+            doc.text('465',465,y);
+            doc.text('475',475,y);
+            doc.text('485',485,y);
+            doc.text('495',495,y);
+            doc.text('505',505,y);
+            doc.text('515',515,y);
+            doc.text('525',525,y);
+            doc.text('535',535,y);
+            doc.text('545',545,y);
+            doc.text('555',555,y);
+            doc.text('565',565,y);
+            doc.text('575',575,y);
+            doc.text('585',585,y);
+            doc.text('595',595,y);
+            doc.text('605',605,y);
+            doc.text('615',615,y);
+        }
+        $scope.PDFfirmas = function (y,doc) {
+            doc.setDrawColor(0);
+            doc.setFontSize(10);
+            doc.setFontStyle('bold');
+            doc.text("El presente formulario no constituye la totalidad de los bienes asignados al funcionario", 150, doc.internal.pageSize.height - 45);
+            doc.setLineWidth(2);
+            doc.line(15, doc.internal.pageSize.height - y, 597, doc.internal.pageSize.height - y);
+            doc.setLineWidth(1);
+            doc.rect(doc.internal.pageSize.width - 315, doc.internal.pageSize.height - (y - 5), 300, 100);
+            doc.rect(doc.internal.pageSize.width - 315, doc.internal.pageSize.height - (y - 5), 150, 100);
+
+            doc.setFontSize(8);
+            doc.setFontStyle('normal');
+            doc.text("Firma y Sello", doc.internal.pageSize.width - 311, doc.internal.pageSize.height - (y - 13));
+            doc.text("Firma y Sello", doc.internal.pageSize.width - 161, doc.internal.pageSize.height - (y - 13));
+            doc.text("Funcionario Responsable", doc.internal.pageSize.width - 311, doc.internal.pageSize.height - (y - 102));
+            doc.text(tecnico, doc.internal.pageSize.width - 161, doc.internal.pageSize.height - (y - 94));
+            doc.text("Tecnico Inventariador - UBM", doc.internal.pageSize.width - 161, doc.internal.pageSize.height - (y - 102));
+
+            doc.setFontSize(5.25);
+            doc.setFontStyle('normal');
+            doc.text("Si Usted deja de pertenecer al Gobierno Municipal de La Paz o es transferido de unidad, deberá hacer la devolución de los activos que fueron ",doc.internal.pageSize.width - 315,doc.internal.pageSize.height - 70);
+            doc.text("asignados a su cargo a través de la Unidad de Bienes Muebles. La omisión a esta obligación dará lugar a inicio de responsabilidad por la ",doc.internal.pageSize.width - 315,doc.internal.pageSize.height - 65);
+            doc.text("Función Pública",doc.internal.pageSize.width - 315,doc.internal.pageSize.height - 60);
+
+            doc.setFontSize(7);
+            doc.setFontStyle('bold');
+            doc.text("NOTA:", 28, doc.internal.pageSize.height - (y - 8));
+            doc.setFontStyle('normal');
+            doc.text("El ARTÍCULO 146°.- (ASIGNACIÓN DE ACTIVOS FIJOS MUEBLES) del ",31, doc.internal.pageSize.height - (y - 15));
+            doc.text("D.S. 181 NBSABS, establece que:",31, doc.internal.pageSize.height - (y - 22));
+            doc.text("I. La asignación de activos fijos muebles es el acto administrativo mediante el cual se entrega ",31, doc.internal.pageSize.height - (y - 29));
+            doc.text("a un servidor público un activo o conjunto de éstos, generando la consiguiente responsabilidad ",31, doc.internal.pageSize.height - (y - 36));
+            doc.text("sobre su debido uso y custodia.",31, doc.internal.pageSize.height - (y - 43));
+            doc.text("II. La entrega de activos fijos muebles a los servidores públicos sólo podrá ser realizada por ",31, doc.internal.pageSize.height - (y - 50));
+            doc.text("la Unidad o Responsable de Activos Fijos, la misma que procederá cuando exista orden",31, doc.internal.pageSize.height - (y - 57));
+            doc.text("documentada y autorizada por instancia competente establecida en el RE-SABS.",31, doc.internal.pageSize.height - (y - 64));
+            doc.text("A partir de la fecha quedan asignados a su cargo los bienes detallados. Cualquier pérdida, ",31, doc.internal.pageSize.height - (y - 71));
+            doc.text("destrucción o maltrato que éstos puedan sufrir en el tiempo en que se encuentren bajo su",31, doc.internal.pageSize.height - (y - 78));
+            doc.text("custodia será imputada a su persona generando las responsabilidades del caso en sujeción a",31, doc.internal.pageSize.height - (y - 85));
+            doc.text("lo dispuesto por la Ley 1178 de Control Gubernamental.",31, doc.internal.pageSize.height - (y - 92));
+        }
+        $scope.$on('api:ready',function(){
+            $.blockUI();
+            $scope.getFAD();
+            $.unblockUI();
+
+        });
+        $scope.inicioAsignacion35 = function () {
+            if(DreamFactory.api[CONFIG.SERVICE]){
+                $.blockUI();
+                $scope.getFAD();
+                $.unblockUI();
+                console.log($scope.datos.gestion);
+            }
+        };
+    }
+</script>
+<div>
+<!-- begin form -->
+    <form class="form-horizontal" name="formulario" novalidate>
+        <div class="wrap" ng-controller="frm_DAG_UBM_Asig_35_Controller" data-ng-init="inicioAsignacion35(datos)">
+            <div class="ibox-title_2">
+                <h5>IMPRESION DE FORMULARIOS GENERADOS:</h5>
+                <h3 align="right">GESTION: {{datos.gestion}}</h3>
+            </div>
+            <div class="hr-line-dashed"></div>
+            <div>
+                <table class="table-responsive" id="dataTable" style="font-size: x-small; border-spacing: 5px;">
+                    <thead style="background-color: #009688 !important;color: white !important;">
+                        <tr>FORMULARIOS DE ASIGNACION</tr>
+                        <tr>
+                            <!-- <th>#</th> -->
+                            <th style="border: 1px solid #dddddd;"></th>
+                            <th style="border: 1px solid #dddddd;text-align:center;padding: 3px;">GESTION</th>
+                            <th style="border: 1px solid #dddddd;text-align:center;padding: 3px;">TIPO DE <BR> FORMULARIO</th>
+                            <th style="border: 1px solid #dddddd;text-align:center;padding: 3px;">S</th>
+                            <th style="border: 1px solid #dddddd;text-align:center;padding: 3px;">DA</th>
+                            <th style="border: 1px solid #dddddd;text-align:center;padding: 3px;">UE</th>
+                            <th style="border: 1px solid #dddddd;text-align:center;padding: 3px;">UO</th>
+                            <th style="border: 1px solid #dddddd;text-align:center;padding: 3px;">FORM</th>
+                            <th style="border: 1px solid #dddddd;text-align:center;padding: 3px;">FECHA</th>
+                            <th style="border: 1px solid #dddddd;text-align:center;padding: 3px;">RESPONSABLE</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="item in datosAsig" ng-class="{'selected':$index == selectedRow}" >
+                            <!-- <td>{{$index}}+1</td> -->
+                            <td style="border: 1px solid #009688;"><a tooltip = "iMPRIMIR" class="btn btn-small btn-circle" ng-click="setClickedRow($index)"><span class="fa fa-print"></span></a></td>
+                            <td style="border: 1px solid #009688;text-align:center;padding: 2px;">{{item.dag_ubm_ac_gestion}}</td>
+                            <td style="border: 1px solid #009688;text-align:center;padding: 2px;">{{item.dag_ubm_ac_tipo_trans}}</td>
+                            <td style="border: 1px solid #009688;text-align:center;padding: 2px;">{{item.dag_ubm_ac_s}}</td>
+                            <td style="border: 1px solid #009688;text-align:center;padding: 2px;">{{item.dag_ubm_ac_da}}</td>
+                            <td style="border: 1px solid #009688;text-align:center;padding: 2px;">{{item.dag_ubm_ac_ue}}</td>
+                            <td style="border: 1px solid #009688;text-align:center;padding: 2px;">{{item.dag_ubm_ac_oficina}}</td>
+                            <td style="border: 1px solid #009688;text-align:center;padding: 2px;">{{item.dag_ubm_ac_form}}</td>
+                            <td style="border: 1px solid #009688;text-align:center;padding: 2px;">{{item.dag_ubm_ac_fecha_trans}}</td>
+                            <td style="border: 1px solid #009688;text-align:center;padding: 2px;">{{item.dag_ubm_ac_codigo_responsable}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="hr-line-dashed"></div>
+            <button type="button" class="btn btn-primary" ng-click="guardarData(datos)" ng-disabled="formulario.$invalid"> <i class="glyphicon fa fa-save"></i> Guardar / Continuar</button>
+        </div>
+    </form>    
+</div>
+

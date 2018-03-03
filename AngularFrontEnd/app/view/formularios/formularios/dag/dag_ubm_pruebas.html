@@ -1,0 +1,41 @@
+<div class="col-md-12" class="row" ng-controller="dagPrueba" data-ng-init="inicioDagPrueba()">
+<!--<div class="col-md-12" class="row" ng-controller="dagController" data-ng-init="inicioDag(datos)"> -->
+    <table  width="100%">
+        <td><h3>PRUEBAS</h3></td> 
+    </table>
+    <div>
+        <table class="table-responsive" id="dataTable" style="font-size: x-small; border-spacing: 5px;">
+            <thead style="background-color: #009688 !important;color: white !important;">
+                <tr>FORMULARIOS DE ASIGNACION</tr>
+                <tr>
+                    <!-- <th>#</th> -->
+                    <th style="border: 1px solid #dddddd;"></th>
+                    <th style="border: 1px solid #dddddd;text-align:center;">GESTION</th>
+                    <th style="border: 1px solid #dddddd;text-align:center;">TIPO DE FORMULARIO</th>
+                    <th style="border: 1px solid #dddddd;text-align:center;">S</th>
+                    <th style="border: 1px solid #dddddd;text-align:center;">DA</th>
+                    <th style="border: 1px solid #dddddd;text-align:center;">UE</th>
+                    <th style="border: 1px solid #dddddd;text-align:center;">UO</th>
+                    <th style="border: 1px solid #dddddd;text-align:center;">FORM</th>
+                    <th style="border: 1px solid #dddddd;text-align:center;">FECHA</th>
+                    <th style="border: 1px solid #dddddd;text-align:center;">RESPONSABLE</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="item in datosAsig" ng-class="{'selected':$index == selectedRow}" >
+                    <!-- <td>{{$index}}+1</td> -->
+                    <td style="border: 1px solid #009688;"><a tooltip = "iMPRIMIR" class="btn btn-small btn-circle" ng-click="setClickedRow($index)"><span class="fa fa-print"></span></a></td>
+                    <td style="border: 1px solid #009688;">{{item.dag_ubm_ac_gestion}}</td>
+                    <td style="border: 1px solid #009688;">{{item.dag_ubm_ac_tipo_trans}}</td>
+                    <td style="border: 1px solid #009688;">{{item.dag_ubm_ac_s}}</td>
+                    <td style="border: 1px solid #009688;">{{item.dag_ubm_ac_da}}</td>
+                    <td style="border: 1px solid #009688;">{{item.dag_ubm_ac_ue}}</td>
+                    <td style="border: 1px solid #009688;">{{item.dag_ubm_ac_oficina}}</td>
+                    <td style="border: 1px solid #009688;">{{item.dag_ubm_ac_form}}</td>
+                    <td style="border: 1px solid #009688;">{{item.dag_ubm_ac_fecha_trans}}</td>
+                    <td style="border: 1px solid #009688;">{{item.dag_ubm_ac_codigo_responsable}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

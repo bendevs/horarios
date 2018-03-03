@@ -1,0 +1,54 @@
+<div class="col-md-12" >
+    <form ng-controller="reporteController2" name="reportForm" id="reportForm" class="form-horizontal" role="form" 
+        novalidate data-ng-init="inicioActuaciones()">        
+        
+        <div class="col-md-12">
+            <div class="col-md-3">                    
+                <div class="form-group">
+                    <label class="col-sm-4 control-label no-padding-right" for="estado_civil">TIPO REPORTE: </label>
+                    <div class="col-sm-8">
+                        <select  id="rptSelec" name="rptSelec"  placeholder="" ng-model="rptSelec" 
+                                 class="form-control" ng-options="datos.rid as datos.rnombre for datos in obtReportes"
+                                 ng-change="selecReporte(); ">
+                            <option style="display:none" value=""> -- Seleccione -- </option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <div class="col-md-12">
+            <div  ng-bind-html="get_pre(html)"></div>
+        </div>
+
+        <!--<div class="botones_inspinia_lmc">
+            <a class="btn btn-primary" ng-click="limpiar()" data-toggle="modal" data-target="#registro">
+                <i class="glyphicon glyphicon-plus-sign"></i>Nueva Persona</a>
+        </div>-->
+        
+        <div>
+            <button data-dismiss="modal" ng-click="cargarDatos()" type="button" class="btn btn-primary fa fa-eye"> Generar Reporte </button>
+            <!--<button ng-click="cargarDatos(registro)" data-dismiss="modal" type="button" class="btn btn-success fa fa-eye" ng-disabled="false"><span span class="textoAux"> VER REPORTE </span></button>-->
+        </div>
+        
+        <!--<div class="botones_inspinia_lmc">
+           <a  class="btn btn-primary" data-toggle="modal"  ng-click="cargarDatos()"><i class="btn btn-primary fa fa-eye"></i> GENERAR REPORTE</a>
+        </div>-->
+
+
+        <div class="col-md-12">
+            <br>
+            <legend><center> {{nombReporte}} </center></legend>
+            <h3>{{subTituloReporte}}</h3>
+            <br>
+            <div  ng-bind-html="get_pre2(html2)"></div>
+        </div>
+        
+        <!--<div class="modal-footer">
+            <button data-dismiss="modal" ng-click="cargarDatos()" type="button" class="btn btn-primary"  >Generar Reporte</button>
+            <button ng-click="cargarDatos(registro)" data-dismiss="modal" type="button" class="btn btn-success fa fa-eye" ng-disabled="false"><span span class="textoAux"> VER REPORTE </span></button>
+        </div>-->
+    </form>    
+</div>

@@ -1,0 +1,432 @@
+<style>
+    input:required:invalid {
+        border: 1px solid red;
+    }
+    input:required:valid {
+        border: 1px solid green;
+    }
+    select:required:invalid {
+        border: 1px solid red;
+    }
+    select:required:valid {
+        border: 1px solid green;
+    }
+    .custom-upload {
+        position: relative;
+        height: 40px;
+        width: 100%;
+        margin:30px;
+    }
+    .custom-upload input[type=file]
+    {
+        outline:none;
+        position: relative;
+        text-align: right;    
+        -moz-opacity:0 ;
+        filter:alpha(opacity: 0);
+        opacity: 0;
+        z-index: 2;
+        width:85%;
+        height:100%;
+        
+    }
+    .custom-upload .fake-file
+    {
+        background:url(http://www.fold3.com/i/upload-icon.png) center right no-repeat;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        width: 85%;
+        padding: 0;
+        margin: 0;
+        z-index: 1;
+        line-height: 100%;
+    }
+    .custom-upload .fake-file input
+    {
+        font-size:16px;
+        height:40px;
+        width:85%;
+    }
+
+</style>
+<script type="text/javascript">
+    $('.custom-upload input[type=file]').change(function(){        
+        $(this).next().find('input').val($(this).val());
+        angular.element(this).scope().cambiarFile(this, $(this).val());
+    });
+</script>
+<script type="text/javascript" src="../../libs/js/render.js"></script>
+<div class="col-md-12" class="row" ng-controller="sProhibController" data-ng-init="inicioRegistros()">
+    <div class="col-lg-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>NNA con Prohibicion de Viajes</h5>
+
+                <div ibox-tools></div>
+                <div class="botones_inspinia_lmc">
+                    <a class="btn btn-primary" ng-click="limpiar()" data-toggle="modal" data-target="#registro">
+                        <i class="glyphicon glyphicon-plus-sign"></i>Nuevo Registro</a>
+                </div>
+            </div>
+            <div class="ibox-content">
+                <table ng-table="tablaRegistros"  show-filter="true" class="table table-striped">
+                    <tr ng-repeat="registro in $data" ng-class="{'colorInactivo': registro.prsEstado == 'INACTIVO'}">
+                        <td align="center" data-title="'Opciones'" style="width: 80px;">
+                            <a ng-click="modificarRegistroCargar(registro)" class="btn btn-info btn-circle" data-toggle="modal" data-target="#registro"><i class="fa fa-pencil"></i></a>
+                            <a ng-click="eliminarRegistroCargar(registro)" class="btn btn-info btn-circle" data-toggle="modal" data-target="#registro"><i class="fa fa-trash-o" ></i></a>
+                        </td>
+                        <td data-title="'Numero de Documento de Niñ@/ Adolecente'" sortable="'def_vict_ci'" filter="{'def_vict_ci':'text'}">{{registro.def_vict_ci}}</td>
+                        <td data-title="'Nombre Niñ@/ Adolecente'" sortable="'nombre'" filter="{'nombre':'text'}">{{registro.nombre}}</td>
+                        <td data-title="'Fecha Registro'">{{registro.def_ing}}</input></td>
+                        <td data-title="'Finaliza Prohibicion'">{{registro.fechafin}}</td>
+                        <td data-title="'Nombre Denunciante'" sortable="'ter_nomquien_prohib'" filter="{'ter_nomquien_prohib':'text'}">{{registro.ter_nomquien_prohib}}</td>
+                        <td data-title="'C.I.'" sortable="'def_denun_ci'" filter="{'def_denun_ci':'text'}">{{registro.def_denun_ci}}</td>
+                        <td data-title="'Motivo'" sortable="'ter_motivo_prohib'" filter="{'ter_motivo_prohib':'text'}">{{registro.ter_motivo_prohib}}</td>
+                        <td data-title="'Documento'" >
+                        <a ng-click="verImagen(registro.ter_doc_adj_url)" class="btn btn-info btn-circle" data-toggle="modal" data-target="#imagen">
+                        <i class="fa fa-eye" style="color:#249FE6"></i></a>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+  
+    <div class="modal fade" id="imagen" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Cerrar</span></button>
+                    <h4 class="modal-title" id="myModalLabel">CEDULA DE IDENTIDAD DIGITALIZADA</h4>
+                </div>
+                <img id="imgSalida" ng-src="{{archivo}}" width="100%" height="100%">
+                <div class="modal-footer">
+                    <button id="cerrar" name="cerrar" type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- MODAL -->
+    <div class="modal fade" id="registro" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Cerrar</span></button>
+                    <h4 class="modal-title" id="myModalLabel">{{titulo}}</h4>
+                </div>
+                <div class="modal-body" >
+                    <form name="formularioRegistros" readOnly="true" novalidate>
+                        <div class="row">
+                            <div class="ibox-title_2">
+                                <h5>FORMULARIO DE REGISTRO DE NNA CON PROHIBICION DE VIAJE</h5>
+                            </div>
+                            <div class="col-md-12" id="div_def_ing">
+                                <div class="form-group" >
+                                    <label for="url">FECHA DE REGISTRO:
+                                    </label>
+                                    <div class="controls">
+                                        <input type="text" placeholder="FECHA DE REGISTRO" class="form-control" id="def_ing"   ng-model="datos.def_ing" readonly="readonly">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12" id="div_ter_sol_prohib">
+                                <div class="form-group" >
+                                    <label for="url">SOLICITA LA PROHIBICION:</label>
+                                    <div class="controls">
+                                        <select onchange= "tipo=f_obtener_valor('ter_sol_prohib');;if (tipo=='1'){f_oculta_div('div_ter_t_prohib');f_oculta_div('div_ter_docjuz_prohib');f_oculta_div('div_ter_nrodocjuz_prohib');f_oculta_div('div_ter_femisen_prohib');f_oculta_div('div_ter_mun_prohib');f_oculta_div('div_ter_inst_prohib');f_oculta_div('div_ter_autsent_prohib');f_oculta_div('div_ter_quieninst_prohib');f_oculta_div('div_ter_respquien_prohib');f_muestra_div('div_ter_motivo_prohib');f_muestra_div('div_ter_plazo_prohib');f_muestra_div('div_ter_nna_prohib');f_muestra_div('div_def_vict_tipoiden');f_muestra_div('div_def_vict_ci');f_muestra_div('div_def_vict_exp');f_muestra_div('div_def_vict_otro');f_muestra_div('div_def_vict_gen');f_muestra_div('div_def_vict_pat');f_muestra_div('div_def_vict_mat');f_muestra_div('div_def_vict_nom');f_muestra_div('div_def_vict_fec_nac');f_muestra_div('div_def_vict_edad');f_muestra_div('div_ter_nomquien_prohib');f_muestra_div('div_def_denun_tipoiden');f_muestra_div('div_ter_telquien_prohib');f_muestra_div('div_ter_doc_adj');} if (tipo=='2'){f_oculta_div('div_ter_t_prohib');f_oculta_div('div_ter_docjuz_prohib');f_oculta_div('div_ter_nrodocjuz_prohib');f_oculta_div('div_ter_femisen_prohib');f_oculta_div('div_ter_mun_prohib');f_oculta_div('div_ter_inst_prohib');f_oculta_div('div_ter_autsent_prohib');f_oculta_div('div_ter_nomquien_prohib');f_muestra_div('div_ter_motivo_prohib');f_muestra_div('div_ter_plazo_prohib');f_muestra_div('div_ter_nna_prohib');f_muestra_div('div_def_vict_tipoiden');f_muestra_div('div_def_vict_ci');f_muestra_div('div_def_vict_exp');f_muestra_div('div_def_vict_gen');f_muestra_div('div_def_vict_pat');f_muestra_div('div_def_vict_mat');f_muestra_div('div_def_vict_nom');f_muestra_div('div_def_vict_fec_nac');f_muestra_div('div_def_vict_edad');f_muestra_div('div_def_denun_tipoiden');f_muestra_div('div_ter_respquien_prohib');f_oculta_div('div_ter_nomquien_prohib');f_muestra_div('div_ter_quieninst_prohib');f_muestra_div('div_ter_telquien_prohib');f_muestra_div('div_ter_doc_adj');} if (tipo=='3'){f_muestra_div('div_ter_respquien_prohib');f_oculta_div('div_ter_nomquien_prohib');f_oculta_div('div_def_denun_tipoiden');f_oculta_div('div_def_denun_ci');f_oculta_div('div_def_denun_exp');f_oculta_div('div_def_denun_otro');f_oculta_div('div_ter_quieninst_prohib');f_muestra_div('div_ter_motivo_prohib');f_muestra_div('div_ter_plazo_prohib');f_muestra_div('div_ter_nna_prohib');f_muestra_div('div_def_vict_tipoiden');f_muestra_div('div_def_vict_ci');f_muestra_div('div_def_vict_exp');f_muestra_div('div_def_vict_gen');f_muestra_div('div_def_vict_pat');f_muestra_div('div_def_vict_mat');f_muestra_div('div_def_vict_nom');f_muestra_div('div_def_vict_fec_nac');f_muestra_div('div_def_vict_edad');f_muestra_div('div_ter_telquien_prohib');f_muestra_div('div_ter_doc_adj');}" id="ter_sol_prohib" name="registro[]" class="form-control" ng-model="datos.ter_sol_prohib">
+                                            <option value="-1"> -- Seleccione -- </option>
+                                            <option value="1">PROGENITOR(A)</option>
+                                            <option value="2">INSTITUCIÓN</option>
+                                            <option value="3">JUZGADO U OTRO</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12" id="div_ter_respquien_prohib">
+                                <div class="form-group" >
+                                    <label for="url">RESP. DE DEJAR LA DOCUMENTACION:</label>
+                                    <div class="controls">
+                                        <input type="text" placeholder="RESP. DE DEJAR LA DOCUMENTACION" class="form-control" ng-disabled="only" id="ter_respquien_prohib" name="registro[]"  value="" ng-model="datos.ter_respquien_prohib">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12" id="div_ter_nomquien_prohib">
+                                <div class="form-group" >
+                                    <label for="url">NOMBRE PROGENITOR(A):</label>
+                                    <div class="controls">
+                                        <input type="text" placeholder="NOMBRE PROGENITOR(A)" class="form-control" ng-disabled="only" id="ter_nomquien_prohib" name="registro[]" value="" ng-model="datos.ter_nomquien_prohib">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12" id="div_def_denun_tipoiden">
+                                <div class="form-group" >
+                                    <label for="url">Doc. de Identidad:</label>
+                                    <div class="controls">
+                                        <select onchange="tipo = f_obtener_valor('def_denun_tipoiden');if (tipo=='1'){f_muestra_div('div_def_denun_ci');f_muestra_div('div_def_denun_exp');f_oculta_div('div_def_denun_otro');}if (tipo=='2'){f_muestra_div('div_def_denun_ci');f_oculta_div('div_def_denun_exp');f_muestra_div('div_def_denun_otro');}if(tipo=='3'){f_muestra_div('div_def_denun_ci');f_oculta_div('div_def_denun_exp');f_oculta_div('div_def_denun_otro');}" id="def_denun_tipoiden" name="registro[]" class="form-control" ng-model="datos.def_denun_tipoiden">
+                                            <option value="-1"> -- Seleccione -- </option>
+                                            <option value="1">Cedula de Identidad</option>
+                                            <option value="2">Pasaporte</option>
+                                            <option value="3">DNI</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12" id="div_def_denun_ci">
+                                <div class="form-group" >
+                                    <label for="url">Nº Doc. de Identidad:</label>
+                                    <div class="controls">
+                                        <input type="text" placeholder="Nº Doc. de Identidad" class="form-control" ng-disabled="only" id="def_denun_ci" name="registro[]" value="" ng-model="datos.def_denun_ci">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12" id="div_def_denun_exp">
+                                <div class="form-group" >
+                                    <label for="url">Expedido:</label>
+                                    <div class="controls">
+                                        <select onchange="tipo = f_obtener_valor('def_denun_exp');if (tipo=='11'){f_muestra_div('div_def_denun_otro');}else{f_oculta_div('div_def_denun_otro');}" id="def_denun_exp" name="registro[]" class="form-control" ng-model="datos.def_denun_exp">
+                                            <option value="-1"> -- Seleccione -- </option>
+                                            <option value="1">LA PAZ</option>
+                                            <option value="2">ORURO</option>
+                                            <option value="3">POTOSI</option>
+                                            <option value="4">COCHABAMBA</option>
+                                            <option value="5">CHUQUISACA</option>
+                                            <option value="6">TARIJA</option>
+                                            <option value="7">BENI</option>
+                                            <option value="8">PANDO</option>
+                                            <option value="9">SANTA CRUZ</option>
+                                            <option value="11">OTRO</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12" id="div_def_denun_otro">
+                                <div class="form-group" >
+                                    <label for="url">LUGAR DE EXPEDIDO:</label>
+                                    <div class="controls">
+                                        <input type="text" placeholder="LUGAR DE EXPEDIDO" class="form-control" ng-disabled="only" id="def_denun_otro" name="registro[]" value="" ng-model="datos.def_denun_otro">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12" id="div_ter_quieninst_prohib">
+                                <div class="form-group" >
+                                    <label for="url">INSTITUCIÓN:</label>
+                                    <div class="controls">
+                                        <input type="text" placeholder="INSTITUCIÓN" class="form-control" ng-disabled="only" id="ter_quieninst_prohib" name="registro[]" value="" ng-model="datos.ter_quieninst_prohib">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12" id="div_ter_motivo_prohib">
+                                <div class="form-group" >
+                                    <label for="url">MOTIVO / TIPO DE PROCESO:</label>
+                                    <div class="controls">
+                                        <input type="text" placeholder="MOTIVO / TIPO DE PROCESO" class="form-control" ng-disabled="only" id="ter_motivo_prohib" name="registro[]" value="" ng-model="datos.ter_motivo_prohib">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12" id="div_ter_telquien_prohib">
+                                <div class="form-group" >
+                                    <label for="url">TELEFONO DE REFERENCIA:</label>
+                                    <div class="controls">
+                                        <input type="number" placeholder="TELEFONO DE REFERENCIA" class="form-control" id="ter_telquien_prohib" name="registro[]" value="" ng-model="datos.ter_telquien_prohib">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ibox-title_2" id="div_ter_t_prohib">
+                                <h5>DATOS DOCUMENTACION DE PROHIBICIÓN DE VIAJE</h5>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group" id="div_ter_docjuz_prohib" >
+                                    <label for="url">TIPO DE DOCUMENTO:</label>
+                                    <div class="controls">
+                                        <select id="ter_docjuz_prohib" name="registro[]" class="form-control" ng-model="datos.ter_docjuz_prohib" >
+                                            <option value="-1"> -- Seleccione -- </option>
+                                            <option value="1">RESOLUCIÓN</option>
+                                            <option value="2">CITE</option>
+                                            <option value="3">OFICIO</option>
+                                            <option value="4">REQUERIMIENTO</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12" id="div_ter_nrodocjuz_prohib">
+                                <div class="form-group" >
+                                    <label for="url">NUMERO DE DOCUMENTO:</label>
+                                    <div class="controls">
+                                        <input type="number" placeholder="NUMERO DE DOCUMENTO" class="form-control" id="ter_nrodocjuz_prohib" name="registro[]" value="" ng-model="datos.ter_nrodocjuz_prohib">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12" id="div_ter_femisen_prohib">
+                                <div class="form-group" >
+                                    <label for="url">EMITIDO  EN FECHA:</label>
+                                    <div class="controls">
+                                        <input type="date" class="form-control" data-date-format="yyyy-mm-dd" id="ter_femisen_prohib" name="registro[]" placeholder="EMITIDO  EN FECHA" value="" ng-model="datos.ter_femisen_prohib" >
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12" id="div_ter_mun_prohib">
+                                <div class="form-group" >
+                                    <label for="url">MUNICIPIO:</label>
+                                    <div class="controls">
+                                        <select onchange = "valores = f_obtener_valor('ter_mun_prohib');  sql ='select  id_mun as valor, juz_desc as dato from ter_juz_prohib= (&amp;' + valores + '&amp;); if (ter_mun_prohib'==' id_mun'){ ter_juz_prohib= (&amp;' + valores + '&amp;)';angular.element(document.getElementById('renderformulario')).scope().datoscomborender('ter_prueb'',sql);$('#'ter_prueb'').val(valores);" id="ter_mun_prohib" name="registro[]" class="form-control" ng-model="datos.ter_mun_prohib">
+                                            <option value="-1"> -- Seleccione -- </option>
+                                            <option value="1">LA PAZ</option>
+                                            <option value="2">EL ALTO</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12" id="div_ter_inst_prohib">
+                                <div class="form-group" >
+                                    <label for="url">INSTITUCIÓN / INSTANCIA:</label>
+                                    <div class="controls">
+                                        <select id="ter_inst_prohib" name="registro[]" class="form-control" ng-model="datos.ter_inst_prohib" ><option value="-1"> -- Seleccione -- </option><option value="1">JUZGADO PÚBLICO DE FAMILIA 1º LA PAZ</option><option value="2">JUZGADO PÚBLICO DE FAMILIA 2º LA PAZ</option><option value="3">JUZGADO PÚBLICO DE FAMILIA 3º LA PAZ</option><option value="4">JUZGADO PÚBLICO DE FAMILIA 4º LA PAZ</option><option value="5">JUZGADO PÚBLICO DE FAMILIA 5º LA PAZ</option><option value="6">JUZGADO PÚBLICO DE FAMILIA 6º LA PAZ</option><option value="7">JUZGADO PÚBLICO DE FAMILIA 7º LA PAZ</option><option value="8">JUZGADO PÚBLICO DE FAMILIA 8º LA PAZ</option><option value="9">JUZGADO PÚBLICO DE FAMILIA 9º LA PAZ</option><option value="10">JUZGADO PÚBLICO DE FAMILIA 10º LA PAZ</option><option value="11">JUZGADO PÚBLICO DE FAMILIA 11º LA PAZ</option><option value="12">JUZGADO PÚBLICO DE FAMILIA 12º LA PAZ</option><option value="13">JUZGADO PÚBLICO DE FAMILIA 13º LA PAZ</option><option value="14">JUZGADO PÚBLICO DE FAMILIA 14º LA PAZ</option><option value="15">JUZGADO PÚBLICO DE FAMILIA 15º LA PAZ</option><option value="16">JUZGADO PÚBLICO DE FAMILIA 1º EL ALTO</option><option value="17">JUZGADO PÚBLICO DE FAMILIA 2º EL ALTO</option><option value="18">JUZGADO PÚBLICO DE FAMILIA 3º EL ALTO</option><option value="19">JUZGADO PÚBLICO DE FAMILIA 4º EL ALTO</option><option value="20">JUZGADO PÚBLICO DE FAMILIA 5º EL ALTO</option><option value="21">JUZGADO PÚBLICO DE FAMILIA 6º EL ALTO</option><option value="22">JUZGADO PÚBLICO DE FAMILIA 7º EL ALTO</option><option value="23">JUZGADO PÚBLICO DE FAMILIA 8º EL ALTO</option><option value="24">JUZGADO PÚBLICO DE NIÑES Y ADOLESCENCIA 1º LA PAZ</option><option value="25">JUZGADO PÚBLICO DE NIÑES Y ADOLESCENCIA 2º LA PAZ</option><option value="26">JUZGADO PÚBLICO DE NIÑES Y ADOLESCENCIA 1º EL ALTO</option><option value="27">FISCALÍA DIV. MENORES Y FAMILIA 1º LA PAZ</option><option value="28">FISCALÍA DIV. MENORES Y FAMILIA 1º  EL ALTO</option></select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12" id="div_ter_autsent_prohib">
+                                <div class="form-group" >
+                                    <label for="url">AUTORIDAD COMPETENTE:</label>
+                                    <div class="controls">
+                                        <input type="text" placeholder="AUTORIDAD COMPETENTE" class="form-control" ng-disabled="only" id="ter_autsent_prohib" name="registro[]" value="" ng-model="datos.ter_autsent_prohib">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12" id="div_ter_plazo_prohib">
+                                <div class="form-group" >
+                                    <label for="url">PLAZO DE DIAS PROHIBIDOS:</label>
+                                    <div class="controls">
+                                        <input type="number" placeholder="PLAZO DE DIAS PROHIBIDOS" class="form-control" id="ter_plazo_prohib" ng-model="datos.ter_plazo_prohib" required="required">
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                            <div class="ibox-title_2" id="div_ter_nna_prohib">
+                                <h5>Datos Niño Niña Adolescente</h5>
+                            </div>
+                            <div class="col-md-12" id="div_def_vict_tipoiden">
+                                <div class="form-group" >
+                                    <label for="url">DOCUMENTO DE IDENTIFICACION:</label>
+                                    <div class="controls">
+                                        <select onchange="tipo = f_obtener_valor('def_vict_tipoiden');if (tipo=='CN'){f_muestra_div('div_def_vict_ci');f_oculta_div('div_def_vict_exp');f_oculta_div('div_def_vict_otro');}if (tipo=='CI'){f_muestra_div('div_def_vict_ci');f_muestra_div('div_def_vict_exp');f_oculta_div('div_def_vict_otro');}if(tipo=='DN'){f_muestra_div('div_def_vict_ci');f_oculta_div('div_def_vict_exp');f_muestra_div('div_def_vict_otro');}" id="def_vict_tipoiden" name="registro[]" class="form-control" ng-model="datos.def_vict_tipoiden">
+                                            <option value="-1"> -- Seleccione -- </option>
+                                            <option value="CN">CERTIFICADO DE NACIMIENTO</option>
+                                            <option value="CI">CARNET DE IDENTIDAD</option>
+                                            <option value="DN">DNI</option>
+                                            <option value="PAS">PASAPORTE</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12" id="div_def_vict_ci">
+                                <div class="form-group" >
+                                    <label for="url">Nº DOCUMENTO DE IDENTIDAD:</label>
+                                    <div class="controls">
+                                        <input type="number" placeholder="Nº DOCUMENTO DE IDENTIDAD" class="form-control" id="def_vict_ci" name="registro[]" value="" ng-model="datos.def_vict_ci">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12" id="div_def_vict_exp">
+                                <div class="form-group" >
+                                    <label for="url">EXPEDIDO:</label>
+                                    <div class="controls">
+                                        <select id="def_vict_exp" name="registro[]" class="form-control" ng-model="datos.def_vict_exp">
+                                            <option value="-1"> -- Seleccione -- </option>
+                                            <option value="1">LA PAZ</option>
+                                            <option value="2">COCHABAMBA</option>
+                                            <option value="3">ORURO</option>
+                                            <option value="4">POTOSI</option>
+                                            <option value="5">STA.CRUZ</option>
+                                            <option value="6">BENI</option>
+                                            <option value="7">PANDO</option>
+                                            <option value="8">TARIJA</option>
+                                            <option value="9">SUCRE</option>
+                                            <option value="10">EL ALTO</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12" id="div_def_vict_otro">
+                                <div class="form-group" >
+                                    <label for="url">OTRO LUGAR DE EXPEDIDO:</label>
+                                    <div class="controls">
+                                        <input type="text" placeholder="OTRO LUGAR DE EXPEDIDO" class="form-control" ng-disabled="only" id="def_vict_otro" name="registro[]" value="" ng-model="datos.def_vict_otro">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12" id="div_def_vict_gen">
+                                <div class="form-group" >
+                                    <label for="url">GÉNERO:</label>
+                                    <div class="controls">
+                                        <select id="def_vict_gen" name="registro[]" class="form-control" ng-model="datos.def_vict_gen" ><option value="-1"> -- Seleccione -- </option><option value="1">MASCULINO</option><option value="2">FEMENINO</option></select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12" id="div_def_vict_pat">
+                                <div class="form-group" >
+                                    <label for="url">APELLIDO PATERNO:</label>
+                                    <div class="controls">
+                                        <input type="text" placeholder="APELLIDO PATERNO" class="form-control" ng-disabled="only" id="def_vict_pat" name="registro[]" value="" ng-model="datos.def_vict_pat">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12" id="div_def_vict_mat">
+                                <div class="form-group" >
+                                    <label for="url">APELLIDO MATERNO:</label>
+                                    <div class="controls">
+                                        <input type="text" placeholder="APELLIDO MATERNO" class="form-control" ng-disabled="only" id="def_vict_mat" name="registro[]"  value="" ng-model="datos.def_vict_mat">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12" id="div_def_vict_nom">
+                                <div class="form-group" >
+                                    <label for="url">NOMBRES:</label>
+                                    <div class="controls">
+                                        <input type="text" placeholder="NOMBRES" class="form-control" ng-disabled="only" id="def_vict_nom" name="registro[]" value="" ng-model="datos.def_vict_nom" required="required">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12" id="div_def_vict_fec_nac">
+                                <div class="form-group" >
+                                    <label for="url">FECHA DE NACIMIENTO:</label>
+                                    <div class="controls">
+                                         <input onchange="tipo = f_obtener_valor('def_vict_fec_nac');fechainsertada = new Date(tipo);anoinsertado=fechainsertada.getFullYear();fechaactual=new Date();anoactual=fechaactual.getFullYear();resultadoedad=parseInt(anoactual)-parseInt(anoinsertado);document.getElementById('def_vict_edad').value=resultadoedad; datos.def_vict_edad = resultadoedad; " type="date" placeholder="FECHA DE NACIMIENTO" class="form-control" ng-disabled="only" id="def_vict_fec_nac" ng-model="datos.def_vict_fec_nac">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12" id="div_def_vict_edad">
+                                <div class="form-group" >
+                                    <label for="url">EDAD:</label>
+                                    <div class="controls">
+                                        <input  type="numeric" placeholder="EDAD" class="form-control" ng-disabled="only" id="def_vict_edad" name="registro[]"  value="" ng-model="datos.def_vict_edad">
+                                    </div>
+                                </div>
+                            </div>                            
+                            <div class="col-md-12" id="div_ter_doc_adj">
+                                <div class="form-group" >
+                                    <label for="url">DOCUMENTO ADJUNTO:</label>
+                                    <div class="controls">
+                                       <div class="custom-upload">
+                                            <input type="file" name="ter_doc_adj" id="ter_doc_adj" uploader-model="ter_doc_adj" accept="image/*"/ >
+                                            <div class="fake-file">
+                                                <input ng-model="datos.ter_doc_adj" type="text">
+                                            </div>             
+                                        </div>         
+                                    </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button id="demo2"  type="button" class="btn btn-default" data-dismiss="modal">Cerrarr </button>
+                    <button ng-click="adicionarRegistro(datos);" ng-disabled = "!datos.ter_plazo_prohib" data-dismiss="modal" type="button" class="btn btn-primary" ng-show="boton=='new'" ng-hide="boton=='upd' || boton=='del'">Guardar</button>
+                    <button ng-click="modificarRegistro(datos.prohid,datos);" ng-disabled = "!datos.ter_plazo_prohib" data-dismiss="modal" type="button" class="btn btn-primary" ng-show="boton=='upd'" ng-hide="boton=='new' || boton=='del'">Modificar</button>
+                    <button ng-click="eliminarRegistro(datos.prohid)" data-dismiss="modal" type="button" class="btn btn-primary" ng-show="boton=='del'" ng-hide="boton=='new' || boton=='upd'">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

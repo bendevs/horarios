@@ -1,0 +1,113 @@
+<div>
+<!-- begin form -->
+    <form class="form-horizontal" name="formulario" novalidate>
+        <div div class="wrap" ng-controller="dag_abm_catalogo_ubmController" data-ng-init="inicioDag()">
+            <div class="ibox-title_2">
+                <h5>GENERACION ESPECIFICA DE ITEMS:</h5>
+            </div>
+            <!-- <button class="btn btn-primary" ng-click="actualizarArbol()"> <i></i>Cargar arbol</button>  -->
+            <div class="form-group"><label class="col-sm-1 control-label" style="red">CLASE: <small class="m-l-sm" style="color: red"></small></label>
+                <div class="col-md-5" style="height:300px;  overflow-y:scroll;">
+                    <div id="tree1" ng-click="alestra()"></div>
+                </div>
+                <label class="col-sm-1 control-label" style="red">PARTIDA: <small class="m-l-sm" style="color: red"></small></label>
+                <div class="col-sm-5"><input type="text" disabled="" placeholder="{{DAG_CAT_PART}}" class="form-control"></div>
+                <label class="col-sm-1 control-label" style="red">DESCRIPCION: <small class="m-l-sm" style="color: red"></small></label>
+                <div class="col-sm-5"><textarea ng-model="DAG_CAT_DESC_ITEM" id="DAG_CAT_DESC_ITEM" name="DAG_CAT_DESC_ITEM" class="form-control" placeholder="-----" ng-disabled="true"></textarea></div>
+                <div class="col-sm-5">
+                    <div class="fixed-action-btn">
+                        <ul class="horizontal">
+                            <li>
+                                <a target="_blank" tooltip = "Ver" ng-click="imprimirArchivo(DAG_CAT_ITEM_IMG)" class="btn btn-default btn-circle" data-toggle="modal" data-target="#divPopup4">
+                                    <i class="fa fa-eye" style="color:#249FE6">  
+                                    </i>
+                                </a>
+                            </li> 
+                        </ul>
+                    </div>
+                </div>
+                <div class="modal fade" id="divPopup4" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" style="width:700px">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Cerrar</span></button>
+                            </div>
+                            <div class="modal-body">
+                                <!--pdf-->
+                                <div id="visorFum" ng-show="archpdf">
+                                    <object data="" type="application/pdf" width="650" height="500"></object>
+                                </div>
+                                <!--imagen-->
+                                <div ng-show="archotro">
+                                    <img id="imgSalida" ng-src="{{archivoP}}" width="100%" height="100%">
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group"><label class="col-sm-2 control-label" style="red">CARACTERISTICAS: <small class="m-l-sm" style="color: red"></small></label><br/></div>
+            <div ng-repeat="caracteristica in caracteristicas" class="form-group">
+                <label class="col-sm-2 control-label" style="red">{{caracteristica.name}}</label>
+                <div class="col-sm-10">
+                    <div class="input-group" >
+                        <input type="text" class="form-control" placeholder="" ng-model="caracteristica.value" ng-change="descCaractfn(caracteristicas)">
+                    </div>                
+                </div>
+            </div>
+            <!-- <button class="btn btn-primary" ng-click="pushItem()"> <i class="glyphicon fa fa-plus"></i>Adicionar Item</button>
+            <button class="btn btn-primary" ng-click="dropItem()"> <i class="glyphicon fa fa-minus"></i> Eliminar ultimo Item</button> -->
+            
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>PARTIDA</th>
+                        <th>NOMBRE DEL ITEM</th>
+                        <th>CARACTERISTICAS</th>
+                        <th>
+                            <div class="fixed-action-btn">
+                                <ul class="horizontal">
+                                    <li>
+                                        <a tooltip = "Adicionar Item" ng-click="pushItem()" class="btn btn-default btn-circle">
+                                            <i class="fa fa-plus">
+                                            </i>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="fixed-action-btn">
+                                <ul class="horizontal">
+                                    <li>
+                                        <a tooltip = "Eliminar ultimo Item" ng-click="dropItem()" class="btn btn-default btn-circle">
+                                            <i class="fa fa-minus">
+                                            </i>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="item in item">
+                        
+                        <td style="cursor: not-allowed;">{{item.id}}</td>
+                        <td>{{item.partida}}</td>
+                        <td>{{item.nombre}}</td>
+                        <td>{{item.caracteristicas}}</td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+            <!-- ----------------------------------------------- Fin  ---------------------------------------------------- -->
+            <div class="hr-line-dashed"></div>
+            <button type="button" class="btn btn-primary" ng-click="guardarItem()" ng-disabled="formulario.$invalid"> <i class="glyphicon fa fa-save"></i> Guardar Cambios</button>
+        </div>        
+    </form>
+</div>
+

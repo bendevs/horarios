@@ -1,0 +1,202 @@
+<script>
+    function frmFin10Controller($scope, $rootScope, $routeParams, $location, $http, Data, sessionService, CONFIG, LogGuardarInfo, DreamFactory,ngTableParams,$filter,sweet, $sce, registroLog,FileUploader, $window, $q) {
+        $scope.todosFusionados="true";
+        $scope.darBajaHijos = function() {
+            $scope[name] = 'Running';
+            var deferred = $q.defer();
+            $scope.exito = "SI";
+            sql = "SELECT * FROM  sp_baja_hijos(" + $rootScope.Tramite + ")";
+            console.log(sql);
+            var rData = new renderData();
+            rData.sql = sql;
+            try{
+                rData.renderSqlDinamic(function(response){
+                    x = JSON.parse(response);
+                    console.log("Esta es la salida ........", x);
+                    $q.all($scope.exito).then(function(data){
+                       deferred.resolve($scope.exito);
+                    });
+                });
+            } catch(error){
+                $scope.exito = "NO";
+            }
+            return deferred.promise;
+        }
+        $scope.guardarForm = function() {
+            angular.forEach($scope.datos, function(value, key) {
+                if(value == null || value =="undefined" || value =="UNDEFINED" || typeof(value)=='undefined' ) {
+                    $scope.datos[key] = "";
+                }
+            }, log);
+            var arregloDatos = $scope.darBajaHijos();
+            arregloDatos.then(function(respuesta) {
+                $scope.datos.grd_f1 = JSON.parse($scope.datos.grd_f1);
+                $scope.datos.grd_f2 = JSON.parse($scope.datos.grd_f2);
+                console.log(respuesta);
+                if (respuesta == "SI") {
+                    $scope.cargarDatos($scope.datos);
+                    $scope.guardarData($scope.datos);
+                } else { 
+                    sweet.show('Error de Fusión', 'Los tramites no fueron fusionados', 'warning');
+                }
+            }, function(reason) {
+               alert('Failed: ' + reason);
+            });
+        };
+        $scope.fusionarHijos = function(){
+            $.blockUI();
+            tabla = JSON.parse('[{"tipo":"GRD","titulos":"Nro REC|RECOMENDACION|ACEPTACION|JUSTIFICATIVO","campos":"AI_G_ORDEN_RECOMENDACION|AI_G_ORDEN_DESCRIPCION|AI_ACEP_RESPUESTAF1_VALOR|AI_JUST_RESPUESTAF1","impresiones":"true|true|true|true|true|true|"}]');
+
+            tabla1 = JSON.parse('[{"tipo":"GRD","titulos":"Nro REC|RECOMENDACION|DE FECHA|HASTA FECHA|RESPONSABLE|TAREAS","campos":"AI_G_ORDEN_RECOMENDACION|AI_G_ORDEN_DESCRIPCION|AI_DEF_RESPUESTAF2|AI_AF_RESPUESTAF2|AI_REPONSABLE_RESPUESTAF2|AI_JUST_RESPUESTAF1","impresiones":"true|true|true|true|true|true|"}]');
+            $scope.datos.grd_f1 = JSON.stringify(tabla);
+            $scope.datos.grd_f2 = JSON.stringify(tabla1);
+            angular.forEach($rootScope.obtDatos,function(celda, fila){
+                item = "{";
+                grdPara = JSON.parse(celda.grd_paralelos);
+                item = item + '"AI_G_ORDEN_RECOMENDACION" : "' + grdPara[fila+1].AI_G_ORDEN_RECOMENDACION + '",';
+                item = item + '"AI_G_ORDEN_DESCRIPCION" : "' + grdPara[fila+1].AI_G_ORDEN_DESCRIPCION + '",';
+                item = item + '"AI_ACEP_RESPUESTAF1_VALOR" : "' + ((typeof(celda.ai_acep_respuestaf1_valor) == 'undefined' || celda.ai_acep_respuestaf1_valor == null) ? '' : celda.ai_acep_respuestaf1_valor) + '",';
+                nuevoDato = celda.ai_just_respuestaf1;
+                if (nuevoDato != null) {
+                    var flags = "gi";            
+                    var regex = new RegExp('"', flags);
+                    nuevoDato = nuevoDato.replace(regex, '\\"'); 
+                } else {
+                    nuevoDato = "";
+                }
+                nuevoDato = ((typeof(nuevoDato) == 'undefined' || nuevoDato == null) ? '' : nuevoDato);
+                item = item + '"AI_JUST_RESPUESTAF1" : "' + nuevoDato + '"';
+                item = item + "}";
+                tabla.push(JSON.parse(item));
+                item = "{";
+                item = item + '"AI_G_ORDEN_RECOMENDACION" : "' + grdPara[fila+1].AI_G_ORDEN_RECOMENDACION + '",';
+                item = item + '"AI_G_ORDEN_DESCRIPCION" : "' + grdPara[fila+1].AI_G_ORDEN_DESCRIPCION + '",';
+                item = item + '"AI_DEF_RESPUESTAF2" : "' + ((typeof(celda.ai_def_respuestaf2) == 'undefined' || celda.ai_def_respuestaf2 == null) ? '' : celda.ai_def_respuestaf2) + '",';
+                item = item + '"AI_AF_RESPUESTAF2" : "' + ((typeof(celda.ai_af_respuestaf2) == 'undefined' || celda.ai_af_respuestaf2 == null) ? '' : celda.ai_af_respuestaf2) + '",';
+                item = item + '"AI_REPONSABLE_RESPUESTAF2" : "' + ((typeof(celda.ai_reponsable_respuestaf2) == 'undefined' || celda.ai_reponsable_respuestaf2 == null) ? '' : celda.ai_reponsable_respuestaf2) + '",';
+                nuevoDato = celda.ai_just_respuestaf2;
+                if (nuevoDato != null) {
+                    var flags = "gi";            
+                    var regex = new RegExp('"', flags);
+                    nuevoDato = nuevoDato.replace(regex, '\\"'); 
+                } else {
+                    nuevoDato = "";
+                }
+                nuevoDato = ((typeof(nuevoDato) == 'undefined' || nuevoDato == null) ? '' : nuevoDato);
+                item = item + '"AI_JUST_RESPUESTAF1" : "' + nuevoDato + '"';
+                item = item + "}";
+                tabla1.push(JSON.parse(item));
+            });
+            $scope.datos.grd_f1 = JSON.stringify(tabla);
+            $scope.datos.grd_f2 = JSON.stringify(tabla1);
+            if (($rootScope.obtDatos.length+1) == tabla.length && ($rootScope.obtDatos.length+1) == tabla1.length ) {
+                $scope.todosFusionados = false;
+            }
+            $.unblockUI();
+        }
+        $scope.traerHijos = function(){
+            var tramite = JSON.parse(sessionService.get("DATOSTRAMITE"));
+            $rootScope.Tramite = tramite.casoid;
+            var sesTrmAct = sessionService.get("TRAMITE_ACTUAL");
+            //sql = "SELECT cas_id, cas_datos ->>'NODO' as NODO, nodo_nombre as NOMBRE_NODO, cas_datos->> 'AI_G_ORDEN' as grd_paralelos, cas_datos ->>'AI_FECHA_RESPUESTAF1' as AI_FECHA_RESPUESTAF1, cas_datos ->>'AI_ACEP_RESPUESTAF1_VALOR' as AI_ACEP_RESPUESTAF1_VALOR, cas_datos ->>'AI_JUST_RESPUESTAF1' as AI_JUST_RESPUESTAF1, cas_datos ->>'AI_DEF_RESPUESTAF2' as AI_DEF_RESPUESTAF2, cas_datos ->>'AI_AF_RESPUESTAF2' as AI_AF_RESPUESTAF2, cas_datos ->>'AI_REPONSABLE_RESPUESTAF2' as AI_REPONSABLE_RESPUESTAF2, cas_datos ->>'AI_JUST_RESPUESTAF2' as AI_JUST_RESPUESTAF2, cas_datos ->>'USUARIO' as USUARIO, cas_datos ->>'AI_RESP_COHERENTES_VALOR' as AI_RESP_COHERENTES_VALOR FROM _fr_casos LEFT JOIN ct_nodos ON nodo_id = cast(cas_datos ->>'NODO' as int) where cas_id_padre = " + tramite.casoid + " AND cas_nombre_caso= '" + sesTrmAct + "'";
+            sql="SELECT cas_id, cas_datos ->>'NODO' as NODO, nodo_nombre as NOMBRE_NODO, cas_datos->> 'AI_G_ORDEN' as grd_paralelos, cas_datos ->>'AI_FECHA_RESPUESTAF1' as AI_FECHA_RESPUESTAF1, cas_datos ->>'AI_ACEP_RESPUESTAF1_VALOR' as AI_ACEP_RESPUESTAF1_VALOR, cas_datos ->>'AI_JUST_RESPUESTAF1' as AI_JUST_RESPUESTAF1, cas_datos ->>'AI_DEF_RESPUESTAF2' as AI_DEF_RESPUESTAF2, cas_datos ->>'AI_AF_RESPUESTAF2' as AI_AF_RESPUESTAF2, cas_datos ->>'AI_REPONSABLE_RESPUESTAF2' as AI_REPONSABLE_RESPUESTAF2, cas_datos ->>'AI_JUST_RESPUESTAF2' as AI_JUST_RESPUESTAF2, cas_datos ->>'USUARIO' as USUARIO, cas_datos ->>'AI_RESP_COHERENTES_VALOR' as AI_RESP_COHERENTES_VALOR FROM _fr_casos INNER JOIN ct_nodos ON nodo_id = cast(cas_datos ->>'NODO' as int) where cas_id_padre = " + tramite.casoid + " AND cas_nombre_caso= '" + sesTrmAct + "' UNION SELECT cas_id, cas_datos ->>'NODO' as NODO, nodo_nombre as NOMBRE_NODO, cas_datos->> 'AI_G_ORDEN' as grd_paralelos, cas_datos ->>'AI_FECHA_RESPUESTAF1' as AI_FECHA_RESPUESTAF1, cas_datos ->>'AI_ACEP_RESPUESTAF1_VALOR' as AI_ACEP_RESPUESTAF1_VALOR, cas_datos ->>'AI_JUST_RESPUESTAF1' as AI_JUST_RESPUESTAF1, cas_datos ->>'AI_DEF_RESPUESTAF2' as AI_DEF_RESPUESTAF2, cas_datos ->>'AI_AF_RESPUESTAF2' as AI_AF_RESPUESTAF2, cas_datos ->>'AI_REPONSABLE_RESPUESTAF2' as AI_REPONSABLE_RESPUESTAF2, cas_datos ->>'AI_JUST_RESPUESTAF2' as AI_JUST_RESPUESTAF2, cas_datos ->>'USUARIO' as USUARIO, cas_datos ->>'AI_RESP_COHERENTES_VALOR' as AI_RESP_COHERENTES_VALOR FROM _fr_casos INNER JOIN ct_nodos ON nodo_id = cas_nodo_id where cas_id_padre = " + tramite.casoid + " AND cas_nombre_caso= '" + sesTrmAct + "' and cast(cas_datos ->>'NODO' as int) is null order by 1";
+            var rData = new renderData();
+            rData.sql = sql;
+            rData.renderSqlDinamic(function(response){
+                x = JSON.parse(response);
+                $rootScope.obtDatos = x.success.data[0].sp_reporte_dinamico123;
+                if (($rootScope.obtDatos.length+1) == $scope.datos.grd_f1.length && ($rootScope.obtDatos.length+1) == $scope.datos.grd_f2.length ) {
+                    $scope.todosFusionados = false;
+                }
+            });
+        }
+        $scope.refrescar = function () {
+            $scope.traerHijos();
+            $scope.datos.grd_f1 = JSON.stringify($scope.datos.grd_f1);
+            $scope.datos.grd_f2 = JSON.stringify($scope.datos.grd_f2);
+        };
+        $scope.$on('api:ready',function() { 
+            $scope.traerHijos();
+            $scope.datos.grd_f1 = JSON.stringify($scope.datos.grd_f1);
+            $scope.datos.grd_f2 = JSON.stringify($scope.datos.grd_f2);
+        });
+        $scope.inicioFinanzas = function () {
+            if(DreamFactory.api[CONFIG.SERVICE]){
+                $scope.traerHijos();
+                $scope.datos.grd_f1 = JSON.stringify($scope.datos.grd_f1);
+                $scope.datos.grd_f2 = JSON.stringify($scope.datos.grd_f2);
+            }
+        };
+    }
+</script>
+<div class="wrap" ng-controller="frmFin10Controller" data-ng-init="inicioFinanzas()">
+    <div>
+        <div class="row"> 
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                   <h5>Lista de respuestas</h5>
+                    <!--div ibox-tools></div-->
+                    <button type="button" class="close" style="color: #23c6c8; opacity: 1 !important"  data-dismiss="modal" ng-click="refrescar();">
+                        <span class="fa fa-refresh fa-spin"></span>
+                    </button>
+                </div>
+
+                <div class="ibox-content">
+                   <table class="table table-striped">
+                      <thead>
+                        <th>#&nbsp;</th>
+                        <th>OPCIONES&nbsp;</th>
+                        <th>NODO&nbsp;</th>
+                        <th>FECHA DE RESPUESTA&nbsp;</th>
+                        <th>ACEPTACIÓN DE LA RESPUESTA&nbsp;</th>
+                        <th>USUARIO&nbsp;</th>
+                        <th>VALIDACIÓN AUDITOR&nbsp;</th>
+                      </thead>
+                      <tbody>
+                         <tr class="column" ng-repeat="datos in obtDatos">
+                            <td>{{$index+1}}</td>
+                            <td>
+                                <a ng-click="verDatos(datos)" tooltip = "Ver" class="btn btn-info btn-circle"><i class="fa fa-folder-open"></i></a>
+                            </td>
+                            <!--td>{{datos.cas_id}}</td-->
+                            <td>{{datos.nombre_nodo}}</td>
+                            <td>{{datos.ai_fecha_respuestaf1}}</td>
+                            <td>{{datos.ai_acep_respuestaf1_valor}}</td>
+                            <td>{{datos.usuario}}</td>
+                            <td>{{datos.ai_resp_coherentes_valor}}</td>
+                          </tr>
+                      </tbody>
+                   </table>
+                </div>
+            </div>
+        </div>
+        <form name="formularioRegistro" readOnly="true" novalidate >    
+            <div ng-show="false">        
+                <textarea ng-model="datos.grd_f1" id="grd_f1" name="grd_f1"></textarea>
+                <textarea ng-model="datos.grd_f2" id="grd_f2" name="grd_f2"></textarea>
+            </div>
+        </form>
+        <a class="btn btn-primary" ng-disabled="false" ng-click="volver()"><i class="glyphicon fa fa-times"></i> Cancelar </a>
+        <a class="btn btn-primary" ng-disabled="false" ng-click="fusionarHijos()"><i class="glyphicon fa fa-archive"></i> Fusionar </a>
+        <a class="btn btn-primary" ng-disabled="todosFusionados" ng-click="guardarForm()"><i class="glyphicon fa fa-save"></i> Guardar / Continuar </a>
+    </div>
+    <div class="modal fade" id="myModal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h2 class="modal-title">Ciudadano Existente</h2>
+                </div>
+                <div class="modal-body">
+                    <p>El Ciudadano {{nombreciu}} se encuentra registrado </p>
+                    <p>CARGAR LOS DATOS DEL CIUDADANO {{nombreciu}}</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-default" ng-click="verFormularioNatural(datos)" data-dismiss="modal">Aceptar</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

@@ -1,0 +1,285 @@
+<script type="text/javascript">
+            // When the document is ready
+    function conMayusculas(field) {
+        field.value = field.value.toUpperCase()
+    };
+      //*** Este Codigo permite Validar que sea un campo Numerico
+    function soloNumerico(variable){
+        Numer=parseInt(variable);
+        if (isNaN(Numer)){
+            return "";
+        }
+        return Numer;
+    }
+    function valNumero(Control){
+        Control.value=soloNumerico(Control.value);
+    }
+    //*** Fin del Codigo para Validar que sea un campo Numerico       
+</script>
+<div  class="col-md-12" ng-controller="formulariosDinamicosController" data-ng-init="inicioFormularioDinamico()">   
+
+    <div class="col-md-6">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>Formularios Din&aacute;micos</h5>
+                    <div ibox-tools></div>
+                        <div class="botones_inspinia_lmc">
+                        <a  class="btn btn-primary" data-toggle="modal" ng-click="limpiar()"  data-target="#registroFormularioDinamico"><i class="glyphicon glyphicon-plus"></i> Formulario Dinámico</a>
+                        </div>
+                    </div>
+                <div class="ibox-content">
+                    <div class="table-responsive">
+                        <table class="table table-striped ">
+                            <thead>
+                                <th>#&nbsp;</th>
+                                <th>Opciones&nbsp;&nbsp;</th>
+                                <th>Nro.&nbsp;</th>
+                                <th>Nombre&nbsp;</th>
+                                <th>Ver&nbsp;</th>
+                            </thead>
+                            <tbody>
+                                <tr class="column" ng-repeat="camposFormulario in obtCampoFormulario" ng-style="camposFormulario.cid==idfd && {'background-color':'#E1FFF9','font-color':'#A2D5AE'}">
+                                    <td>{{$index+1}}</td>
+                                    <td><a tooltip = "Modificar Formulario" ng-click="modificarFormularioDinamicoCargar(camposFormulario)" class="btn btn-info btn-circle" data-toggle="modal" data-target="#registroFormularioDinamico" ><i class="fa fa-pencil"></i> </a>
+                                    <a tooltip = "Eliminar Formulario" ng-click="eliminarFormularioDinamicoCargar(camposFormulario)" class="btn btn-info btn-circle" data-toggle="modal" data-target="#registroFormularioDinamico">
+                                    <i class="fa fa-trash-o">
+                                    </a></td>
+                                    <td>{{camposFormulario.cid}}</td>
+                                    <td>{{camposFormulario.cnombre}}</td>
+                                    <td><a tooltip = "Ver Campos" ng-click="getCampos(camposFormulario.cid)" class="btn-floating"><i class="fa fa-eye"></i></a></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6" ng-show = "panelVerCampos">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>Campos</h5>
+                    <div ibox-tools></div>
+                        <div class="botones_inspinia_lmc">
+                        <a  class="btn btn-primary" data-toggle="modal" ng-click="limpiarCampos()"  data-target="#registroCampoFormulario"><i class="glyphicon glyphicon-plus"></i> Campo</a>
+                        </div>
+                </div>
+                <div class="ibox-content">
+                    <div ibox-tools></div>
+                    <div class="botones_inspinia_lmc">
+                        <div class="col-lg-8" align = "right">
+                            <select id="cid" name="cid" ng-model="datosCombo.cid" class="form-control" ng-options="camposf.cid as camposf.cnombre for camposf in obtCampoFormulario" required> 
+                                <option style="display:none" value="">-- Seleccione Formulario --</option>
+                            </select>
+                        </div>
+                        <div class="col-lg-4">
+                        <a  class="btn btn-primary" data-toggle="modal" ng-click="clonarCampos(datosCombo.cid)"><i class="fa fa-files-o"></i> Copiar</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="table-responsive">
+                        <table class="table table-striped ">
+                            <thead>
+                                <th>&nbsp;</th>
+                                <th>#&nbsp;</th>
+                                <th>Opciones&nbsp;&nbsp;</th>
+                                <th>Tipo&nbsp;</th>
+                                <th>T&iacute;tulo&nbsp;</th>
+                                <th>Campo&nbsp;</th>
+                                <th>Orden&nbsp;</th>
+                            </thead>
+                            <tbody>
+                                <tr class="column" ng-repeat="campos in obtCampos" class="campos" >
+                                    <td><input type="checkbox" ng-model="campos.Selected" ng-change="check(campos.Selected, $index)"/></td>
+                                    <td>{{$index+1}}</td>
+                                    <td><a tooltip = "Modificar Campo" ng-click="modificarCamposCargar(campos,$index)" class="btn btn-info btn-circle" data-toggle="modal" data-target="#registroCampoFormulario" ><i class="fa fa-pencil"></i> </a>
+                                    <a tooltip = "Eliminar Campo" ng-click="eliminarCamposCargar(campos,$index)" class="btn btn-info btn-circle" data-toggle="modal" data-target="#registroCampoFormulario"><i class="fa fa-trash-o"></a></td>
+                                    <td>{{campos.tipo}}</td>
+                                    <td>{{campos.titulo}}</td>
+                                    <td>{{campos.campo}}</td>
+                                    <td>{{campos.orden}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="registroFormularioDinamico" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Cerrar</span></button>
+                    <h4 class="modal-title" id="myModalLabel">{{tituloP}}</h4>
+                </div>
+                <div class="modal-body" >
+                    <form name="formularioDinamico"  readOnly="true" novalidate>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <label for="url">Nombre</label>
+                                    <input required ng-model="datosfd.cnombre" id="cnombre" name="cnombre" class="form-control" type="text" placeholder="ingrese Nombre" ng-disabled="desabilitado" onkeyUp="return conMayusculas(this);">
+                                    <span style="color:red" ng-show="formularioDinamico.cnombre.$invalid" >
+                                    <span ng-show="formularioDinamico.cnombre.$error.required">el campo es requerido.
+                                    </span></span>
+                                </div>
+                            </div>              
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <button ng-click="adicionarFormularioDinamico(datosfd)" data-dismiss="modal" type="button" class="btn btn-primary" ng-show="boton=='new'" ng-hide="boton=='upd' || boton=='del'" ng-disabled="formularioDinamico.$invalid">Guardar</button>
+                    <button ng-click="modificarFormularioDinamico(datosfd)" data-dismiss="modal" type="button" class="btn btn-primary" ng-show="boton=='upd'" ng-hide="boton=='new' || boton=='del'" ng-disabled="formularioDinamico.$invalid">Modificar</button>
+                    <button ng-click="eliminarFormularioDinamico(datosfd)" data-dismiss="modal" type="button" class="btn btn-primary" ng-show="boton=='del'" ng-hide="boton=='new' || boton=='upd'" >Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="registroCampoFormulario" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Cerrar</span></button>
+                    <h4 class="modal-title" id="myModalLabel">{{tituloP}}</h4>
+                </div>
+                <div class="modal-body" >
+                    <form name="formularioCampo"  readOnly="true" novalidate>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <label for="url">T&iacute;tulo</label>
+                                    <input required ng-model="datosCampo.titulo" id="titulo" name="titulo" class="form-control" type="text" placeholder="ingrese Título" ng-disabled="desabilitado">
+                                    <span style="color:red" ng-show="formularioCampo.titulo.$invalid">
+                                    <span ng-show="formularioCampo.titulo.$error.required">El campo es requerido.
+                                    </span></span>
+                                </div>
+                            </div>
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <label for="url">Campo</label>
+                                    <input required ng-model="datosCampo.campo" id="campo" name="campo" class="form-control" type="text" placeholder="ingrese Campo" ng-disabled="desabilitado" onkeyUp="return conMayusculas(this);">
+                                    <span style="color:red" ng-show="formularioCampo.campo.$invalid">
+                                    <span ng-show="formularioCampo.campo.$error.required">El campo es requerido.
+                                    </span></span>
+                                </div>
+                            </div>
+                            <div class="col-sm-12">
+                                <div class="form-group" >
+                                    <label for="url" >Tipo:</label>
+                                    <select id="tipo" name="tipo" ng-model="datosCampo.tipo" class="form-control" ng-disabled="desabilitado"> 
+                                        <option style="display:none" value="">-- Seleccione Tipo --</option>
+                                        <option value="TXT">CAJA DE TEXTO</option>
+                                        <option value="NRO">TIPO NUM&Eacute;RICO</option>
+                                        <option value="CBO">COMBO</option>
+                                        <option value="CHK">CHECKBOX</option>
+                                        <option value="CHKM">CHECKBOX M&Uacute;LTIPLE</option>
+                                        <option value="TIT">T&Iacute;TULOS</option>
+                                        <option value="RAD">RADIO BUTTON</option>
+                                        <option value="EDT">EDITOR</option>
+                                    </select>
+                                    <span style="color:red" ng-show="formularioCampo.tipo.$invalid">
+                                        <span ng-show="formularioCampo.tipo.$error.required">El campo es requerido.
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-sm-12">
+                                <div class="form-group" >
+                                    <label for="url" >Tipo Script:</label>
+                                    <select id="type" name="type" ng-model="datosCampo.type" class="form-control" ng-disabled="desabilitado"> 
+                                        <option style="display:none" value="">-- Seleccione Tipo --</option>
+                                        <option value="IN">ENTRADA</option>
+                                        <option value="OUT">SALIDA</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-sm-12">
+                                <div class="form-group" >
+                                    <label for="category">Posici&oacute;n</label>
+                                    <select id="posicion" name="posicion" ng-model="datosCampo.posicion" class="form-control" ng-disabled="desabilitado"> 
+                                        <option style="display:none" value="">-- Seleccione Tipo --</option>
+                                        <option value="UP">ARRIBA</option>
+                                        <option value="DOWN">ABAJO</option>
+                                        <option value="LEFT">IZQUIERDA</option>
+                                        <option value="RIGHT">DERECHA</option>
+                                    </select>
+                                    <span style="color:red" ng-show="formularioCampo.posicion.$invalid">
+                                    <span ng-show="formularioCampo.posicion.$error.required">El campo es requerido.</span></span>
+                                </div>
+                            </div>
+                            <div class="col-sm-12">
+                                <div class="form-group" >
+                                    <label for="category">Columnas</label>
+                                    <input  required ng-model="datosCampo.columnas" id="columnas" name="columnas" class="form-control" type="text" placeholder="ingrese Columnas" ng-disabled="desabilitado" onkeyUp="return valNumero(this);">
+                                    <span style="color:red" ng-show="formularioCampo.columnas.$invalid">
+                                    <span ng-show="formularioCampo.columnas.$error.required">El campo es requerido.</span></span>
+                                </div>
+                            </div>
+                            <div class="col-sm-12">
+                                <div class="form-group" >
+                                    <label for="category">Estado</label>
+                                    <select id="estado" name="estado" ng-model="datosCampo.estado" class="form-control" ng-disabled="desabilitado"> 
+                                        <option style="display:none" value="">-- Seleccione Tipo --</option>
+                                        <option value="LECTURA">LECTURA</option>
+                                        <option value="ESCRITURA">ESCRITURA</option>
+                                    </select>
+                                    <span style="color:red" ng-show="formularioCampo.estado.$invalid">
+                                    <span ng-show="formularioCampo.estado.$error.required">El campo es requerido.</span></span>
+                                </div>
+                            </div>
+                            <div class="col-sm-12">
+                                <div class="form-group" >
+                                    <label for="category">Orden</label>
+                                    <input  required ng-model="datosCampo.orden" id="estado" name="orden" class="form-control" type="text" placeholder="ingrese Orden" ng-disabled="desabilitado" onkeyUp="return valNumero(this);">
+                                    <span style="color:red" ng-show="formularioCampo.orden.$invalid">
+                                    <span ng-show="formularioCampo.orden.$error.required">El campo es requerido.</span></span>
+                                </div>
+                            </div>
+                            <div class="col-sm-12" ng-if = "datosCampo.tipo == 'CBO'">
+                                <div class="form-group" >
+                                    <label for="url" >Tipo de Llenado</label>
+                                    <select id="tipo_llenado" name="tipo_llenado" ng-model="datosCampo.tipo_llenado" class="form-control" ng-disabled="desabilitado" required> 
+                                        <option style="display:none" value="">-- Seleccione Tipo --</option>
+                                        <option value="SQL">SQL</option>
+                                        <option value="datos">Datos</option>
+                                    </select>
+                                    <span style="color:red" ng-show="formularioCampo.tipo_llenado.$invalid">
+                                        <span ng-show="formularioCampo.tipo_llenado.$error.required">El campo es requerido.
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-sm-12" ng-if = "datosCampo.tipo == 'CBO'">
+                                <div class="form-group" >
+                                    <label for="category">Data</label>
+                                    <textarea ng-model="datosCampo.data" id="data" name="data" class="form-control" style="resize:none; height:8em;" ng-disabled="desabilitado">
+                                    </textarea> 
+                                    <span style="color:red" ng-show="formularioCampo.data.$invalid">
+                                        <span ng-show="formularioCampo.data.$error.required">El campo es requerido.
+                                        </span>
+                                    </span>
+
+                                </div>
+                            </div>               
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <button ng-click="adicionarCampos(datosCampo)" data-dismiss="modal" type="button" class="btn btn-primary" ng-show="boton=='new'" ng-hide="boton=='upd' || boton=='del'" ng-disabled="formularioCampo.$invalid">Guardar</button>
+                    <button ng-click="modificarCampos(datosCampo)" data-dismiss="modal" type="button" class="btn btn-primary" ng-show="boton=='upd'" ng-hide="boton=='new' || boton=='del'" ng-disabled="formularioCampo.$invalid">Modificar</button>
+                    <button ng-click="eliminarCampos(datosCampo)" data-dismiss="modal" type="button" class="btn btn-primary" ng-show="boton=='del'" ng-hide="boton=='new' || boton=='upd'" >Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</div>

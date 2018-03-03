@@ -1,0 +1,99 @@
+<style>
+    .column {cursor: move;}
+    .column header {color: #fff;}
+</style>
+<div class="col-md-12" ng-controller="UsuariosRolesController" data-ng-init="inicioUsuariosRoles()">
+    <legend><H3> <label for="title">Administracion de Usuarios Roles</label> </H3></legend>
+    <div class="row">
+        <div class="col-md-5">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>Usuarios</h5>
+                    <div ibox-tools></div>
+                </div>
+                <div class="ibox-content">
+                    <table class="table table-striped ">
+                                <thead>
+                                    <th>ID&nbsp;</th>
+                                    <th>Nombre&nbsp;</th>
+                                    <th>Codigo&nbsp;</th>
+                                    <th>Clave&nbsp;</th>
+                                </thead>
+                                <tbody>
+                                    <tr class="column" ng-repeat="usuario in usuarios" ng-click="seleccionarUsuario(usuario.usrId,usuario.usrNombre)">
+                                        <td>{{usuario.usrId}}</td>
+                                        <td>{{usuario.usrNombre}}</td>
+                                        <td>{{usuario.usrUsuario}}</td>
+                                        <td>{{usuario.usrClave}}</td>
+                                    </tr>
+                                </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-md-6">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>Roles Asignados {{nombre_usuario}}</h5>
+                    <div ibox-tools></div>
+                </div>
+                <div class="ibox-content">
+                    <table class="table table-striped ">
+                                <thead>
+                                    <th>SELECCIONAR&nbsp;</th>
+                                    <th>ID&nbsp;</th>
+                                    <th>Usuario&nbsp;</th>
+                                    <th>Rol&nbsp;</th>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="usuariosRol in usuariosRoles">
+                                        <td><div class="ngSelectionCell">
+                                            <input tabindex="-1" class="ngSelectionCheckbox" type="checkbox" ng-checked="row.selected" ng-model="checkboxesi.items[usuariosRol.usrlsid]" /></div></td>
+                                        <td>{{usuariosRol.usrlsid}}</td>
+                                        <td>{{usuariosRol.usr}}</td>
+                                        <td>{{usuariosRol.rol}}</td>
+                                    </tr>
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+
+
+            <div align="center">
+                <p><button ng-click="subir()" class="btn btn-large btn-primary btn"  type="submit"><span class="glyphicon glyphicon-chevron-up"></span>Asignar&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</button>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <button ng-click="bajar()" class="btn btn-large btn-primary btn"  type="submit"><span class="glyphicon glyphicon-chevron-down"></span>Desasignar</button>
+                                </b></p>
+            </div>
+
+
+            <div class="col-lg-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>Roles No Asignados</h5>
+                        <div ibox-tools></div>
+                    </div>
+                    <div class="ibox-content">
+                        <table class="table table-striped ">
+                                    <thead>
+                                        <th>SELECCIONAR&nbsp;</th>
+                                        <th>ID&nbsp;</th>
+                                        <th>Rol&nbsp;</th>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="rol in roles">
+                                            <td><div class="ngSelectionCell">
+                                                <input tabindex="-1" class="ngSelectionCheckbox" type="checkbox" ng-checked="row.selected" ng-model="checkboxes.items[rol.rlid]"/></div></td>
+                                            <td>{{rol.rlid}}</td>
+                                            <td>{{rol.rol}}</td>
+                                        </tr>
+                                    </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

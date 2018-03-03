@@ -1,0 +1,171 @@
+<style>
+    html, body {
+        height:100%;
+    }
+    #box2 {
+        height:80%;
+        background:#331266;
+    }
+    #container2 {
+        position:relative;
+        height:100%;
+    }
+    #box1 {
+        height:80%;
+        background:#331266;
+    }
+    #container1 {
+        position:relative;
+        height:100%;
+    }
+</style>
+<div class="wrapper wrapper-content animated fadeInRight" ng-controller="usgdasController" data-ng-init="inicioGrafica()">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="col-md-2">
+                <div class="ibox float-e-margins" >
+                    <div class="ibox-title">                            
+                        <h3>Total Solicitudes Recibidas</h3>
+                    </div>
+                    <div class="ibox-content">
+                        <h1 class="no-margins" >{{totalunidad}}</h1>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">                            
+                        <h3 >Total Solicitudes Atendidas</h3>
+                    </div>
+                    <div class="ibox-content">
+                        <h1 class="no-margins" >{{totalatendido}}</h1>                        
+                    </div>
+                </div>
+            </div>
+        </div> 
+    </div>                 
+    <div class="row" class="col-lg-12">
+        <div class="col-md-6">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5> UOs Solicitantes
+                        <small> Hasta gestión 2016.</small>
+                    </h5>
+                    <div ibox-tools></div>
+                </div>
+                <div class="ibox-content">
+                    <div>
+                        <div id="box1">
+                            <div id="container1">
+                            </div>
+                        </div>
+                    </div>
+                    <table ng-table="tabla2" class="table table-hover table-bordered">
+                        <tr ng-repeat="uni in leyenda1">
+                            <td data-title="'unidad'" sortable="'Unidad'">{{uni.unidad}} </td>
+                            <td data-title="'Cantidad'" sortable="'Cantidad'">{{uni.suma}} </td>
+                        </tr>
+                        <tr>
+                            <td ><strong>TOTAL</strong> </td>
+                            <td >{{totalunidad}} </td>
+                        </tr>
+                    </table>   
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>Tipo de servicio mas requerido
+                        <small> Hasta gestión 2016.</small>
+                    </h5>
+                    <div ibox-tools></div>
+                </div>
+                <div class="ibox-content">
+                    <div>
+                        <div id="box2">
+                            <div id="container2">
+                            </div>
+                        </div>
+                        <table ng-table="tabla1" class="table table-hover table-bordered">
+                            <tr ng-repeat="ser in leyenda">
+                                <td data-title="'Servicio'" sortable="'CIMs'">{{ser.nombre}} </td>
+                                <td data-title="'Cantidad'" sortable="'Cantidad'">{{ser.cantidad}} </td> 
+                            </tr>
+                            <tr>
+                                <td ><strong>TOTAL</strong> </td>
+                                <td >{{totalservicio}} </td>
+                            </tr>
+                        </table>   
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5> Calificaciones Recibidas
+                        <small> Hasta gestión 2016.</small>
+                    </h5>
+                    <div ibox-tools></div>
+                </div>
+                <div class="ibox-content">
+                    <div>
+                        <canvas id="doughnutChart" height="100"></canvas>
+                        <table ng-table="tabla2" class="table table-hover table-bordered">
+                            <tr ng-repeat="ser in calficaciones">
+                                <td data-title="'Calficaciones'" sortable="'CIMs'">{{ser.calificacion}} </td>
+                                <td data-title="'Cantidad'" sortable="'Cantidad'">{{ser.cantidad}} </td> 
+                            </tr>
+                            <tr>
+                                <td ><strong>TOTAL</strong> </td>
+                                <td >{{totalcalficaciones}} </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5> Por Conductor
+                        <!--small> Hasta gestión 2016.</small-->
+                    </h5>                    
+                    <div ibox-tools></div>
+                </div>
+                <div class="ibox-content">
+                    <div>
+                        <canvas id="doughnutChart3" height="100"></canvas>  
+                        <table ng-table="tabla3" class="table table-hover table-bordered">
+                            <tr ng-repeat="ser in apoyo">
+                                <td data-title="'Conductor'" sortable="'CIMs'">{{ser.chofer}} </td>
+                                <td data-title="'Cantidad'" sortable="'Cantidad'">{{ser.suma}} </td> 
+                            </tr>
+                            <tr>
+                                <td ><strong>TOTAL</strong> </td>
+                                <td >{{totalapoyo}} </td>
+                            </tr>
+                        </table>                          
+                    </div>
+                </div>
+            </div>
+        </div>
+       
+    </div>
+</div>
+
+<!-- Flot -->
+<script src="../../libs/js2/js/plugins/flot/jquery.flot.js"></script>
+<script src="../../libs/js2/js/plugins/flot/jquery.flot.tooltip.min.js"></script>
+<script src="../../libs/js2/js/plugins/flot/jquery.flot.resize.js"></script>
+<script src="../../libs/js2/js/plugins/flot/jquery.flot.pie.js"></script>
+
+<!-- Custom and plugin javascript -->
+<script src="../../libs/js2/js/inspinia.js"></script>
+<script src="../../libs/js2/js/plugins/pace/pace.min.js"></script>
+
+<!-- ChartJS-->
+<script src="../../libs/js2/js/plugins/chartJs/Chart.min.js"></script>
+<!--script src="../../libs/js2/js/demo/chartjs-demo.js"></script-->
+

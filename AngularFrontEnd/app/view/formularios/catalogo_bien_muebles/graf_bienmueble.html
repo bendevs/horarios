@@ -1,0 +1,82 @@
+<div class="col-md-12" ng-controller="grafica_bien_mueble">
+    <form  name="reportForm" id="reportForm" class="form-horizontal" role="form"
+        novalidate data-ng-init="inicioActuaciones()" >
+        <div>
+               <div class="col-md-12 col-sm-12 col-xs-12"   >
+                <div class="form-group">
+                    <label for="category">REPORTES GRAFICOS:</label>
+                    <div class="controls">
+
+                     
+                    </div>
+                </div>
+            </div>
+              <br>
+
+              <div>
+                   <a class="btn btn-primary" ng-click="categoria(datosCarga.area) " >
+                      <i class="glyphicon fa fa-eye"></i>
+                       Generar Grafica
+                  </a>
+                  <a class="btn btn-primary" ng-click="cargarDatos()" >
+                      <i class="glyphicon fa fa-print"></i>
+                      Imprimir
+
+                  </a>
+              </div>
+
+          <div>
+    </form>
+
+    <div ng-show = "graficaP">
+      <div class="row"  id="grafica" >
+          <table  width="100%">
+            <td>
+            </br>
+              <center><h3>CATALOGO POR PARTIDA PRESUPUESTARIA - GRAFICA </h3></center>
+            </td>
+          </table>
+          <br/>
+      </div>
+  <div class="col-md-12" id="graficass">
+            <div id="containerdato" style="width: 1200px; height:600px; margin: 0 auto"></div>
+        </div>
+
+
+        <div class="col-md-12" >
+        <div class="row panel panel-default" >
+          <div class="table-responsive" >
+              <table class="table table-hover">
+                 <thead>
+                  <tr>
+                      <th class="text-center"><br></th>
+                  </tr>
+                  </thead>
+                 <tbody  id="Tramite">
+                  <tr>
+                      <td><div class="col-sm-1"><b>#</b></div></td>
+                      <td><div class="col-sm-12" ><b>PARTIDA PRESUPUESTARIA</b></div></td>
+                     <td><div class="col-sm-2"><b>CANTIDAD</b></div></td>
+                  </tr>
+                  <tr ng-repeat="dato in datatramite">
+                      <td><div class="col-sm-1" >{{$index+1}}</div></td>
+                      <td><div class="col-sm-12" >{{dato.nombres}}</div></td>
+                       <td><div class="col-sm-2" >{{dato.countpart}}</div></td>
+                  </tr>
+                   <td>
+                      <!--td>
+                          <div class="col-sm-3"><b>Total</b></div></td>
+                          <td><div class="col-sm-7"><b>=</b></div></td>
+
+                          <td><div class="col-sm-3"><b>{{cantidad}}</b></div></td>
+
+                      </td-->
+                  </tbody>
+              </table>
+              </br>
+            </div>
+          </div>
+        </div>
+      
+
+  </div>

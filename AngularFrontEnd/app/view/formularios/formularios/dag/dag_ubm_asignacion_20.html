@@ -1,0 +1,354 @@
+<script>
+    function frm_DAG_UBM_Asig_20_Controller($scope,  $rootScope, DreamFactory, CONFIG, sessionService, sweet) {
+        var f = new Date();
+        var dia=parseInt(f.getDate());
+        if(dia<10) {
+            dia='0'+f.getDate();
+        } else {
+            dia=f.getDate();
+        }
+        if(parseInt(f.getMonth() +1)<10){
+            mes='0'+(f.getMonth() +1);
+        }else{
+            mes=(f.getMonth() +1);
+        }
+        fecha = f.getFullYear() + '-' + mes + '-' + dia;
+        // document.getElementById('UBM_ASIG_FEC_SOLICITUD').value = fecha;
+        $scope.datos.UBM_ASIG_FEC_SOLICITUD = fecha;
+
+        // document.getElementById('UBM_ASIG_PATERNO').value = appat;
+        // document.getElementById('UBM_ASIG_MATERNO').value = apmat;
+        // document.getElementById('UBM_ASIG_NOMBRES').value = nombre;
+        
+        $scope.ListFuncionarios = "";
+        $scope.Cargarfuncionarios = function () {
+            var datosFuncionarios = {
+                "procedure_name":"dag.sp_dag_ubm_funcionarioreponsable",
+            };
+            DreamFactory.api[CONFIG.SERVICE].callStoredProcWithParams(datosFuncionarios).success(function (response){
+                var tmpListFuncionarios = JSON.stringify(response);
+                $scope.ListFuncionarios = JSON.parse(tmpListFuncionarios);
+            })
+            .error(function(data){
+                sweet.show('', 'Error al cargar la informacion de los funcionarios: ', 'error');
+            });
+        };
+        $scope.TecnicoAsignadof = function (id_item) {
+            var resUE = {
+                table_name:"dag.dag_ubm_asignacion_tecnico",
+                filter:"dag_uo_s="+parseInt($scope.S_SOLICITANTE)+" and dag_uo_da="+parseInt($scope.DA_SOLICITANTE)+" and dag_uo_ue="+parseInt($scope.UE_SOLICITANTE)+" and dag_uo_uo="+parseInt($scope.UO_SOLICITANTE)
+            };
+            var obj=DreamFactory.api[CONFIG.SERVICE].getRecords(resUE);
+            obj.success(function(response){
+                var tmp = response.record;
+                //var size = Object.keys(tmp).length;
+                $scope.datos.TECNICO_ASIGNADO = tmp[0].asig_tec_id;
+            })
+            .error(function(response){
+                sweet.show('', 'Error: ', 'error');
+            })
+        };
+
+        $scope.TecnicosUBM = function () {
+            var datosFuncionarios = {
+                "procedure_name":"dag.sp_dag_ubm_tecnicoasignado",
+            };
+            DreamFactory.api[CONFIG.SERVICE].callStoredProcWithParams(datosFuncionarios).success(function (response){
+                var tmpListTecnicoAsig = JSON.stringify(response);
+                $scope.ListTecnicoAsig = JSON.parse(tmpListTecnicoAsig);
+            })
+            .error(function(data){
+                sweet.show('', 'Error al cargar la informacion de los técnicos: ', 'error');
+            });
+        };
+
+        $scope.cerear = function () {
+            $scope.datos.obtAsignaciones[$scope.selectedRow].dag_ubm_asig_funcionario_responsable = $scope.tmprowfunc;
+        }
+
+        //Cuando eliges un usuario lo reemplaza en el campo de texto
+        $scope.cambiafuncionario = function(funcionario,ap_pat,ap_mat,nomb){
+            $scope.funcionario = funcionario + ' ' + ap_pat + ' ' + ap_mat + ', ' + nomb;
+            var table = document.getElementById('dataTable1');
+            $scope.datos.obtAsignaciones[$scope.selectedRow].dag_ubm_asig_funcionario_responsable = funcionario + ' ' + ap_pat + ' ' + ap_mat + ', ' + nomb;
+            $scope.datos.obtAsignaciones[$scope.selectedRow].dag_ubm_asig_cod_funcionario_responsable = funcionario;
+        }
+
+        $scope.CargarAsignaciones = function (xx) {
+            // dag_ubm_fr_id
+            // dag_ubm_fr_ci
+            // dag_ubm_fr_numitem
+            // dag_ubm_fr_paterno
+            // dag_ubm_fr_materno
+            // dag_ubm_fr_nombres
+            // dag_ubm_ac_s
+            // dag_ubm_ac_da
+            // dag_ubm_ac_ue
+            // dag_ubm_ac_oficina
+            // dag_ubm_ac_form
+            // dag_ubm_ac_fecha_trans
+            // dag_ubm_activo_codigoaf
+            // dag_ubm_activo_codigo
+            // dag_ubm_activo_codigoold
+            // dag_ubm_activo_nombre
+            // dag_ubm_activo_descripcion
+            // dag_ubm_activo_observaciones 
+            // dag_ubm_asig_funcionario_responsable
+            // dag_ubm_asig_cod_funcionario_responsable
+            var resRoles = {
+                "procedure_name":"dag.dag_ubm_sp_asignaciones_funcionario",
+                "body":{
+                "params": [                                
+                    {
+                        "name": "funcionario",
+                        "value": xx
+                    }
+                ]
+            }
+            };
+            //servicio listar acrivos asignados a un funcionario 
+            obj=DreamFactory.api[CONFIG.SERVICE].callStoredProcWithParams(resRoles);
+            obj.success(function (response) {
+                $scope.datos.obtAsignaciones = response;
+                $scope.datos.totalactivosasignados = Object.keys($scope.datos.obtAsignaciones).length;
+
+            })
+            obj.error(function(error) {
+                // $.unblockUI();
+                sweet.show('', 'Error al recuperar la informacion, intentelo nuevamente', 'warning');
+            });
+        };
+
+        $scope.Cargar_s_da_ue_uo_func = function (xx) {
+            var resRoles = {
+                "procedure_name":"dag.sp_dag_ubm_s_da_ue_uo_funcionario",
+                "body":{
+                "params": [                                
+                    {
+                        "name": "funcionario",
+                        "value": xx
+                    }
+                ]
+            }
+            };
+            //servicio listar acrivos asignados a un funcionario 
+            obj=DreamFactory.api[CONFIG.SERVICE].callStoredProcWithParams(resRoles);
+            obj.success(function (response) {
+                $scope.datos.s_da_ue_uo_func = response;
+                if (Object.keys($scope.datos.s_da_ue_uo_func).length == 1) {
+                    $scope.S_SOLICITANTE = $scope.datos.s_da_ue_uo_func[0].dag_s_s;
+                    $scope.S_SOLICITANTE_D = $scope.datos.s_da_ue_uo_func[0].dag_s_descripcion;
+                    $scope.DA_SOLICITANTE = $scope.datos.s_da_ue_uo_func[0].dag_da_da;
+                    $scope.DA_SOLICITANTE_D = $scope.datos.s_da_ue_uo_func[0].dag_da_descripcion;
+                    $scope.UE_SOLICITANTE = $scope.datos.s_da_ue_uo_func[0].dag_ue_ue;
+                    $scope.UE_SOLICITANTE_D = $scope.datos.s_da_ue_uo_func[0].dag_ue_descripcion;
+                    $scope.UO_SOLICITANTE = $scope.datos.s_da_ue_uo_func[0].dag_uo_uo;
+                    $scope.UO_SOLICITANTE_D = $scope.datos.s_da_ue_uo_func[0].dag_uo_descripcion;
+                    $scope.TecnicoAsignadof();
+                }
+                else
+                {
+                    sweet.show('', 'Usted no tiene unidad solicitante actualizada, contactese con el administrador del sistema', 'error');
+                }
+
+            })
+            obj.error(function(error) {
+                $.unblockUI();
+                sweet.show('', 'Error al recuperar la informacion, intentelo nuevamente', 'warning');
+            });
+        };
+
+        $scope.selectedRow = null;
+        $scope.setClickedRow = function(index){
+            $scope.selectedRow = index;
+            $scope.funcionario = "";
+            $scope.tmprowfunc = $scope.datos.obtAsignaciones[$scope.selectedRow].dag_ubm_asig_funcionario_responsable;
+        }
+
+        $scope.cancelaseleccion = function () {
+            $scope.datos.obtAsignaciones[$scope.selectedRow].dag_ubm_asig_funcionario_responsable = $scope.tmprowfunc;
+        }
+        $scope.noasignar = function () {
+            $scope.datos.obtAsignaciones[$scope.selectedRow].dag_ubm_asig_funcionario_responsable = "-----";
+        }
+        $scope.guardarcontinuar = function () {
+            if ($scope.datos.totalactivosasignados > 0){
+                $scope.cargarDatos($scope.datos);
+                $scope.guardarData($scope.datos);
+            }
+            else
+            {
+                sweet.show('', 'No tiene activos asignados a su cargo, no puede solicitar una asignacion', 'error');
+            }
+        }
+        $scope.vertablaf = function () {
+            if ($scope.vertabla==0){
+                $scope.vertabla=1;
+            }
+            else{
+                $scope.vertabla=0;
+            }
+        }
+        
+        $scope.$on('api:ready',function(){
+            $scope.datos.obtAsignaciones ="";
+            $scope.vertabla=0;
+            $scope.datos.TECNICO_ASIGNADO = "";
+            $scope.TecnicosUBM();
+            $scope.Cargarfuncionarios();
+            $scope.Cargar_s_da_ue_uo_func($rootScope.x);
+            $scope.CargarAsignaciones($rootScope.x);
+        });
+        $scope.inicioAsignacion20 = function () {
+            $rootScope.UBMx=$scope.datos.SOL_CI_FUNC;
+            if(DreamFactory.api[CONFIG.SERVICE]){
+                $scope.datos.obtAsignaciones ="";
+                $scope.vertabla=0;
+                $scope.datos.TECNICO_ASIGNADO = "";
+                $scope.TecnicosUBM();
+                $scope.Cargarfuncionarios();
+                $scope.Cargar_s_da_ue_uo_func($rootScope.UBMx);
+                $scope.CargarAsignaciones($rootScope.UBMx);
+            }
+        };
+    }
+</script>
+<div>
+<!-- begin form -->
+    <form class="form-horizontal" name="formulario" novalidate>
+        <div class="wrap" ng-controller="frm_DAG_UBM_Asig_20_Controller" data-ng-init="inicioAsignacion20(datos)">
+            <div class="ibox-title_2">
+                <h5>DESIGNACION DE TECNICO INVENTARIADOR:</h5>
+            </div>
+            <div class="hr-line-dashed"></div>
+            <div class="form-group"><label class="col-sm-2 control-label" style="red">FECHA DE SOLICITUD: <small class="m-l-sm" style="color: red"></small></label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.UBM_ASIG_FEC_SOLICITUD}}" class="form-control"></div>
+            </div>
+            <div class="form-group"><label class="col-sm-2 control-label" style="red">APELLIDO PATERNO: <small class="m-l-sm" style="color: red"></small></label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.SOL_APA_FUNC}}" class="form-control"></div>
+            </div>
+            <div class="form-group"><label class="col-sm-2 control-label" style="red">APELLIDO MATERNO: <small class="m-l-sm" style="color: red"></small></label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.SOL_AMA_FUNC}}" class="form-control"></div>
+            </div>
+            <div class="form-group"><label class="col-sm-2 control-label" style="red">NOMBRES: <small class="m-l-sm" style="color: red"></small></label>
+                <div class="col-sm-10"><input type="text" disabled="" placeholder="{{datos.SOL_NOM_FUNC}}" class="form-control"></div>
+            </div>
+            <div class="form-group"><label class="col-sm-2 control-label" style="red">SECTOR: <small class="m-l-sm" style="color: red"></small></label>
+                <div class="col-sm-2"><input type="text" disabled="" placeholder="{{S_SOLICITANTE}}" class="form-control"></div>
+                <div class="col-sm-8"><input type="text" disabled="" placeholder="{{S_SOLICITANTE_D}}" class="form-control"></div>
+            </div>
+            <div class="form-group"><label class="col-sm-2 control-label" style="red">DIRECCION ADMINISTRATIVA: <small class="m-l-sm" style="color: red"></small></label>
+                <div class="col-sm-2"><input type="text" disabled="" placeholder="{{DA_SOLICITANTE}}" class="form-control"></div>
+                <div class="col-sm-8"><input type="text" disabled="" placeholder="{{DA_SOLICITANTE_D}}" class="form-control"></div>
+            </div>
+            <div class="form-group"><label class="col-sm-2 control-label" style="red">UNIDAD EJECUTORA: <small class="m-l-sm" style="color: red"></small></label>
+                <div class="col-sm-2"><input type="text" disabled="" placeholder="{{UE_SOLICITANTE}}" class="form-control"></div>
+                <div class="col-sm-8"><input type="text" disabled="" placeholder="{{UE_SOLICITANTE_D}}" class="form-control"></div>
+            </div>
+            <div class="form-group"><label class="col-sm-2 control-label" style="red">UNIDAD ORGANIZACIONAL: <small class="m-l-sm" style="color: red"></small></label>
+                <div class="col-sm-2"><input type="text" disabled="" placeholder="{{UO_SOLICITANTE}}" class="form-control"></div>
+                <div class="col-sm-8"><input type="text" disabled="" placeholder="{{UO_SOLICITANTE_D}}" class="form-control"></div>
+            </div>
+            <div class="form-group"><label class="col-sm-2 control-label" style="red">TÉCNICO ASIGNADO: <small class="m-l-sm" style="color: red"></small></label>
+                <div class="col-sm-10">
+                   <select 
+                        id="ListTecnicoAsig" 
+                        name="ListTecnicoAsig" 
+                        placeholder="-- Seleccione --" 
+                        ng-model="datos.TECNICO_ASIGNADO" 
+                        class="form-control" 
+                        ng-options='datoP.tec_id as (datoP.prs_paterno + " " + datoP.prs_materno + ", " +  datoP.prs_nombres) for datoP in ListTecnicoAsig'>
+                    </select> 
+                </div>
+            </div>
+
+            <div class="hr-line-dashed"></div>
+            <div class="ibox-title_2">
+                <h5>Activos Asignados</h5>
+            </div>
+            <div class="form-group"><label class="col-sm-2 control-label" style="red">TOTAL ACTIVOS ASIGNADOS: <small class="m-l-sm" style="color: red"></small></label>
+                <div class="col-sm-2"><input type="text" disabled="" placeholder="{{datos.totalactivosasignados}}" class="form-control"></div>
+            </div>
+            <input type="button" ng-click="vertablaf()" value="Ver Tabla">
+            <div ng-show="vertabla==1">
+                <!-- ----------------------------------------------- tabla ---------------------------------------------------- -->
+                <div>
+                    <table class="table-responsive" id="dataTable1">
+                        <thead style="background-color: #009688 !important;color: white !important;">
+                            <tr>
+                                <!-- <th>#</th> -->
+                                <th style="border: 1px solid #dddddd;"></th>
+                                <th style="border: 1px solid #dddddd;">CODIGO</th>
+                                <th style="border: 1px solid #dddddd;">CODIGO BERTHIN 2006</th>
+                                <th style="border: 1px solid #dddddd;">CODIGO ANTERIOR</th>
+                                <th style="border: 1px solid #dddddd;">TIPO DE ACTIVO</th>
+                                <th style="border: 1px solid #dddddd;">DESCRIPCION</th>
+                                <th style="border: 1px solid #dddddd;">OBSERVACIONES</th>
+                                <th style="border: 1px solid #dddddd;">S</th>
+                                <th style="border: 1px solid #dddddd;">DA</th>
+                                <th style="border: 1px solid #dddddd;">UE</th>
+                                <th style="border: 1px solid #dddddd;">OFICINA</th>
+                                <th style="border: 1px solid #dddddd;">FORMULARIO</th>
+                                <th style="border: 1px solid #dddddd;">FECHA ASIGNACION</th>
+                                <th style="border: 1px solid #dddddd;">FUNCIONARIO A ASIGNAR</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="item in datos.obtAsignaciones" ng-class="{'selected':$index == selectedRow}" ng-click="setClickedRow($index)">
+                                <!-- <td>{{$index}}+1</td> -->
+                                <td style="border: 1px solid #009688;"><a tooltip = "Asignar" class="btn btn-small btn-circle" data-toggle="modal" data-target="#formulariomodal"><span class="fa fa-check"></span></a></td>
+                                <td style="border: 1px solid #009688;">{{item.dag_ubm_activo_codigoaf}}</td>
+                                <td style="border: 1px solid #009688;">{{item.dag_ubm_activo_codigo}}</td>
+                                <td style="border: 1px solid #009688;">{{item.dag_ubm_activo_codigoold}}</td>
+                                <td style="border: 1px solid #009688;">{{item.dag_ubm_activo_nombre}}</td>
+                                <td style="border: 1px solid #009688;">{{item.dag_ubm_activo_descripcion}}</td>
+                                <td style="border: 1px solid #009688;">{{item.dag_ubm_activo_observaciones}}</td>
+                                <td style="border: 1px solid #009688;">{{item.dag_ubm_ac_s}}</td>
+                                <td style="border: 1px solid #009688;">{{item.dag_ubm_ac_da}}</td>
+                                <td style="border: 1px solid #009688;">{{item.dag_ubm_ac_ue}}</td>
+                                <td style="border: 1px solid #009688;">{{item.dag_ubm_ac_oficina}}</td>
+                                <td style="border: 1px solid #009688;">{{item.dag_ubm_ac_form}}</td>
+                                <td  style="border: 1px solid #009688;" class="joinedDate">{{item.dag_ubm_ac_fecha_trans | date:'short'}}</td>
+                                <td style="border: 1px solid #009688;">{{item.dag_ubm_asig_funcionario_responsable}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- ----------------------------------------------- Fin UBM ---------------------------------------------------- -->
+            <div class="hr-line-dashed"></div>
+            <button type="button" class="btn btn-primary" ng-disabled="false" ng-click="volver()"> <i class="glyphicon fa fa-times"></i> Cancelar </button> 
+            <button type="button" class="btn btn-primary" ng-click="guardarcontinuar()" ng-disabled="formulario.$invalid"> <i class="glyphicon fa fa-save"></i> Guardar / Continuar</button>
+            <!-- ---------------------------------- modal de busqueda de funcionario responsable ------------------------------------------- -->
+            <div class="modal fade" id="formulariomodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button ng-click="cancelaseleccion();" type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Cerrar</span></button>
+                            <h4 class="modal-title" id="myModalLabel">Nuevo funcionario responsable</h4>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <div class="col-sm-1"></div>
+                            <div class="col-sm-10"><input type="text" ng-model="funcionario" ng-change="cerear()" placeholder="Buscar Funcionario" class="form-control">
+                                <br><br>
+                                <ul style="border: 1px solid #009688;height:120px;  overflow-y:scroll;">
+                                    <li ng-repeat="funcionario in ListFuncionarios | filter:funcionario " ng-click="cambiafuncionario(funcionario.dag_ubm_fr_ci,funcionario.dag_ubm_fr_paterno,funcionario.dag_ubm_fr_materno,funcionario.dag_ubm_fr_nombres)">
+                                        <a>{{funcionario.dag_ubm_fr_ci}} {{funcionario.dag_ubm_fr_paterno}} {{funcionario.dag_ubm_fr_materno}}, {{funcionario.dag_ubm_fr_nombres}}</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div><br>
+                        <div class="hr-line-dashed"></div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" data-dismiss="modal">Aceptar</button>
+                            <button ng-click="cancelaseleccion();" id="cerrar" name="cerrar" type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
+                            <button ng-click="noasignar();" type="button" class="btn btn-primary" data-dismiss="modal">No asignar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>    
+</div>
+

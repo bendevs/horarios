@@ -1,0 +1,1303 @@
+<style>
+    input:required:invalid {
+        border: 1px solid red;
+    }
+    input:required:valid {
+        border: 1px solid green;
+    }
+    select:required:invalid {
+        border: 1px solid red;
+    }
+    select:required:valid {
+        border: 1px solid green;
+    }
+    .form-group {        
+        padding-left: 8px;
+    }    
+</style>
+<script>
+    function frmObitoController($scope, $rootScope, $routeParams, $location, $http, Data, sessionService, CONFIG, LogGuardarInfo, DreamFactory,ngTableParams,$filter,sweet, $sce, $soap,registroLog,FileUploader,wsObt) {
+        $scope.datosBusqueda        = {};
+        $scope.tablaCiudadanos      = null;
+        $scope.formNuevoFallecido   = null;        
+        $scope.formGrillaFallecido  = null;        
+        $scope.formInicioObito      = "mostrar";
+        //ESTADOS BOTONES
+        $scope.aprobado = true;
+        $scope.estBtnVolver         = "mostrar";
+        $scope.estBtnBuscar         = "mostrar";
+        $scope.estBtnNuevoRegistro  = "mostrar";
+        $scope.estBtnSinRegF        = "mostrar";
+        //TITULOS
+        $scope.estLblRequiriente    = "mostrar";        
+        $scope.estLblBusqueda       = "mostrar";
+        $scope.lblDatosDifunto       = "";
+        
+        //INICIALIZANDO 
+        $scope.dataObt      =   {};
+        $scope.requiriente  =   {};
+        $scope.difunto      =   {};
+        $scope.swgeneradoc  =   false;
+        
+        
+        //VOLVER A PANTALLA - DATOS DEL REQUIRIENTE
+        $scope.volverBusqueda   =   function(){
+            $scope.formInicioObito      = "mostrar";
+            //$scope.tablaCiudadanos      = "mostrar";
+            $scope.formNuevoFallecido   = null;
+            $scope.formGrillaFallecido  = "mostrar";
+            //$scope.formInicioObito      = null;
+        };
+
+        $scope.startDateOpen = function($event) {
+             $event.preventDefault();
+             $event.stopPropagation();
+             $scope.startDateOpened = true;
+        };
+        
+        //REGISTRAR DATOS PARA LA EMISION DE CERTIFICADO
+        $scope.generarCertificado   =   function(difunto){
+            var idFum           = $scope.dataObt.codigo_genesis;
+            var datos           =   difunto;
+            var base_url_2      =   "http://gmlpsr0171/AdministracionSatelitePrueba/Service1.asmx";            
+            //var base_url_2    =   "http://gmlpsr0179/AdministracionSatelite/Service1.asmx";            
+            datos.idfum         =   idFum;
+            //DATOS DE LA SOLICITUD sel_SIMGEPsolicitud
+            wsObt.wsPandora("imprmir_solicitud","sel_SIMGEPsolicitud",base_url_2,datos).then(function(response){                
+                console.log("RESPUESTA :->", response);                
+                var resp = response['diffgr:diffgram']['NewDataSet']['consulta'];
+                if(Object.keys(resp).length > 0){
+                    var url_metodo      =   "ins_SIMGEPemitirObito";
+                    datos.idnrotramite  =   resp.id_nro_tramite;
+                    datos.idsolicitud   =   resp.id_solicitud;                    
+                    wsObt.wsPandora("generar_certificado",url_metodo,base_url_2,datos).then(function(response){
+                        var respuesta = response['diffgr:diffgram']['NewDataSet']['Table1'];
+                        /*GENERAR PDF CERTIFICADO*/
+                        function generarPdfObito(resp){
+                            const promise = new Promise(function (resolve, reject) {
+                                setTimeout(function() {
+                                    try{
+                                        $.ajax({
+                                            type        : 'GET',            
+                                            url         : 'http://gmlpsr0171/wsCertificado/servicioCertificado.asmx/ObtenerCertificado2?codigo=' + datos.idnrotramite,
+                                            //url       : 'http://gmlpsr0179/wsCertificado/servicioCertificado.asmx/ObtenerCertificado2?codigo=' + datos.idnrotramite,
+                                            //dataType  : 'application/x-www-form-urlencoded',
+                                            dataType    : 'html',
+                                            success     : function(data) {
+                                            },
+                                            error: function (xhr, status, error) {
+                                            }
+                                        });
+                                    }catch(e){}
+                                    resp = "true";
+                                    resolve(resp)
+                                }, 500);
+                            })
+                            return promise                        
+                        }
+                        generarPdfObito().then(function (resp) {
+                            
+                            console.log("MI RESPUESTA 1 ->", resp);
+                            
+                            var base_url_3       =   "http://prometeo/AdministracionSatelitePrueba/Service1.asmx";
+                            //var base_url_3       =   "http://gmlpsr0080/AdministracionSatelite/Service1.asmx";
+                            var url_metodo3      =   "ListarRuta";
+                            wsObt.wsPandora("listar_pdf_certificado",url_metodo3,base_url_3,datos).then(function(response){
+                                var respuesta = response['diffgr:diffgram']['NewDataSet']['consulta'];
+                                console.log("MI RESPUESTA 2 ->", respuesta);
+                                console.log("MI RESPUTESTA:", respuesta);
+                                respuesta.ruta  =   "http://gmlpsr0171/wsCertificado/servicioCertificado.asmx/obtenerCertificado?codigo=" + datos.idnrotramite;
+                                //respuesta.ruta  =   "http://gmlpsr0179/wsCertificado/servicioCertificado.asmx/obtenerCertificado?codigo=" + datos.idnrotramite;
+                                //alert("respuesta");
+                                console.log("CI BIG DATA:", $scope.impFormulario);
+                                $scope.almacenarDocumentoObtRc(respuesta);
+                            });
+                            sweet.show('', respuesta.descripcion, 'success');
+                            //console.log("mi respuesta:", resp);
+                            //console.log(array)
+                        });                        
+                        console.log("DATOS DE ADMINISTRACION:", datos);                        
+                    });
+                }
+            });
+        };
+        
+        /*DOCUMENTOS DE SALIDA*/
+        $scope.almacenarDocumentoObtRc = function(response){
+            $scope.urlData = response;
+
+            if($scope.urlData){
+                /*RECORRIENDO LOS ADJUNTOS*/
+                console.log($scope.impFormulario.CI_BIGDATA);
+                //angular.forEach($scope.urlData, function(value, key) {
+                    //console.log(key + ': ' + value.nombre_archivo);
+                    /*ALMACENAR ADJUNTOS CIUDADANO*/
+                    var sDocSistema     =   "IF_GENESIS";
+                    var sDocProceso     =   $scope.casoActual.procnombre;
+                    var sDocId          =   $scope.casoActual.casoid;
+                    var sDocCiNodo      =   '1473';
+                    var sDocDatos       =   "";
+                    var sDocUrl         =   response.ruta;
+                    var sDocVersion     =   1;
+                    var sDocTiempo      =   60;
+                    var sDocFirmaDigital=   "0";
+                    var sDocUsuario     =   $scope.impFormulario.CI_BIGDATA;//"Ciudadano";
+                    var sDocTipoDoc     =   "pdf";
+                    var sDocTamDoc      =   "";
+                    var sDocNombre      =   response.motivo;
+
+                    var sDocTpsId       =   0;
+                    var sDocUrlLogica   =   response.ruta;
+                    var sDocAcceso      =   "";
+                    var sDocTipoExt     =   "";
+                    var sDocNroTramNexo =   "";
+                    var sCasoCodigo     =   $scope.sCasonombre;        
+
+                     var documento=new gDocumentos();
+                        documento.doc_sistema = sDocSistema;
+                        documento.doc_proceso = sDocProceso;
+                        documento.doc_id = sDocId;
+                        documento.doc_ci_nodo = sDocCiNodo;
+                        documento.doc_datos = sDocDatos;
+                        documento.doc_url = sDocUrl;
+                        documento.doc_version = sDocVersion;
+                        documento.doc_tiempo = sDocTiempo;
+                        documento.doc_firma_digital = sDocFirmaDigital;
+                        documento.doc_usuario = sDocUsuario;
+                        documento.doc_tipo_documento = sDocTipoDoc;
+                        documento.doc_tamanio_documento = sDocTamDoc;
+                        documento.doc_nombre = sDocNombre;
+                        documento.doc_tps_doc_id = sDocTpsId;
+                        documento.doc_url_logica = sDocUrlLogica;
+                        documento.doc_acceso = sDocAcceso;
+                        documento.doc_tipo_documento_ext = sDocTipoExt;
+                        documento.doc_nrotramite_nexo = sDocNroTramNexo;
+                        documento.doc_id_codigo = sCasoCodigo;
+
+                        documento.insertarDoc(function(resultado){
+                            resultadoApi = JSON.parse(resultado);							
+                            if (resultadoApi.success) {                                
+                                $scope.validarEmisionCertificado($scope.casoActual.casoid, response.ruta);
+                            } else {
+                                $.unblockUI();
+                                sweet.show(resultadoApi.error.message);
+                            }
+                        });
+                //});
+            }
+        };
+        
+        $scope.validarEmisionCertificado = function (scasoid, ruta) {
+            console.log("DATA CASO ID:", scasoid);
+            var sdataform = {
+                  "procedure_name":"obt.sp_update_genera_pdf",
+                  "body":{
+                      "params": [
+                          {
+                              "name": "campo",
+                              "value": '{"sw_genera_documento":"true", "ruta_pdf":"' + ruta + '"}'
+                          },{
+                              "name": "casoid",
+                              "value": scasoid                          
+                          }
+                      ]
+                  }
+            };
+            var obj=DreamFactory.api[CONFIG.SERVICE].callStoredProcWithParams(sdataform);
+            obj.success(function (response){
+                var resp    =  JSON.parse(response[0]['nombre_campo1']);
+                $("#btnGenerarDocumento").hide();
+                $scope.swgeneradoc  =   true;
+                $scope.urldocobt    =   resp.ruta_pdf;
+            })
+            obj.error(function(error) {
+            });
+        };
+        
+        $scope.buscarPersonaDifunta = function (datos) {
+            $.blockUI();
+            var x2js = new X2JS(); 
+            var datoss = {};
+            datoss.bfdesde     =   ((typeof(datos.bfdesde)      == 'undefined' || datos.bfdesde   == null) ? '' : datos.bfdesde);
+            datoss.bfhasta     =   ((typeof(datos.bfhasta)      == 'undefined' || datos.bfhasta   == null) ? '' : datos.bfhasta);
+            datoss.bapcasada =  ((typeof(datos.bapcasada)      == 'undefined' || datos.bapcasada   == null) ? '' : datos.bapcasada);
+            datoss.bci =  ((typeof(datos.bci)      == 'undefined' || datos.bci   == null) ? '' : datos.bci);
+            datoss.bmaterno =  ((typeof(datos.bmaterno)      == 'undefined' || datos.bmaterno   == null) ? '' : datos.bmaterno);
+            datoss.bnombre =  ((typeof(datos.bnombre)      == 'undefined' || datos.bnombre   == null) ? '' : datos.bnombre);
+            datoss.bpaterno =  ((typeof(datos.bpaterno)      == 'undefined' || datos.bpaterno   == null) ? '' : datos.bpaterno);
+            var difunto1 = [];
+            var difunto2 = [];
+            var difunto3 = [];         
+            $.ajax({
+                url: 'http://prometeo/AdministracionSatelitePrueba/Service1.asmx/ListarDifuntos?jsoncallback=?',
+                //url: 'http://gmlpsr0080/AdministracionSatelite/Service1.asmx/ListarDifuntos?jsoncallback=?',
+                type:"post",
+
+                data: {
+                    Nombre: datoss.bnombre,
+                    Paterno: datoss.bpaterno,
+                    Materno: datoss.bmaterno,
+                    ApellidoCasada:datoss.bapcasada,
+                    Fecha1: datoss.bfdesde,
+                    Fecha2: datoss.bfhasta,
+                    CI_fallecido: datoss.bci
+                },
+                success: function (xml, status, xhr) {
+                    xml = xhr.responseText;
+                      try{
+                        difunto1 = x2js.xml_str2json(xml).DataSet.diffgram.NewDataSet.consulta;
+                        console.log(difunto1);
+                      }catch(e){
+                        difunto1 = [];
+                      }                      
+                },
+                error: function (SOAPResponse) {
+                }
+            });
+            $.ajax({
+                url: 'http://prometeo/AdministracionSatelitePrueba/Service1.asmx/ListarDifuntos2?jsoncallback=?',
+                //url: 'http://gmlpsr0080/AdministracionSatelite/Service1.asmx/ListarDifuntos2?jsoncallback=?',
+                type:"post",
+
+                data: {
+                    Nombre: datoss.bnombre,
+                    Paterno: datoss.bpaterno,
+                    Materno: datoss.bmaterno,
+                    ApellidoCasada:datoss.bapcasada,
+                    Fecha1: datoss.bfdesde,
+                    Fecha2: datoss.bfhasta,
+                    CI_fallecido: datoss.bci
+                },
+                success: function (xml, status, xhr) {
+                    xml = xhr.responseText;
+                    try{
+                        difunto2 = x2js.xml_str2json(xml).DataSet.diffgram.NewDataSet.consulta;
+                    }catch(e){
+                        difunto2 = [];
+                    } 
+                },
+                error: function (SOAPResponse) {
+                }
+            });
+            $.ajax({
+                url: 'http://prometeo/AdministracionSatelitePrueba/Service1.asmx/ListarDifuntos3?jsoncallback=?',
+                //url: 'http://gmlpsr0080/AdministracionSatelite/Service1.asmx/ListarDifuntos3?jsoncallback=?',
+                type:"post",
+                data: {
+                    Nombre: datoss.bnombre,
+                    Paterno: datoss.bpaterno,
+                    Materno: datoss.bmaterno,
+                    ApellidoCasada:datoss.bapcasada,
+                    Fecha1: datoss.bfdesde,
+                    Fecha2: datoss.bfhasta,
+                    CI_fallecido: datoss.bci
+                },
+                success: function (xml, status, xhr) {
+                    xml = xhr.responseText;
+                    try{
+                        difunto3 = x2js.xml_str2json(xml).DataSet.diffgram.NewDataSet.consulta;
+                      }catch(e){
+                        difunto3 = [];
+                    } 
+                },
+                error: function (SOAPResponse) {
+                }
+            });
+            setTimeout(function(){
+                var  difdato = [];
+                var difunto111 = JSON.stringify(difunto1);
+                var difunto222 = JSON.stringify(difunto2);
+                var difunto333 = JSON.stringify(difunto3);
+                console.log(difunto111);
+                if(difunto111 != '[]'){
+                    if(difunto1.length > 0){
+                        difdato = difunto1; 
+                    }else{
+                        var difunto11 = "["+JSON.stringify(difunto1)+"]";
+                        difunto1 = JSON.parse(difunto11); 
+                        difdato = difunto1; 
+                    }                   
+                }else if(difunto222 != '[]'){
+                    if(difunto2.length > 0){
+                        difdato = difunto2;
+                    }else{
+                        var difunto11 = "["+JSON.stringify(difunto2)+"]";
+                        difunto2 = JSON.parse(difunto11);
+                        difdato = difunto2; 
+                    }
+                } else if(difunto333 != '[]'){
+                    if(difunto3.length > 0){
+                        difdato = difunto3;
+                    }else{
+                        var difunto11 = "["+JSON.stringify(difunto3)+"]";
+                        difunto3 = JSON.parse(difunto11);
+                        difdato = difunto3; 
+                    }
+                }   
+                console.log(difunto1,difunto2,difunto3,difdato);           
+                var response = difdato;
+                var nroregistros = difdato.length;
+                    if(difdato.length > 0){
+                        console.log(difdato);
+                        for(var i = 0; i<nroregistros ; i++){
+                            if(response[i].materno.length == undefined){
+                                response[i].materno = '';
+                            }
+                        }  
+                        $scope.$apply(function(){
+                            $scope.formGrillaFallecido = "mostrar";
+                            $scope.tablaCiudadanos = "mostrar";
+                            $scope.obtDatos = response;
+                            sweet.show('', "Datos Encontrados !!!", 'success');
+                        });
+                        $.unblockUI();
+                    } else {
+                        $scope.obtDatos = [];
+                        $scope.tablaCiudadanos = null;
+                        sweet.show('', "No se Encontro ningun Registro", 'error');
+                        $.unblockUI();
+                    }  
+            }, 5000);
+        };
+        $scope.nuevoRegistroDifunto = function (datos) {            
+            $scope.tablaCiudadanos      = null;
+            $scope.formNuevoFallecido   = "mostrar";        
+            $scope.formGrillaFallecido  = null;        
+            $scope.formInicioObito      = null;
+            $scope.difunto.nnombre = $scope.dataObt.nombres_f;
+            $scope.difunto.npaterno = $scope.dataObt.primer_apellido_f;
+            $scope.difunto.nmaterno = $scope.dataObt.segundo_apellido_f;
+            $scope.difunto.ngenero = '';
+            $scope.difunto.nnacionalidad = '';
+            $scope.difunto.edad = '';
+            $scope.difunto.nprofesion = '';
+            $scope.difunto.nlocalidad       =  '';
+            $scope.difunto.nestado_civil  = '';
+            $scope.difunto.nprovincia = '';
+            $scope.difunto.ncausamuerte = '';
+            $scope.difunto.nmedico = '';
+            $scope.difunto.nregistrocivil = '';
+            $scope.difunto.nlibro = '';
+            $scope.difunto.nfolio = '';
+            $scope.difunto.npartida = '';
+            $scope.difunto.ndistrito = '';
+            $scope.difunto.nfechamuerte = '';
+        };
+        $scope.iniciarSolicitud =   function(){
+            //DATOS DEL SOLICITANTE
+            $scope.requiriente.rrequiriente  =   $scope.dataObt.nombres_t + " " + $scope.dataObt.primer_apellido_t + " " + $scope.dataObt.segundo_apellido_t;
+            $scope.requiriente.rci  =   $scope.dataObt.carnet_t;
+            $scope.requiriente.rexpedido  =   $scope.dataObt.ci_expedido_t;
+            $scope.requiriente.rparentesco  =   $scope.dataObt.parentesco;
+            //DATOS DEL DIFUNTO
+            $scope.datosBusqueda.bnombre    =   $scope.dataObt.nombres_f;
+            $scope.datosBusqueda.bpaterno   =   $scope.dataObt.primer_apellido_f;
+            $scope.datosBusqueda.bmaterno   =   $scope.dataObt.segundo_apellido_f;
+            $scope.datosBusqueda.bapcasada  =   $scope.dataObt.apellido_casado_f;
+            $scope.datosBusqueda.bci        =   $scope.dataObt.carnet_f;
+            $scope.datosBusqueda.oexpedido  =   "LPZ";
+            $scope.datosBusqueda.bfdesde    =   $scope.dataObt.fecha_def_1;
+            $scope.datosBusqueda.bfhasta    =   $scope.dataObt.fecha_def_2;
+            //DATOS DEL REQUIRIENTE
+            $scope.difunto.rexpedido        =   $scope.dataObt.ci_expedido_t;
+            $scope.difunto.rnombre          =   $scope.dataObt.nombres_t;
+            $scope.difunto.rpaterno         =   $scope.dataObt.primer_apellido_t;
+            $scope.difunto.rmaterno         =   $scope.dataObt.segundo_apellido_t;
+            $scope.difunto.rci              =   $scope.dataObt.carnet_t;
+            $scope.difunto.rparentesco      =   $scope.dataObt.parentesco;
+            $scope.difunto.rmotivo          =   $scope.dataObt.motivo;
+            $scope.difunto.rzona            =   $scope.dataObt.titular_zona;
+            $scope.difunto.rnro             =   $scope.dataObt.titular_nro;
+            $scope.difunto.rtelefono        =   $scope.dataObt.titular_fono ;
+            $scope.difunto.rcorreo          =   $scope.dataObt.titular_correo;
+        };
+        $scope.profesiones = function(){        
+            $scope.aProfesiones = {};
+            var parametros = {
+                    "table_name":"_bp_profesion",
+                    "order":"prf_id"
+            };        
+            DreamFactory.api[CONFIG.SERVICE].getRecordsByPost(parametros).success(function (results){
+                if(results.record.length > 0){
+                    $scope.aProfesiones = results.record;
+                }else{
+                    $scope.msg = "Error !!";
+                }             
+            }).error(function(results){
+            });
+        };
+        $scope.estadoCivil = function(){
+            $scope.aEstadoCivil = {};
+            var parametros = {
+                "table_name":"_bp_estados_civiles"
+            };        
+            DreamFactory.api[CONFIG.SERVICE].getRecordsByPost(parametros).success(function (results){
+                if(results.record.length > 0){
+                    $scope.aEstadoCivil = results.record;
+                }else{
+                    $scope.msg = "Error !!";
+                }             
+            }).error(function(results){
+            });
+        }; 
+        $scope.profesion = function(){
+            $scope.aProfesiones = {};
+            var parametros = {
+                             "table_name":"_bp_profesion"
+            };        
+            DreamFactory.api[CONFIG.SERVICE].getRecordsByPost(parametros).success(function (results){
+                     if(results.record.length > 0){
+                             $scope.aProfesiones = results.record;
+                     }else{
+                             $scope.msg = "Error !!";
+                     }             
+             }).error(function(results){
+             });
+        }; 
+        $scope.provincia = function(){
+            $scope.aProvincias = {};
+            $scope.desabilitadoZ=true;
+            var reslocal = {
+                "procedure_name":"ejecutartojson",
+                "body":{
+                    "params": [
+                    {
+                        "name":"expression",
+
+                        "param_type":"IN","value":"select upper(prv_provincia) as prv_provincia from _bp_provincias order by prv_provincia "
+                    }]
+                }
+            };
+            DreamFactory.api[CONFIG.SERVICE].callStoredProcWithParams(reslocal).success(function (results){
+            var a = JSON.parse(results[0].ejecutartojson)
+                if(a.length > 0){
+                    $scope.aProvincias = a;
+                    $scope.desabilitadoZ=true;
+                }else{
+                    $scope.msg = "Error !!";
+                }             
+            }).error(function(results){
+            });
+        }; 
+        $scope.vaciar = function(difunto,datos){
+           datos.nombres_f = $scope.difunto.nnombre;
+           datos.primer_apellido_f = $scope.difunto.npaterno;
+           datos.segundo_apellido_f = $scope.difunto.nmaterno;
+           datos.genero_f = $scope.difunto.ngenero;
+           datos.nnacionalidad = $scope.difunto.nnacionalidad;
+           datos.nestado_civil = $scope.difunto.nestado_civil;
+           datos.nregistrocivil = $scope.difunto.nregistrocivil;
+           datos.nlocalidad = $scope.difunto.nlocalidad;
+           datos.nprofesion = $scope.difunto.nprofesion;
+           datos.nprovincia = $scope.difunto.nprovincia;
+           datos.ncausamuerte = $scope.difunto.ncausamuerte;
+           datos.nmedico = $scope.difunto.nmedico;
+           datos.edad = $scope.difunto.edad;
+           datos.nlibro = $scope.difunto.nlibro;
+           datos.nfolio = $scope.difunto.nfolio;
+           datos.npartida = $scope.difunto.npartida;
+           datos.ndistrito = $scope.difunto.ndistrito;
+           datos.nfechamuerte = $scope.difunto.nfechamuerte;
+           var json = '';
+           if($scope.datos.guardar != 'SI'){
+                var updatefum = new fum();
+                updatefum.tra_id = $scope.datos.idTramite;
+                updatefum.estado_pago = 'POR PAGAR';
+                json = JSON.stringify(datos);
+                json = '['+json+']';
+                updatefum.fum = json;
+                updatefum.estadoFum(function(resultado){
+                    resultadoApi = JSON.parse(resultado); 
+                });
+            }
+            datos.guardar = 'SI';
+        }
+        
+        //SELECCIONAR DIFUNTO
+        $scope.seleccionarDifunto = function (datos) {
+            $scope.tablaCiudadanos      = null;
+            $scope.formNuevoFallecido   = "mostrar";
+            $scope.formGrillaFallecido  = null;
+            $scope.formInicioObito      = null;
+            $scope.lblDatosDifunto       = "DATOS DIFUNTO";
+            $scope.difunto.rnombre      =   $scope.dataObt.nombres_t;            
+            $scope.difunto.rpaterno     =   $scope.dataObt.primer_apellido_t;            
+            $scope.difunto.rmaterno     =   $scope.dataObt.segundo_apellido_t;            
+            $scope.difunto.rci          =   $scope.dataObt.carnet_t;            
+            $scope.difunto.rexpedido    =   $scope.dataObt.ci_expedido_t + "";
+            $scope.difunto.rparentesco  =   $scope.dataObt.parentesco + "";
+            $scope.difunto.rmotivo      =   $scope.dataObt.motivo;
+            $scope.difunto.rzona        =   $scope.dataObt.titular_zona;            
+            $scope.difunto.rnro         =   $scope.dataObt.titular_nro;            
+            $scope.difunto.rtelefono    =   $scope.dataObt.titular_fono;            
+            $scope.difunto.rcorreo      =   $scope.dataObt.titular_correo;
+            
+            //DATOS DEL SOLICITANTE
+            /*$scope.requiriente.rrequiriente  =   $scope.dataObt.nombres_t + " " + $scope.dataObt.primer_apellido_t + " " + $scope.dataObt.segundo_apellido_t;
+            $scope.requiriente.rci  =   $scope.dataObt.carnet_t;
+            $scope.requiriente.rexpedido  =   $scope.dataObt.ci_expedido_t;
+            $scope.requiriente.rparentesco  =   $scope.dataObt.parentesco;*/            
+            //DATOS DEL DIFUNTO
+            /*$scope.datosBusqueda.bnombre  =  $scope.dataObt.nombres_f;
+            $scope.datosBusqueda.bpaterno   =   $scope.dataObt.primer_apellido_f;
+            $scope.datosBusqueda.bmaterno   =   $scope.dataObt.segundo_apellido_f;
+            $scope.datosBusqueda.bapcasada  =   "";
+            $scope.datosBusqueda.bci        =   $scope.dataObt.carnet_f;
+            $scope.datosBusqueda.oexpedido  =   "LPZ";
+            $scope.datosBusqueda.bfdesde    =   $scope.dataObt.fecha_def_1;
+            $scope.datosBusqueda.bfhasta    =   $scope.dataObt.fecha_def_2;*/
+            
+            /*$scope.difunto.rnombre = datos[0].nombre;
+            $scope.difunto.nnombre  =   datos[0].nombre;
+            $scope.difunto.npaterno  =   datos[0].paterno;
+            $scope.difunto.rpaterno  =   datos[0].paterno;
+            $scope.difunto.nmaterno  =   datos[0].materno;
+            $scope.difunto.ngenero  =   datos[0].ngenero;
+            $scope.difunto.nnacionalidad  =   datos[0].nnacionalidad;
+            $scope.difunto.nregistrocivil  =   datos[0].nregistrocivil;
+            $scope.difunto.nlibro  =   datos[0].nlibro;
+            $scope.difunto.nfolio  =   datos[0].nfolio;
+            $scope.difunto.nfolio  =   datos[0].nfolio;
+            $scope.difunto.npartida  =   datos[0].npartida;
+            $scope.difunto.ndistrito  =   datos[0].ndistrito;
+            $scope.difunto.nfechamuerte  =   datos[0].nfechamuerte;
+            $scope.difunto.nnombre  =   datos[0].nfechamuerte;*/
+            
+            //SERVICIO SELECCIONAR DIFUNTO            
+            var x2js = new X2JS(); 
+            var dif =[];
+            $.ajax({
+                url: 'http://prometeo/AdministracionSatelitePrueba/Service1.asmx/SeleccionarImprimir_PorCasos_SIMGEPLABM?jsoncallback=?',
+                //url: 'http://gmlpsr0080/AdministracionSatelite/Service1.asmx/SeleccionarImprimir_PorCasos_SIMGEPLABM?jsoncallback=?',
+                type:"post",
+                data: {
+                    Accion: 'A',
+                    Tipo: datos.tipo,
+                    id_fallecido: datos.id_fallecido,
+                    fecha_muerte:''
+                },
+                success: function (xml, status, xhr) {
+                    xml = xhr.responseText;
+                    try{
+                        dif = x2js.xml_str2json(xml).DataSet.diffgram.NewDataSet.consulta;
+                        var sgenero         = dif.sexo;
+                        var sestadocivil    = dif.est_civil.trim();
+                        if(dif.sexo   ==  'FEMENINO'){
+                            sgenero = 'F';
+                        }else{
+                            sgenero = 'M';
+                        }               
+                        $scope.difunto.nnombre = dif.nombre;
+                        $scope.difunto.npaterno =  dif.paterno;
+                         if(dif.materno.length == undefined){
+                                dif.materno = '';
+                            }
+                        $scope.difunto.nmaterno  =  dif.materno;
+                        $scope.difunto.ngenero =  sgenero;
+                        $scope.difunto.nnacionalidad = dif.nacionalidad;
+                        $scope.difunto.edad = "";
+                        $scope.difunto.nprofesion  =  dif.profesion;
+                        $scope.difunto.nestado_civil  =  sestadocivil;
+                        $scope.localidades(dif.provincia);
+                        $scope.difunto.nprovincia = dif.provincia;
+                        $scope.difunto.nlocalidad  = dif.localidad;
+                        $scope.difunto.ncausamuerte = dif.causa_muerte;
+                        $scope.difunto.nmedico   = dif.medico;
+                        $scope.difunto.nregistrocivil = dif.oficial_reg_civil;
+                        $scope.difunto.nlibro =   dif.libro;
+                        $scope.difunto.nfolio =   dif.folio;
+                        $scope.difunto.npartida =   dif.partida;
+                        $scope.difunto.ndistrito =   dif.distrito;
+                        $scope.difunto.nfechamuerte = dif.fecha_muerte;
+                    }catch(e){
+                    } 
+                },
+                error: function (SOAPResponse) {
+                }
+            });
+        };
+        function OnSuccess(response) {
+        }         
+    $scope.causasmuerte = function(){
+        $scope.aCausasMuerte = {};
+        var parametros = {
+                "table_name":"obt.causa_muerte"
+        };        
+        DreamFactory.api[CONFIG.SERVICE].getRecordsByPost(parametros).success(function (results){
+            if(results.record.length > 0){
+                $scope.aCausasMuerte = results.record;
+            }else{
+                $scope.msg = "Error !!";
+            }             
+        }).error(function(results){
+        });
+    };
+    $scope.localidades = function(idProvincia){
+        var idPro = "";
+        if($scope.aProvincias){
+            angular.forEach($scope.aProvincias, function(value, key) {
+                if(value.prv_id == idProvincia){
+                    idPro = value.prv_id;
+                }
+            });                  
+        }
+        $scope.datos.INT_AC_MACRO_ID    =   idPro;
+        $scope.aLocalidades = {};
+             var reslocal = {
+                "procedure_name":"ejecutartojson",
+                "body":{
+                    "params": [
+                    {
+                        "name":"expression",
+
+                        "param_type":"IN","value":"select mnc_municipio from _bp_municipios , _bp_provincias where upper(prv_provincia) = '"+idProvincia+"' and mnc_prv_id = prv_id "
+                    }]
+                }
+            };
+            DreamFactory.api[CONFIG.SERVICE].callStoredProcWithParams(reslocal).success(function (results){
+            var a = JSON.parse(results[0].ejecutartojson)
+
+            if(a.length > 0){
+                $scope.aLocalidades = a;
+                $scope.desabilitadoZ=false;
+            }else{                
+                $scope.msg = "Error !!";
+            }             
+        }).error(function(results){
+        });
+        $scope.desabilitadoZ=true;
+        //$scope.desabilitadoV=true;
+    };
+    $scope.mostrarDocumentoGenerado = function () {
+        if($scope.urldocobt){
+            //alert($scope.urldocobt);
+        }
+    };    
+        
+    $scope.inicioObt = function () {
+            if(DreamFactory.api[CONFIG.SERVICE]){                
+                if ($scope.datos.guardar == 'SI'){
+                    $scope.formNuevoFallecido = true;
+                    $scope.formInicioObito = null;
+                    $scope.difunto.nnombre = $scope.datos.nombres_f;
+                    $scope.difunto.npaterno = $scope.datos.primer_apellido_f;
+                    $scope.difunto.nmaterno = $scope.datos.segundo_apellido_f;
+                    $scope.difunto.ngenero = $scope.datos.genero_f;
+                    $scope.difunto.nnacionalidad = $scope.datos.nnacionalidad;
+                    $scope.difunto.edad = $scope.datos.edad;
+                    $scope.difunto.nprofesion = $scope.datos.nprofesion;
+                    $scope.difunto.nlocalidad       =   $scope.datos.nlocalidad;
+                    $scope.difunto.nestado_civil  = $scope.datos.nestado_civil;
+                    $scope.difunto.nprovincia = $scope.datos.nprovincia;
+                    $scope.difunto.ncausamuerte = $scope.datos.ncausamuerte;
+                    $scope.difunto.nmedico = $scope.datos.nmedico;
+                    $scope.difunto.nregistrocivil = $scope.datos.nregistrocivil;
+                    $scope.difunto.nlibro = $scope.datos.nlibro;
+                    $scope.difunto.nfolio = $scope.datos.nfolio;
+                    $scope.difunto.npartida = $scope.datos.npartida;
+                    $scope.difunto.ndistrito = $scope.datos.ndistrito;
+                    $scope.difunto.nfechamuerte = $scope.datos.nfechamuerte;
+                }
+                else{
+                    $scope.formNuevoFallecido = null;
+                    $scope.formInicioObito = true;
+                }
+                
+                if ($scope.datos.f01_firma_tramite == 'APROB'){
+                    $scope.aprobado = false;
+                }else {
+                    $scope.aprobado = true;
+                }                
+                $scope.dataObt  =   $scope.datos;
+                
+                if($scope.datos.sw_genera_documento){
+                    $scope.swgeneradoc  =   $scope.datos.sw_genera_documento;                    
+                }
+                
+                if($scope.datos.ruta_pdf){
+                    $scope.urldocobt    =   $scope.datos.ruta_pdf;
+                }
+                
+                console.log("DATOS INICIALES DEL PROCESO: ", $scope.datos);
+                $scope.iniciarSolicitud();
+                $scope.estadoCivil();
+                $scope.profesion();
+                $scope.provincia();
+                $scope.causasmuerte(); 
+                $scope.localidades($scope.datos.nprovincia);
+            }
+        };
+    }
+</script>
+
+<script>
+    $(function(){
+        
+        var nowTemp = new Date();
+        var now = new Date(nowTemp.getFullYear(), nowTemp.getMonth(), nowTemp.getDate());
+        $('#bfdesde').fdatepicker({onRender: function (date) {return date.valueOf() > now.valueOf() ? 'disabled' : '';}}).on('changeDate', function (ev) {  var d = bfhasta.value; dArr = d.split('/');    ts = new Date(dArr[1] + "-" + dArr[0] + "-" + dArr[2]).getTime();  
+        if (ev.date.valueOf() > ts.valueOf()) {
+            bfhasta.value = '';
+            bfdesde.value = '';
+        }        
+    }).data('datepicker');
+        $('#bfhasta').fdatepicker({onRender: function (date) {  return  date.valueOf() > now.valueOf()  ? 'disabled' : ''}}).on('changeDate', function (ev) {  var d = bfdesde.value; dArr = d.split('/');    ts = new Date(dArr[1] + "-" + dArr[0] + "-" + dArr[2]).getTime(); 
+        if (ev.date.valueOf() < ts.valueOf()) {
+            bfhasta.value = '';
+        } 
+    }).data('datepicker');
+         $('#nfechamuerte').fdatepicker({onRender: function (date) {  return  date.valueOf() > now.valueOf()  ? 'disabled' : ''}}).on('changeDate', function (ev) { 
+    }).data('datepicker');
+         
+    })
+</script>
+<!--FORMULARIO DE SOLICITUD DE CERTIFICADOS DE OBITO -->
+<div class="wrap" ng-controller="frmObitoController" ng-init="inicioObt();">
+        <!--DATOS DEL REQUIRIENTE-->
+        <div ng-show = "formInicioObito != null">
+            <form name="formularioBuscar" readOnly="true" novalidate>                
+                <label for="url" >DATOS REQUIRIENTE:</label>
+                <div class="hr-line-dashed"/>                
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group" >
+                            <label for="url" >Requiriente:</label>
+                            <input  ng-model="requiriente.rrequiriente" id="rrequiriente" name="rrequiriente" class="form-control" type="text" placeholder="Ingrese Requiriente" class="form-control"  onkeyUp="return conMayusculas(this);" ng-minlength="3" required>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group" >
+                            <label for="url" >Nro CI:</label>
+                            <input  ng-model="requiriente.rci" id="rci" name="rci" class="form-control" type="text" placeholder="Ingrese Nro. CI" size="20"  required>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label >Expedido:</label>                            
+                            <select id="rexpedido" name="rexpedido" placeholder="Expedido" ng-model="requiriente.rexpedido" class="form-control" required>
+                                <option value="">--Seleccione--</option>
+                                <option value="LP">LA PAZ</option>
+                                <option value="CB">COCHABAMBA</option>
+                                <option value="SC">SANTA CRUZ</option>
+                                <option value="CH">CHUQUISACA</option>
+                                <option value="TA">TARIJA</option>
+                                <option value="PO">POTOSI</option>
+                                <option value="OR">ORURO</option>
+                                <option value="BE">BENI</option>
+                                <option value="PA">PANDO</option>
+                            </select>
+                        </div>
+                    </div>                    
+
+                    <div class="col-md-4">
+                        <div class="form-group" >
+                            <label for="url" >Parentesco:</label>
+                            <select id="parentesco" name="parentesco"  ng-model="requiriente.rparentesco"  class="form-control" placeholder="-- Seleccione --" ng-disabled="desabilitado" required>
+                                <option value="1">HIJO (A)</option>
+                                <option value="2">PADRE / MADRE</option>
+                                <option value="3">ABUELO (A)</option>
+                                <option value="4">NIETO (A)</option>
+                                <option value="6">ESPOSO(A)</option>
+                                <option value="7">CONVIVIENTE</option>
+                                <option value="9">TUTOR(A)</option>
+                                <option value="10">HERMANO(A)</option>
+                                <option value="13">TIO (A)</option>
+                                <option value="14">PRIMO(A)</option>
+                                <option value="15">SOBRINO(A)</option>
+                                <option value="16">SUEGRO(A)</option>
+                                <option value="17">HIJO POLÍTICO</option>
+                                <option value="18">CUÑADO (A)</option>
+                                <option value="19">ORDEN JUDICIAL</option>
+                            </select>
+                           
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <label for="url" >BUSQUEDA :</label>
+                <div class="hr-line-dashed"/>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group" >
+                            <label for="url" >Nombre:</label>
+                            <input  ng-model="datosBusqueda.bnombre" id="bnombre" name="bnombre" class="form-control" type="text" placeholder="Ingrese Nombre" class="form-control"  onkeyUp="return conMayusculas(this);" ng-minlength="3" required>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group" >
+                            <label for="url" >Paterno:</label>
+                            <input  ng-model="datosBusqueda.bpaterno" id="bpaterno" name="bpaterno" class="form-control" type="text" placeholder="Ingrese Paterno" class="form-control"  onkeyUp="return conMayusculas(this);" ng-minlength="3" required>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group" >
+                            <label for="url" >Materno:</label>
+                            <input  ng-model="datosBusqueda.bmaterno" id="bmaterno" name="bmaterno" class="form-control" type="text" placeholder="Ingrese Materno" class="form-control"  onkeyUp="return conMayusculas(this);" ng-minlength="3" required>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group" >
+                            <label for="url" >Ap. Casada:</label>
+                            <input  ng-model="datosBusqueda.bapcasada" id="bapcasada" name="bapcasada" class="form-control" type="text" placeholder="Ingrese Ap Casada" class="form-control"  onkeyUp="return conMayusculas(this);" ng-minlength="3" required>
+                        </div>
+                    </div>                    
+                    <div class="col-md-4">
+                        <div class="form-group" >
+                            <label for="url" >Nro CI:</label>
+                            <input  ng-model="datosBusqueda.bci" id="bci" name="bci" class="form-control" type="text" placeholder="Ingrese Nro. CI" size="20" onkeyup="deshabilita(this.form);valNumero(this);" required>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label >Expedido:</label>                            
+                            <select id="bexpedido" name="bexpedido" placeholder="Expedido" ng-model="datosBusqueda.oexpedido" class="form-control" required>
+                                <option value="">--Seleccione--</option>
+                                <option value="LPZ">LA PAZ</option>
+                                <option value="CBB">COCHABAMBA</option>
+                                <option value="SCZ">SANTA CRUZ</option>
+                                <option value="CHQ">CHUQUISACA</option>
+                                <option value="TJA">TARIJA</option>
+                                <option value="PTS">POTOSI</option>
+                                <option value="ORU">ORURO</option>
+                                <option value="BNI">BENI</option>
+                                <option value="PND">PANDO</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group" >
+                            <label for="url" >Fecha Desde:</label>
+                            <input  ng-model="datosBusqueda.bfdesde" id="bfdesde" data-date-format="dd/mm/yyyy" name="bfdesde" class="form-control" type="text" placeholder="Ingrese Fecha" class="form-control"  onkeyUp="return conMayusculas(this);" ng-minlength="3" required>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group" >
+                            <label for="url" >Fecha Hasta:</label>
+                            <input  ng-model="datosBusqueda.bfhasta" id="bfhasta" data-date-format="dd/mm/yyyy" name="bfhasta" class="form-control" type="text" placeholder="Ingrese Fecha" class="form-control"  onkeyUp="return conMayusculas(this);" ng-minlength="3" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="hr-line-dashed"/>                
+                <div>
+                    <button  name="btnBuscar" ng-click="buscarPersonaDifunta(datosBusqueda)" data-dismiss="modal" type="button" class="btn btn-primary" ng-disabled="formularioBuscar.vnombre.$invalid && formularioBuscar.vappaterno.$invalid && formularioBuscar.vapmaterno.$invalid"><i class="glyphicon fa fa-search"></i>BUSCAR</button>
+                    <button name="btnNuevoRegistro" id="btnNuevoRegistro" ng-click="nuevoRegistroDifunto()" data-dismiss="modal" type="button" class="btn btn-primary"><i
+                    class="glyphicon fa fa-plus"></i>NUEVO REGISTRO</button>
+                    <!--<button name="btnNumeroRegistro" id="btnNumeroRegistro" ng-click="nuevoForm()" data-dismiss="modal" type="button" class="btn btn-primary"><i class="glyphicon fa fa-plus"></i> SIN REGISTRO DEL FALLECIDO</button>  -->                  
+                </div>
+            </form>
+        </div>
+    
+        <!-- GRILLA NUEVO REGISTRO -->
+
+        <div  ng-show = "formNuevoFallecido != null">
+            <form name="formNuevoRegistroDifunto" readOnly="true" novalidate>
+                <label for="url" >{{lblDatosDifunto}}</label>
+                <div class="hr-line-dashed"/>                
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group" >
+                            <label for="url" >Nombre:</label>
+                            <input  ng-model="difunto.nnombre" id="nnombre" name="nnombre" class="form-control" type="text" placeholder="Ingrese Nombre" class="form-control"  onkeyUp="return conMayusculas(this);" required>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group" >
+                            <label for="url" >Ap. Paterno:</label>
+                            <input  ng-model="difunto.npaterno" id="npaterno" name="npaterno" class="form-control" type="text" placeholder="Ingrese Paterno" size="20" onkeyUp="return conMayusculas(this);" required>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group" >
+                            <label for="url" >Ap. Materno:</label>
+                            <input  ng-model="difunto.nmaterno" id="nmaterno" name="nmaterno" class="form-control" type="text" placeholder="Ingrese Materno" size="20" onkeyUp="return conMayusculas(this);" required>
+                        </div>
+                    </div>                    
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label >Género:</label>                            
+                            <select id="ngenero" name="ngenero" placeholder="Ingreso Género" ng-model="difunto.ngenero" class="form-control" required>
+                                <option value="">--Seleccione--</option>
+                                <option value="M">Masculino</option>
+                                <option value="F">Femenino</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group" >
+                            <label for="url" >Nacionalidad:</label>
+                            <input  ng-model="difunto.nnacionalidad" id="nnacionalidad" name="nnacionalidad" class="form-control" type="text" placeholder="Ingrese Nacionalidad" size="20" onkeyUp="return conMayusculas(this);" required>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label >Edad:</label>                            
+                            <select id="edad" name="edad" placeholder="Ingreso Género" ng-model="difunto.edad" class="form-control" required>
+                                <option value="">--Seleccione--</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value="10">10</option>
+                                <option value="11">11</option>
+                                <option value="12">12</option>
+                                <option value="13">13</option>
+                                <option value="14">14</option>
+                                <option value="15">15</option>
+                                <option value="16">16</option>
+                                <option value="17">17</option>
+                                <option value="18">18</option>
+                                <option value="19">19</option>
+                                <option value="20">20</option>
+                                <option value="21">21</option>
+                                <option value="22">22</option>
+                                <option value="23">23</option>
+                                <option value="24">24</option>
+                                <option value="25">25</option>
+                                <option value="26">26</option>
+                                <option value="27">27</option>
+                                <option value="28">28</option>
+                                <option value="29">29</option>
+                                <option value="30">30</option>
+                                <option value="31">31</option>
+                                <option value="32">32</option>
+                                <option value="33">33</option>
+                                <option value="34">34</option>
+                                <option value="35">35</option>
+                                <option value="36">36</option>
+                                <option value="37">37</option>
+                                <option value="38">38</option>
+                                <option value="39">39</option>
+                                <option value="40">40</option>
+                                <option value="41">41</option>
+                                <option value="42">42</option>
+                                <option value="43">43</option>
+                                <option value="44">44</option>
+                                <option value="45">45</option>
+                                <option value="46">46</option>
+                                <option value="47">47</option>
+                                <option value="48">48</option>
+                                <option value="49">49</option>
+                                <option value="50">50</option>
+                                <option value="51">51</option>
+                                <option value="52">52</option>
+                                <option value="53">53</option>
+                                <option value="54">54</option>
+                                <option value="55">55</option>
+                                <option value="56">56</option>
+                                <option value="57">57</option>
+                                <option value="58">58</option>
+                                <option value="59">59</option>
+                                <option value="60">60</option>
+                                <option value="61">61</option>
+                                <option value="62">62</option>
+                                <option value="63">63</option>
+                                <option value="64">64</option>
+                                <option value="65">65</option>
+                                <option value="66">66</option>
+                                <option value="67">67</option>
+                                <option value="68">68</option>
+                                <option value="69">69</option>
+                                <option value="70">70</option>
+                                <option value="71">71</option>
+                                <option value="72">72</option>
+                                <option value="73">73</option>
+                                <option value="74">74</option>
+                                <option value="75">75</option>
+                                <option value="76">76</option>
+                                <option value="77">77</option>
+                                <option value="78">78</option>
+                                <option value="79">79</option>
+                                <option value="80">80</option>
+                                <option value="81">81</option>
+                                <option value="82">82</option>
+                                <option value="83">83</option>
+                                <option value="84">84</option>
+                                <option value="85">85</option>
+                                <option value="86">86</option>
+                                <option value="87">87</option>
+                                <option value="88">88</option>
+                                <option value="89">89</option>    
+                                <option value="90">90</option>
+                                <option value="91">91</option>
+                                <option value="92">92</option>
+                                <option value="93">93</option>
+                                <option value="94">94</option>
+                                <option value="95">95</option>
+                                <option value="96">96</option>
+                                <option value="97">97</option>
+                                <option value="98">98</option>
+                                <option value="99">99</option>    
+                                <option value="100">100</option>
+                                <option value="101">101</option>
+                                <option value="102">102</option>
+                                <option value="103">103</option>
+                                <option value="104">104</option>
+                                <option value="105">105</option>
+                                <option value="106">106</option>
+                                <option value="107">107</option>
+                                <option value="108">108</option>
+                                <option value="109">109</option>   
+                                <option value="110">110</option>
+                                <option value="111">111</option>
+                                <option value="112">112</option>
+                                <option value="113">113</option>
+                                <option value="114">114</option>
+                                <option value="115">115</option>
+                                <option value="116">116</option>
+                                <option value="117">117</option>
+                                <option value="118">118</option>
+                                <option value="119">119</option>    
+                                <option value="120">120</option>
+                                <option value="121">NEONATO</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label >Profesión:</label>
+                            <select  id="nprofesion" name="nprofesion"  placeholder="--seleccionar--" ng-model="difunto.nprofesion"  class="form-control" ng-options="pro.prf_profesion as pro.prf_profesion for pro in aProfesiones"  required>
+                              <option value="">--Seleccionar--</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="url" >Estado Civil:</label>
+                            <select id="nestado_civil" name="nestado_civil"  ng-model="difunto.nestado_civil"  class="form-control" placeholder="-- Seleccione --" ng-disabled="desabilitado" required>
+                                <option value="CASADO(A)">CASADO(A)</option>
+                                <option value="SOLTERO(A)">SOLTERO(A)</option>
+                                <option value="VIUDO(A)">VIUDO(A)</option>
+                                <option value="DIVORCIADO(A)">DIVORCIADO(A)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label >Provincia:</label><select id="nprovincia" name="nprovincia" placeholder="provincia" ng-model="difunto.nprovincia" class="form-control"  ng-options="pro.prv_provincia as pro.prv_provincia for pro in aProvincias" required ng-change="localidades(difunto.nprovincia)" ng-disabled="desabilitado" required>
+                             <option value="">--Seleccionar--</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                           <label >Localidad:</label>
+                           <select id="nidlocalidad" name="nidlocalidad" placeholder="--seleccionar--" ng-model="difunto.nlocalidad" class="form-control" required ng-options="loc.mnc_municipio as loc.mnc_municipio for loc in aLocalidades"  required>
+                            <option value="">--Seleccionar--</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label >Causa Muerte:</label>
+                           <select id="ncausamuerte" name="ncausamuerte" placeholder="--seleccionar--" ng-model="difunto.ncausamuerte" class="form-control" required ng-options="causam.causamu_des as causam.causamu_des for causam in aCausasMuerte" ng-change="">
+                             <option value="">--Seleccionar--</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group" >
+                            <label for="url" >Médico:</label>
+                            <input  ng-model="difunto.nmedico" id="nmedico" name="nmedico" class="form-control" type="text" placeholder="Ingrese Nombre Medico" onkeyUp="return conMayusculas(this);" size="20" required>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group" >
+                            <label for="url" >Oficial Reg. Civil:</label>
+                            <input  ng-model="difunto.nregistrocivil" id="nregistrocivil" name="difunto.nregistrocivil" class="form-control" type="text" placeholder="Ingrese Reg. Civil" size="20" required>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group" >
+                            <label for="url" >Libro:</label>
+                            <input  ng-model="difunto.nlibro" id="nlibro" name="nlibro" class="form-control" type="text" placeholder="Ingrese Libro" size="20" required>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group" >
+                            <label for="url" >Folio :</label>
+                            <input  ng-model="difunto.nfolio" id="nfolio" name="nfolio" class="form-control" type="text" placeholder="Ingrese Folio" size="20" required>
+                        </div>
+                    </div>                    
+                    <div class="col-md-3">
+                        <div class="form-group" >
+                            <label for="url" >Partida:</label>
+                            <input  ng-model="difunto.npartida" id="npartida" name="npartida" class="form-control" type="text" placeholder="Ingrese Partida" size="20" required>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group" >
+                            <label for="url" >Distrito:</label>
+                            <input  ng-model="difunto.ndistrito" id="ndistrito" name="ndistrito" class="form-control" type="text" placeholder="Ingrese Distrito" size="20" required>
+                        </div>
+                    </div>                        
+                    <div class="col-md-3">
+                        <div class="form-group" >
+                            <label for="url" >Fecha Muerte:</label>
+                            <p class="input-group"><input name="nfechamuerte" id="nfechamuerte" type="date" class="form-control" datepicker-popup="" ng-model="difunto.nfechamuerte" is-open="startDateOpened" close-text="Close" ng-disabled="true" max-date="model.endDate" required/>   
+                                <span class="input-group-btn">
+                                    <button type="button" class="btn btn-default" ng-click="startDateOpen($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+                                </span>
+                            </p>
+                            
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                         
+
+                    </div>
+                </div>
+                <br>
+                <label for="url" >REQUIRIENTE:</label>
+                <div class="hr-line-dashed"/>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group" >
+                            <label for="url" >Nombre:</label>
+                            <input  ng-model="difunto.rnombre" id="rnombre" name="rnombre" class="form-control" type="text" placeholder="Ingrese Nombre" class="form-control"  onkeyUp="return conMayusculas(this);" required readonly="readonly" disabled="disabled">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group" >
+                            <label for="url" >Ap. Paterno:</label>
+                            <input  ng-model="difunto.rpaterno" id="rpaterno" name="rpaterno" class="form-control" type="text" placeholder="Ingrese Paterno" class="form-control"  onkeyUp="return conMayusculas(this);" readonly="readonly" disabled="disabled" required>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group" >
+                            <label for="url" >Materno:</label>
+                            <input  ng-model="difunto.rmaterno" id="rmaterno" name="rmaterno" class="form-control" type="text" placeholder="Ingrese Materno" class="form-control"  onkeyUp="return conMayusculas(this);" readonly="readonly" disabled="disabled" required>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group" >
+                            <label for="url" >C.I:</label>
+                            <input  ng-model="difunto.rci" id="rci" name="rci" class="form-control" type="text" placeholder="Ingrese C.I." class="form-control"  onkeyUp="return conMayusculas(this);" ng-minlength="3" readonly="readonly" disabled="disabled" required>
+                        </div>
+                    </div>                    
+                    <div class="col-md-3">
+                        <div class="form-group" >
+                            <label for="url" >Expedido:</label>
+                            <input  ng-model="difunto.rexpedido" id="rexpedido" name="rexpedido" class="form-control" type="text" placeholder="Ingrese Expedido" size="20" onkeyup="deshabilita(this.form);valNumero(this);" readonly="readonly" disabled="disabled" required>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group" >
+                             <label for="url" >Parentesco:</label>
+                            <select id="parentesco" name="parentesco"  ng-model="difunto.rparentesco"  class="form-control" placeholder="-- Seleccione --" readonly="readonly" disabled="disabled" required>
+                                <option value="1">HIJO (A)</option>
+                                <option value="2">PADRE / MADRE</option>
+                                <option value="3">ABUELO (A)</option>
+                                <option value="4">NIETO (A)</option>
+                                <option value="6">ESPOSO(A)</option>
+                                <option value="7">CONVIVIENTE</option>
+                                <option value="9">TUTOR(A)</option>
+                                <option value="10">HERMANO(A)</option>
+                                <option value="13">TIO (A)</option>
+                                <option value="14">PRIMO(A)</option>
+                                <option value="15">SOBRINO(A)</option>
+                                <option value="16">SUEGRO(A)</option>
+                                <option value="17">HIJO POLÍTICO</option>
+                                <option value="18">CUÑADO (A)</option>
+                                <option value="19">ORDEN JUDICIAL</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group" >
+                            <label for="url" >Motivo:</label>
+                            <select id="motivo" name="motivo"  ng-model="datos.motivo"  class="form-control" placeholder="-- Seleccione --" ng-readonly="readonly" disabled="disabled" required>
+                                <option value="1">DECLARATORIA DE HEREDEROS</option>
+                                <option value="2">SOLICITAR EL CERTIFICADO DE DEFUNCIÓN </option>
+                                <option value="3">TRÁMITES - AFP's</option>
+                                <option value="4">TRÁMITES - SENASIR</option>
+                                <option value="5">TRÁMITES - INSTITUCIONES BANCARIAS</option>
+                                <option value="6">TRÁMITES ANTE SEGIP</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group" >
+                            <label for="url" >Zona:</label>
+                            <input  ng-model="difunto.rzona" id="rzona" name="rzona" class="form-control" type="text" placeholder="Ingrese Zona" class="form-control"  onkeyUp="return conMayusculas(this);" readonly="readonly" disabled="disabled"  required>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group" >
+                            <label for="url" >Nro:</label>
+                            <input  ng-model="difunto.rnro" id="rnro" name="rnro" class="form-control" type="text" placeholder="Ingrese Número" class="form-control"  onkeyUp="return conMayusculas(this);" readonly="readonly" disabled="disabled" required>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group" >
+                            <label for="url" >Teléfono:</label>
+                            <input  ng-model="difunto.rtelefono" id="rtelefono" name="rtelefono" class="form-control" type="text" placeholder="Ingrese Telefono" class="form-control"  onkeyUp="return conMayusculas(this);" readonly="readonly" disabled="disabled" required>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group" >
+                            <label for="url" >Correo:</label>
+                            <input  ng-model="difunto.rcorreo" id="rcorreo" name="rcorreo" class="form-control" type="text" placeholder="Ingrese Correo" class="form-control"  onkeyUp="return conMayusculas(this);" readonly="readonly" disabled="disabled" required>
+                        </div>
+                    </div>                    
+                </div>
+                <div class="hr-line-dashed"/>                
+                <div>
+                    <button  ng-show = "aprobado == true" name="btnBuscar" ng-click="volverBusqueda()" data-dismiss="modal" type="button" class="btn btn-primary" ng-><i class="glyphicon fa fa-search"></i>BUSCAR NUEVO DIFUNTO</button>
+                    <button id="btnGenerarDocumento" ng-show = "swgeneradoc != 'true'"  name="btnBuscar" ng-click="generarCertificado(difunto)" data-dismiss="modal" type="button" class="btn btn-primary" ng-disabled="aprobado"><i class="glyphicon fa fa-search"></i>GENERAR CERTIFICADO</button>
+                    <a href="{{urldocobt}}" target="_blank" ng-show = "swgeneradoc" class="btn btn-primary" ng-click="mostrarDocumentoGenerado();" ng-disabled="formulario.$invalid">
+                     <i class="glyphicon fa fa-save"></i>
+                        PDF
+                    </a>
+                    <a ng-show = "aprobado == true" class="btn btn-primary" ng-click="vaciar(difunto,datos);guardarData(datos)" ng-disabled="formNuevoRegistroDifunto.$invalid">
+                     <i class="glyphicon fa fa-save"></i>
+                        Guardar / Continuar
+                    </a>
+                </div>
+            </form>
+        </div>     
+        
+        <!-- BUSQUEDA GRILLA -->
+        <div class="row" ><BR/></div>
+        <div ng-show = "formGrillaFallecido != null">
+            <div class="row" ng-show="tablaCiudadanos != null"> 
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                       <h5>Lista de personas</h5>
+                          <div ibox-tools></div>
+                    </div>
+                    <div class="ibox-content">
+                       <table class="table table-striped">
+                          <thead>
+                            <th>#&nbsp;</th>
+                            <th>SELECCIONAR&nbsp;</th>
+                            <th>NOMBRE&nbsp;</th>
+                            <th>PATERNO&nbsp;</th>
+                            <th>MATERNO&nbsp;</th>
+                            <th>AP. CASDO(A)&nbsp;</th>
+                            <th>FECHA REGISTRO&nbsp;</th>
+                          </thead>
+                          <tbody>
+                             <tr class="column" ng-repeat="datos in obtDatos">
+                                <td>{{$index+1}}</td>
+                                <td>
+                                    <a ng-click="seleccionarDifunto(datos)" tooltip = "Ver" class="btn btn-info btn-circle"><i class="fa fa-folder-open"></i></a>
+                                </td>
+                                <td>{{datos.nombre}}</td>
+                                <td>{{datos.paterno}}</td>
+                                <td>{{datos.materno}}</td>
+                                <td>{{datos.apellido_casada}}</td>
+                                <td>{{datos.fecha_registro}}</td>
+                              </tr>
+                          </tbody>
+                       </table>
+                    </div>
+                </div>
+            </div>
+        </div>            
+</div>
+

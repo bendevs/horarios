@@ -1,0 +1,246 @@
+<div class="col-md-12" class="row" ng-controller="VerifMantController" data-ng-init="inicioCrear()">
+    <table  width="100%">
+        <td><h3>Ficha de Verificacion de Mantenimiento de Infraestructura Realizado </h3></td> 
+    </table>
+    <div class="modal-body" >
+        <!-- <div class="col-sm-6 col-sm-12 col-xs-12"> -->
+           <div class="col-md-3">
+            <!-- <label >Busqueda por Fecha de Programación:</label> -->
+            <div class="form-group">
+
+                <label class="col-sm-4 control-label no-padding-right" for="url">FECHA DE:</label>
+                <div class="controls">
+                    <p class="input-group">
+                    <input name="FECHA1" id="registro1[]" type="text" class="form-control" datepicker-popup="" ng-model="registro.FECHA1" is-open="startDateOpened1" ng-required="true" close-text="Close" ng-disabled="desabilitado"/>
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-default" ng-click="startDateOpen1($event)"><i class="glyphicon glyphicon-calendar"></i>
+                        </button>
+                    </span>
+                </p>
+                </div>
+            </div>
+        </div> 
+        <div class="col-md-4">
+            <div class="form-group">
+                <label class="col-sm-4 control-label no-padding-right" for="url">A:</label>
+                    <div class="controls">    
+                        <p class="input-group"><input name="FECHA2" id="registro2[]" type="text" class="form-control" datepicker-popup="" ng-model="registro.FECHA2" is-open="startDateOpened" ng-required="true" close-text="Close" ng-disabled="desabilitado"/>
+                        <span class="input-group-btn">
+                            <button type="button" class="btn btn-default" ng-click="startDateOpen($event)"><i class="glyphicon glyphicon-calendar"></i>
+                            </button>
+                        </span></p>
+                    </div>
+                </div>
+            </div> 
+
+             <div class="col-md-4">
+                <button ng-click="getTablefecha('USG-MANT',registro);" data-dismiss="modal" type="button" class="btn btn-primary" >Buscar</button>
+            </div>
+        <!--   busqueda texto -->
+         <div class="col-md-7">
+            <div class="form-group">
+                <label for="category" >Busqueda por:</label>
+                <div class="controls">
+                    <select ng-model="datosCargar.campo" id="campo" name="campo" class="form-control"  ng-required="true" ng-change="getTabla(datosCargar.campo)" >
+                        <option style="display:none" value="">-- Elegir--</option>
+                        <option value = 'USG_UO_SOL_VALOR'>UNIDAD SOLICITANTE</option>
+                        <option value = 'USG_FUN_SOL'>FUNCIONARIO SOLICITANTE</option>
+                        <option value = 'USG_TEC1'>TÉCNICO ALBAÑIL</option>
+                        <option value = 'USG_TEC2'>TÉCNICO CARPINTERO</option>
+                        <option value = 'USG_TEC3'>TÉCNICO ELECTRICISTA</option>
+                        <option value = 'USG_TEC4'>ENCARGADO DE MANTENIMIENTO DE EDIFICIO</option>
+                        <option value = 'USG_TEC5'>ENCARGADO DE TELEFONIA ANALOGICA</option>
+                        <option value = 'USG_TEC7'>TÉCNICO PINTOR</option>
+                        <option value = 'USG_TEC8'>TÉCNICO PLOMERO</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-7"  ng-if="datosCargar.campo==='USG_UO_SOL_VALOR' ">
+                    <div class="form-group">
+                       <p> <label >Busqueda: </label>                        
+                       <input  ng-value="&nbsp;" ng-model="datosCargar.id" name="wsnombre" id="wsnombre" class="form-control" type="text" placeholder="Ingrese Unidad Solicitante" ng-disabled="only" ng-required="true" onkeyUp="return conMayusculas(this)">
+                        <span>
+                          <button ng-click="getTabla(datosCargar.id)" data-dismiss="modal" type="button" class="btn btn-primary" >Buscar</button>
+                        </span>
+                      </p>
+                    </div>
+         </div>
+        
+
+          <div class="col-md-7"  ng-if="datosCargar.campo==='USG_FUN_SOL'">
+                    <div class="form-group">
+                       <p> <label >Busqueda: </label>                        
+                       <input  ng-value="&nbsp;" ng-model="datosCargar.id" name="wsnombre" id="wsnombre" class="form-control" type="text" placeholder="Ingrese Funcionario Solicitante" ng-disabled="only" ng-required="true" onkeyUp="return conMayusculas(this)">
+                    </div>
+                    <span>
+                <button ng-click="getTabla(datosCargar.id)"  data-dismiss="modal" type="button" class="btn btn-primary" >Buscar</button>
+            </span>
+            </p>
+         </div>
+          <div class="col-md-7 col-sm-11 col-xs-12" ng-if="datosCargar.campo==='USG_TEC1'">
+                  <div class="form-group">
+                      <p>  <label >Busqueda: </label>                        
+                       <input  ng-value="&nbsp;" ng-model="datosCargar.id" name="wsnombre" id="wsnombre" class="form-control" type="text" placeholder="Ingrese nombre de técnico" ng-disabled="only" ng-required="true">
+                    </div>
+                    <span>
+                <button ng-click="getTablatecnico('USG-MANT',datosCargar.id,'USG_TEC1')" data-dismiss="modal" type="button" class="btn btn-primary" >Buscar</button>
+            </span>
+            </p>
+          </div>
+
+          <div class="col-md-7 col-sm-11 col-xs-12" ng-if="datosCargar.campo==='USG_TEC2'">
+                  <div class="form-group">
+                       <p> <label >Busqueda: </label>                        
+                       <input  ng-value="&nbsp;" ng-model="datosCargar.id" name="wsnombre" id="wsnombre" class="form-control" type="text" placeholder="Ingrese nombre de técnico" ng-disabled="only" ng-required="true" 
+                       >
+                    </div>
+                    <span>
+                <button ng-click="getTablatecnico('USG-MANT',datosCargar.id,'USG_TEC2')" data-dismiss="modal" type="button" class="btn btn-primary" >Buscar</button>
+            </span>
+            </p>
+          </div>
+
+        <div class="col-md-7 col-sm-11 col-xs-12" ng-if="datosCargar.campo==='USG_TEC3'">
+                  <div class="form-group">
+                       <p> <label >Busqueda: </label>                        
+                       <input  ng-value="&nbsp;" ng-model="datosCargar.id" name="wsnombre" id="wsnombre" class="form-control" type="text" placeholder="Ingrese nombre de técnico" ng-disabled="only" ng-required="true" 
+                       >
+                    </div>
+                    <span>
+                <button ng-click="getTablatecnico('USG-MANT',datosCargar.id,'USG_TEC3')" data-dismiss="modal" type="button" class="btn btn-primary" >Buscar</button>
+            </span>
+            </p>
+          </div>
+
+          <div class="col-md-7 col-sm-11 col-xs-12" ng-if="datosCargar.campo==='USG_TEC4'">
+                  <div class="form-group">
+                      <p>  <label >Busqueda: </label>                        
+                       <input  ng-value="&nbsp;" ng-model="datosCargar.id" name="wsnombre" id="wsnombre" class="form-control" type="text" placeholder="Ingrese nombre de técnico" ng-disabled="only" ng-required="true" 
+                      >
+                    </div>
+                    <span>
+                <button ng-click="getTablatecnico('USG-MANT',datosCargar.id,'USG_TEC4')" data-dismiss="modal" type="button" class="btn btn-primary" >Buscar</button>
+            </span>
+            </p>
+          </div>
+
+          <div class="col-md-7 col-sm-11 col-xs-12" ng-if="datosCargar.campo==='USG_TEC5'">
+                  <div class="form-group">
+                      <p>  <label >Busqueda: </label>                        
+                       <input  ng-value="&nbsp;" ng-model="datosCargar.id" name="wsnombre" id="wsnombre" class="form-control" type="text" placeholder="Ingrese nombre de técnico" ng-disabled="only" ng-required="true" 
+                       >
+                    </div>
+                    <span>
+                <button ng-click="getTablatecnico('USG-MANT',datosCargar.id,'USG_TEC5')" data-dismiss="modal" type="button" class="btn btn-primary" >Buscar</button>
+            </span>
+             </p>
+          </div>
+         
+         <div class="col-md-7 col-sm-11 col-xs-12" ng-if="datosCargar.campo==='USG_TEC7'">
+                  <div class="form-group">
+                      <p>  <label >Busqueda: </label>                        
+                       <input  ng-value="&nbsp;" ng-model="datosCargar.id" name="wsnombre" id="wsnombre" class="form-control" type="text" placeholder="Ingrese nombre de técnico" ng-disabled="only" ng-required="true" 
+                       >
+                    </div>
+                    <span>
+                <button ng-click="getTablatecnico('USG-MANT',datosCargar.id,'USG_TEC7')" data-dismiss="modal" type="button" class="btn btn-primary" >Buscar</button>
+            </span>
+            </p>
+          </div>
+
+          <div class="col-md-7 col-sm-11 col-xs-12" ng-if="datosCargar.campo==='USG_TEC8'">
+                  <div class="form-group">
+                      <p>  <label >Busqueda: </label>                        
+                       <input  ng-value="&nbsp;" ng-model="datosCargar.id" name="wsnombre" id="wsnombre" class="form-control" type="text" placeholder="Ingrese nombre de técnico" ng-disabled="only" ng-required="true" 
+                       >
+                    </div>
+                    <span>
+
+                <button ng-click="getTablatecnico('USG-MANT',datosCargar.id,'USG_TEC8')" data-dismiss="modal" type="button" class="btn btn-primary" >Buscar</button>
+            </span>
+            </p>
+          </div>
+            
+            <br/>
+            <br>
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>Datos </h5> 
+                    <div ibox-tools></div>
+                    <div align="right">
+                        <a class="btn btn-primary" ng-click="ejemplo(datosCargar.campo,grupo.casid,71)" >
+                            <i class="fa fa-print"></i>
+                                 Imprimir Listado
+                        </a>
+                    </div>
+                </div>  
+                <div class="ibox-content" >
+                    <div class="table-responsive"> 
+                         <table  class="table table-striped"  >
+                            <thead>      
+                                <th>#&nbsp;</th>
+                                <th>Codigo&nbsp;</th>
+                                <th>Unidad Solicitante</th>
+                                <th>Funcionario Solicitante</th>
+                                <th ng-show="prueba">Técnico</th>
+                                <th ng-show ="prueba_1">Técnico Asignados</th>
+                                <th>Lugar&nbsp;</th>
+                                <th>Teléfono&nbsp;</th>
+
+                               <!--  <th>Revisor&nbsp;</th>
+                                <th>Inventariador&nbsp;</th>
+                                <th>Fecha de Creacion&nbsp;</th> -->
+                            </thead>
+                         
+                  <tr ng-repeat="grupo in grupos" >
+                  <td>{{grupo.casid}}</td>
+                  <td>{{grupo.codigo}}</td>
+                  <td>{{grupo.unidad_sol}}</td>
+                  <td>{{grupo.funcionario_solicitante}}</td>
+                  <td ng-show ="prueba">{{grupo.tecnicos}}</td>
+                  <td ng-show ="prueba_1">{{grupo.tecnicos}}</td>
+                  <td>{{grupo.ubicacion}}</td>
+                  <td>{{grupo.telefono}}</td>
+              
+                  
+                  <tr ng-repeat="grupo in prueba" >
+                  <!--td>{{grupo.casid}}</td>
+                  <td>{{grupo.codigo}}</td>
+                  <td>{{grupo.unidad_sol}}</td>
+                  <td>{{grupo.funcionario_solicitante}}</td>
+                  <td ng-show="datosCargar.campo=='USG_TEC1'">{{grupo.tec_1}}</td>
+                  <td ng-show="datosCargar.campo=='USG_TEC2'">{{grupo.tec_2}}</td>
+                  <td ng-show="datosCargar.campo=='USG_TEC3'">{{grupo.tec_3}}</td>
+                  <td ng-show="datosCargar.campo=='USG_TEC4'">{{grupo.tec_4}}</td>
+                  <td ng-show="datosCargar.campo=='USG_TEC5'">{{grupo.tec_5}}</td>
+                  <td ng-show="datosCargar.campo=='USG_TEC7'">{{grupo.tec_7}}</td-->
+                  <td>{{grupo}}</td>
+                  <!--td>{{grupo.ubicacion}}</td>
+                  <td>{{grupo.telefono}}</td-->
+                   
+                  <!-- <td>{{grupo.cas_datos.USG_TEL}}</td> -->
+
+                <!--     <td>{{grupo.cas_datos.PTR_REV}}</td>
+                    <td>{{grupo.cas_datos.PTR_INVENT}}</td> 
+                    <td>{{grupo.cas_datos.PTR_FEC_INVENT}}</td> -->
+                                     
+                  <td data-title="'IMPRIMIR'"><a  tooltip = "Imprimir" ng-click="ejemplo3(grupo.casid)" class="btn btn-primary"><i class="fa fa-print" ></i></a></td>
+                 <!--  <td data-title="'IMP'"><a  tooltip = "Imprimir"  class="btn-floating" ng-click="ejemplo3(grupo.casid,71)"><i class="fa fa-eye" ></i></a></td>  -->
+                  
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
+          </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+

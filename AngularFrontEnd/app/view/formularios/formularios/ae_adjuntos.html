@@ -1,0 +1,1200 @@
+<!-- TIPOS OBLIGATORIO -->
+<style>
+    input:required:invalid {
+        border: 1px solid red;
+    }
+    input:required:valid {
+        border: 1px solid green;
+    }
+    select:required:invalid {
+        border: 1px solid red;
+    }
+    select:required:valid {
+        border: 1px solid green;
+    }
+    .form-group {
+        padding-left: 8px;
+    }
+</style>
+
+<style>
+    .custom-upload {
+        position: relative;
+        height: 40px;
+        width: 100%;
+        margin:30px;
+    }
+    .custom-upload input[type=file]
+    {
+        outline:none;
+        position: relative;
+        text-align: right;
+        -moz-opacity:0 ;
+        filter:alpha(opacity: 0);
+        opacity: 0;
+        z-index: 2;
+        width:85%;
+        height:100%;
+    }
+    .custom-upload .fake-file
+    {
+        background:url(http://www.fold3.com/i/upload-icon.png) center right no-repeat;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        width: 85%;
+        padding: 0;
+        margin: 0;
+        z-index: 1;
+        line-height: 100%;
+    }
+    .custom-upload .fake-file input
+    {
+        font-size:16px;
+        height:40px;
+        width:85%;
+    }
+</style>
+
+<script type="text/javascript">
+    $('#file-input').change(function(e) {
+        var id = 0;
+        angular.element(this).scope().addImage(e,id);
+    });
+    $('#file-input1').change(function(e) {
+        var id = 1;
+        angular.element(this).scope().addImage(e,id);
+    });
+
+    function subirArchivoController($scope,$timeout,DreamFactory,CONFIG,$window,$rootScope,sessionService,ngTableParams,$filter,$route,sweet,$http,FileUploader,$sce,fileUpload,$timeout)
+    {
+    	$scope.direccionAdjuntosCel = "http://192.168.6.57:90/rest/files/";
+        $scope.imagenDoc= "../../libs/img/clips.jpg";
+        $scope.verimagen=false;
+        var direccion =  {"direccion":"documentos"};
+        $scope.datosArchi=direccion;
+        var fecha= new Date();
+        var fechactual=fecha.getFullYear() + "-" + fecha.getMonth() + "-" + fecha.getDate() + " " + fecha.getHours() + ":" + fecha.getMinutes() + ":" + fecha.getSeconds();
+        var size = 10;
+        var direccionvirtual= "";
+        $scope.btnCrear=false;
+        $scope.btnSubir=false;
+        $scope.clase22='col-md-12';
+
+        //*******************elaborar*********************
+
+        $scope.fechadeadjunto=fechactual;
+        $scope.editorOptions = {
+            language: 'es',
+            uiColor: '#E5E6E8'
+        };
+        $scope.$on("ckeditor.ready", function( event ) {
+            $scope.isReady = true;
+        });
+        $scope.test = '<p>De mi consideración</p>\n';
+
+        $scope.modificar = function (datos){
+            var mutli_education = document.formulario1.elements["registro[]"];
+            var json="[";
+            for (var i = 0; i <= mutli_education.length - 1; i++) {
+              json = json + '{"clave":"' + mutli_education[i].attributes[2].nodeValue + '", "valor": "' + mutli_education[i].value + '"},'
+            };
+            json = json.substring(0, json.length-1);
+            json = json + "]";     
+            var valores = JSON.stringify(json);
+            $.ajax({
+                url:CONFIG.API_URL_DMS+'elaborar/elaborador/elaborar.php',
+                type:"post",
+                data:{
+                    "option":"MODIFICARELABORACION",
+                    "sistema":'DMS',
+                    "sproceso":'ELABORACION',
+                    "somd_nodo":'DMS',
+                    "sdoc_datos":valores,
+                    "susuario_registro":sessionService.get('USUARIO'),
+                    "scuerpo":datos.vdoc_cuerpo,
+                    "sidelaborado":datos.vdoc_idd,
+                    "sdoc_tiempo":datos.vdoc_tiempo,
+                    "sdoc_tps_doc_id":datos.vtps_doc_id,
+                    "sacceso":datos.vdoc_acceso
+                },
+                success:function(response){
+                    $.unblockUI();
+                    sweet.show('', 'Registro modificado', 'success');
+                    $scope.tiposDocumentacion();
+                    $scope.getDocumento(sessionService.get('USUARIO'),'DMS',null,null);
+                    $scope.personaNatural1 = null;
+                    $scope.elaboracionFor = null;
+                }
+            });
+        }
+        //**********************fin de la elaboracion***********
+
+          $scope.tiposDocumentacion = function(){
+              $.blockUI();
+              var resDocumentacion = {
+                  "procedure_name":"sp_dms_lst_tiposdocumentacion",
+              };
+              var obj=DreamFactory.api[CONFIG.SERVICE].callStoredProcWithParams(resDocumentacion);
+              obj.success(function (response) {
+                  $scope.datadocumentaciones = response;
+                  $.unblockUI();
+              })
+              obj.error(function(error) {
+                  sweet.show('', 'Registro no eliminado', 'error');
+              });
+        };
+
+        $scope.volver = function () {
+          $scope.clase222='col-md-12';
+          $scope.clase22='col-md-4';
+              $scope.cargarInformacionvista12 = null;
+        };
+
+        $scope.modificarDocumentoCargar = function(rol){
+          $scope.only=false;
+          $scope.datosRol=rol;
+          $scope.boton="upd";
+          $scope.titulo="Modificar Roles";
+        };
+
+        $scope.eliminarDocumentoCargar = function(rol){
+          $scope.only=true;
+          $scope.datosRol=rol;
+          $scope.boton="del";
+          $scope.titulo="Eliminar Roles";
+        };
+
+        $scope.limpiar = function(){
+          $scope.only=false;
+          $scope.datosRol = '';
+          $scope.boton="new";
+          $scope.titulo="Nuevo Adjunto";
+          $scope.fechadeadjunto=fechactual;
+          $scope.Adjuntar = true;
+          $scope.personaNatural1 = true;
+        };
+
+        // ***************************upload***********************************
+        $scope.uploader = new FileUploader({
+        });
+
+        var uploader = $scope.uploader;
+        uploader.filters.push({
+          name: 'customFilter',
+          fn: function(item /*{File|FileLikeObject}*/, options) {
+              return this.queue.length < 10;
+            }
+        });
+
+	 //Star image
+    $scope.addImage=function(e,idFoto){
+            console.log(e);
+            $scope.idFoto=idFoto;
+            var file = e.target.files[0],
+            imageType = /image.*/;
+
+            if (!file.type.match(imageType))
+            return;
+
+            var reader = new FileReader();
+            reader.onload = fileOnload;
+            reader.readAsDataURL(file);
+        };
+
+        function fileOnload(e) {
+            var result=e.target.result;
+            switch($scope.idFoto) {
+                case 0:
+                    $('#imgSalida').attr("src",result);
+                    var b64_2 = result.split('data:image/jpeg;base64,');
+                    $scope.labels2 = b64_2[1];
+                    break;
+                case 1:
+                    $('#imgSalida1').attr("src",result);
+                    var b64_1 = result.split('data:image/jpeg;base64,');
+                    $scope.labelºs1 = b64_1[1];
+                    break;
+            }
+        }
+    //end image
+
+        uploader.onWhenAddingFileFailed = function(item /*{File|FileLikeObject}*/, filter, options) {
+          //console.info('onWhenAddingFileFailed', item, filter, options);
+
+        };
+
+        $scope.tipoDocumento1 = '';
+        $scope.tiponame1 = '';
+        $scope.tiposize1 = '';
+
+        uploader.onAfterAddingFile = function(fileItem) {
+            fileItem.url= CONFIG.UPLOAD_URL+"?desripcion=temporal&&arch_sistema=DMS&&arch_proceso=INFORME&&idusuario="+ sessionService.get('IDUSUARIO'); // direccionamiento
+
+            $scope.tipoDocumento = fileItem.file.type;
+            $scope.tiponame = fileItem.file.name;
+            $scope.tiposize = fileItem.file.size;
+
+            $scope.tiponame1 = $scope.tiponame1+'$'+fileItem.file.name;
+            $scope.tiposize1 = $scope.tiposize1+'$'+fileItem.file.size;
+            $scope.imagenDoc= "../../libs/img/clip.png";
+            var nameArray = $scope.tipoDocumento.split('/');
+            $scope.tipoDocumento = nameArray[1];
+            $scope.tipoDocumento1 =$scope.tipoDocumento1 +'$'+$scope.tipoDocumento;
+            if($scope.tiposize   < 80000000){
+                $scope.botonSubirOriginal = null;
+                $scope.botonSubirError = "oculta";
+                $scope.botonSubireliminar = true;
+
+		if($scope.tipoDocumento == "png" || $scope.tipoDocumento == "jpg" || $scope.tipoDocumento == "jpeg" || $scope.tipoDocumento == "gif")
+                {
+		    $scope.verimagen=true;
+                    $scope.botonSubirOriginal = null;
+                    $scope.botonSubirError = "oculta";
+                }else{
+			console.log('error de documento');
+			$scope.verimagen=false;
+			$scope.imagenDoc= "../../libs/img/clip.png";
+                      $scope.botonSubirError = null;
+                      $scope.botonSubirOriginal = "oculta";
+                    }
+
+            } else {
+                  sweet.show('', 'El archivo es mayor a 8 MB no pudo ser adjuntada', 'warning');
+                  $scope.botonSubirError = null;
+                  $scope.botonSubirOriginal = "oculta";
+                  $scope.botonSubireliminar = null;
+            }
+        };
+
+        uploader.onAfterAddingAll = function(addedFileItems) {
+            //console.info('onAfterAddingAll', addedFileItems);
+        };
+
+        uploader.onBeforeUploadItem = function(item) {
+              //console.info('onBeforeUploadItem', item);
+
+        };
+
+        uploader.onProgressItem = function(fileItem, progress) {
+            //console.info('onProgressItem', fileItem, progress);
+        };
+
+        uploader.onProgressAll = function(progress) {
+            //console.info('onProgressAll', progress);
+        };
+
+        var direccionURL=CONFIG.IMG_URL;
+        $scope.origen1='';
+        $scope.origen2='';
+
+        uploader.onSuccessItem = function(fileItem, response, status, headers) {
+          console.info('onSuccessItem', fileItem, response, status, headers);
+            var respuestaa= response.split('\"');
+            $scope.origen1 = $scope.origen1 +'$'+respuestaa[0];
+            $scope.origen2 = $scope.origen2 +'$'+respuestaa[1];
+            console.log($scope.origen1);
+            console.log($scope.origen2);
+            $scope.opciontiposDocumentacion = true;
+            archivoUpload =fileItem.file.name;
+            direccionURL = direccionURL+"/"+archivoUpload;
+        };
+
+        uploader.onErrorItem = function(fileItem, response, status, headers) {
+          console.info('onErrorItem', fileItem, response, status, headers);
+        };
+
+        uploader.onCancelItem = function(fileItem, response, status, headers) {
+            console.info('onCancelItem', fileItem, response, status, headers);
+        };
+
+        uploader.onCompleteItem = function(fileItem, response, status, headers) {
+            console.info('onCompleteItem', fileItem, response, status, headers);
+        };
+
+        uploader.onCompleteAll = function() {
+            console.info('onCompleteAll');
+        };
+
+        $scope.falla = function()
+        {
+            sweet.show('', "Tipo de archivo incorrecto elimine por favor", 'error');
+            $scope.desabilitado2=true;
+            $scope.botonSubireliminar = null;
+        };
+        // *********************** FIN DEL UPLOAD *****************************
+
+        $scope.eliminarArchivo = function(archivo){
+            console.log(archivo);
+            /*var resFile = {
+                container:"ruta/1/14",
+                file_path:'autenticacion.JPG'
+            };
+            var file=DreamFactory.api.files.deleteFile(resFile);
+            file.success(function(data){
+              console.log(data);
+            });
+            file.error(function(data){
+                $.unblockUI();
+                sweet.show('', 'Registro no Eliminado', 'error');
+            });  */
+            var datosUpload = {};
+            datosUpload['doc_modificacion'] = fechactual;
+            datosUpload['doc_usuario'] = sessionService.get('USUARIO');
+            datosUpload['doc_estado'] = 'B';
+            var ressubirU = {
+                table_name:"dms_gt_documentos",
+                body:datosUpload,
+                id:archivo.doc_idd
+            };
+            //servicio insertar personas
+            var obj=DreamFactory.api[CONFIG.SERVICE].updateRecord(ressubirU);
+            obj.success(function(data){
+                $.unblockUI();
+                $scope.datosArchi='';
+                $scope.myFile='';
+                $scope.imagenDoc='';
+                $scope.getArchivosAdjuntos();
+                var resFile = {
+                    container:"dms_gt_documentos",
+                    file_path:datosUpload
+                };
+                var file=DreamFactory.api.files.deleteFile(resFile);
+                file.success(function(data){
+                });
+                file.error(function(data){
+                    $.unblockUI();
+                    sweet.show('', 'Registro no Eliminado', 'error');
+                });
+                sweet.show('', 'Registro Eliminado', 'success');
+            });
+            obj.error(function(data){
+                $.unblockUI();
+                sweet.show('', 'Registro no Eliminado', 'error');
+            });
+        };
+
+
+
+
+
+
+
+        $scope.convertToDataURLviaCanvas = function (url, callback, outputFormat){
+            var img = new Image();
+            img.crossOrigin = 'Anonymous';
+            img.onload = function(){
+                var canvas = document.createElement('CANVAS');
+                var ctx = canvas.getContext('2d');
+                var dataURL;
+                canvas.height = this.height;
+                canvas.width = this.width;
+                ctx.drawImage(this, 0, 0);
+                dataURL = canvas.toDataURL(outputFormat);
+                callback(dataURL);
+                canvas = null;
+            };
+            img.src = url;
+        };
+        $scope.subirImgBase64= function(imagen,url,nombre,docs){
+            var contentType = 'image/png';
+            var b64Data = imagen;
+            var blob = b64toBlob(b64Data, contentType);
+            var blobUrl = URL.createObjectURL(blob);
+            var combo = document.getElementById('vtps_doc_id2');
+            var descripcionArchivo = combo.options[combo.selectedIndex].text;
+            function b64toBlob(b64Data, contentType, sliceSize) {
+                contentType = contentType || '';
+                sliceSize = sliceSize || 512;
+                var byteCharacters = atob(b64Data);
+                var byteArrays = [];
+                for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+                    var slice = byteCharacters.slice(offset, offset + sliceSize);
+                    var byteNumbers = new Array(slice.length);
+                    for (var i = 0; i < slice.length; i++) {
+                        byteNumbers[i] = slice.charCodeAt(i);
+                    }
+                    var byteArray = new Uint8Array(byteNumbers);
+                    byteArrays.push(byteArray);
+                }
+                var blob = new Blob(byteArrays, {type: contentType});
+                return blob;
+            }
+            var resFormulario = {
+                container: url,
+                file_path: nombre,
+                body:blob
+            };
+            //$scope.datosArchi.tipo
+
+            DreamFactory.api.files.createFile(resFormulario).success(function (response){
+                var datosUpload = {};
+                datosUpload['doc_sistema'] = 'IF';
+                datosUpload['doc_proceso'] = $scope.sIdProcesoActual;
+                datosUpload['doc_id'] = $scope.sIdCaso;
+                datosUpload['doc_ci_nodo'] = $scope.sCasoNombre;
+                datosUpload['doc_datos'] = descripcionArchivo + " - " + $scope.datosArchi.CI;
+                datosUpload['doc_titulo'] = descripcionArchivo;
+                datosUpload['doc_palabras'] = $scope.datosArchi.CI;
+                datosUpload['doc_version'] ='1';
+                datosUpload['doc_tiempo'] = 0;
+                datosUpload['doc_firma_digital'] = 0;
+                datosUpload['doc_acceso'] = "PUBLICO";
+                datosUpload['doc_tamanio_documento'] = "0";
+                datosUpload['doc_tps_doc_id'] = data.tipificacion;
+                datosUpload['doc_tipo_documentacion'] = 'U';
+                datosUpload['doc_tipo_ingreso'] = 'I';
+                datosUpload['doc_estado_de_envio'] = 'N';
+                datosUpload['doc_correlativo'] = '';
+                datosUpload['doc_tipo_documento_ext'] = '';
+                datosUpload['doc_nrotramite_nexo'] = '';
+                datosUpload['doc_id_carpeta'] = '0';
+                datosUpload['doc_registro'] = fechactual;
+                datosUpload['doc_modificacion'] = fechactual;
+                datosUpload['doc_usuario'] = sessionService.get('USUARIO');
+                datosUpload['doc_estado'] = 'A';
+                datosUpload['doc_url_logica'] = "http://192.168.6.57:90/rest/files/"+url +"/"+ nombre + "?app_name=todoangular";
+                datosUpload['doc_url'] = nombre;
+                datosUpload['doc_nombre'] = nombre;
+                datosUpload['doc_tipo_documento'] = tipo[1];
+
+                var ressubirU = {
+                    table_name:"dms_gt_documentos",
+                    body:datosUpload
+                };
+
+                var obj=DreamFactory.api[CONFIG.SERVICE].createRecords(ressubirU);
+                obj.success(function(data){
+                    $.unblockUI();
+                    $scope.getArchivosAdjuntos();
+                })
+                .error(function(data){
+                    $.unblockUI();
+                })
+            }).error(function(results){
+                console.log("ERROR");
+            });
+        }
+
+
+//  http://192.168.6.57:90/rest/files/IF/17/843/undefined/constantine.png?app_name=todoangular
+
+        //var aDocAdjuntosmapa    =   new Array();
+        var aDocAdjuntosmapa = new Object();
+
+        $scope.capturarImagen= function(urlLogica ,NombreArchivo, oID, docs){
+            $scope.convertToDataURLviaCanvas(urlLogica, function(base64Img){
+                var Imagen = base64Img.replace(/data:image\/png;base64,/i,'');
+                $scope.Imagenb = Imagen;
+                var sDirTramite = $rootScope.tramiteId;
+                $scope.url = "RC_CLI/"+ $scope.sIdCaso;
+                $scope.archivo1 = NombreArchivo;
+                $scope.subirImgBase64($scope.Imagenb, $scope.url, $scope.archivo1, docs);
+                /*$scope.datos.INT_AC_direccionImagenmapa = CONFIG.APIURL+"/files/"+$scope.url + "/"+ $scope.archivo1 + "?app_name=todoangular";
+
+                aDocAdjuntosmapa = [];
+                var datosAdjuntosmapa = {
+                    "nombre_archivo" : $scope.archivo1,
+                    "tam_archivo" : '0',
+                    "estado_archivo" : "Env.",
+                    "opcion_archivo" : "-",
+                    "url_archivo" : $scope.datos.INT_AC_direccionImagenmapa
+                };
+                aDocAdjuntosmapa[0]=datosAdjuntosmapa;
+                $scope.datos.ARCHIVOS_MULTIPLES_MAPA = aDocAdjuntosmapa;
+                $scope.map.control.refresh();
+                */
+
+            });
+        }
+
+
+
+
+
+
+        $scope.buscarDocs = function(data){
+            console.log(data);
+            $.blockUI();
+            var parametros = {
+                container:"SCANNER/" + data.CI
+            };
+            var obj=DreamFactory.api.files.getContainer(parametros);
+            obj.success(function(data){
+                $scope.tablaDocs = true;
+                //var archivos = [{}];
+                /*angular.forEach(data.file,function(celda, fila){
+                    console.log(celda);
+                    archivos[fila]['archivo'] = celda.name;
+                    archivos[fila]['tipo'] = celda.content_type;
+                    archivos[fila]['url'] = "http://192.168.6.57:90/rest/files/" + celda.path + "?app_name=todoangular";
+                });*/
+
+                $scope.obtdatosFile = data.file;
+                console.log($scope.obtdatosFile);
+                $.unblockUI();
+            })
+            .error(function(data){
+                $.unblockUI();
+            })
+        }
+        $scope.guardarDocs = function(data, docs){
+            $.blockUI();
+            carnet = $scope.datosArchi.CI;
+            $scope.capturarImagen($scope.direccionAdjuntosCel + docs.path + "?app_name=todoangular",  docs.name, $scope.sIdCaso, docs);
+            $.unblockUI();
+
+            /*var filtro = "dtspsl_ci = '" + carnet +"'";
+                var misDatos = {
+                        "table_name":"Ciudadano",
+                        "body":{
+                            "filter": filtro
+                        }
+                };
+                DreamFactory.api[CONFIG.SERVICERC].getRecordsByPost(misDatos).success(function (response){
+                    var results = response.record;
+                    console.log(docs);
+                    $scope.capturarImagen($scope.direccionAdjuntosCel + docs.path + "?app_name=todoangular",  docs.name, results[0]._id, docs);
+
+                    if($scope.datosArchi.tipo==1) {
+                        response.record[0].dtspsl_file_fotocopia_ci =  docs.name;
+                        var parametros = {
+                            "table_name":"Ciudadano",
+                            "ids" : results[0]._id,
+                            "body":response
+                        };
+                        DreamFactory.api[CONFIG.SERVICERC].updateRecordsByIds(parametros).success(function (results){
+                            var mensajeExito = "Carnet de identidad anverso cargado en sistema.";
+                            sweet.show('', mensajeExito, 'success');
+                            $.unblockUI();
+                        });
+                    }
+
+                    if($scope.datosArchi.tipo==2) {
+                        response.record[0].dtspsl_file_fotocopia_ci_reverso =  docs.name;
+                        var parametros = {
+                            "table_name":"Ciudadano",
+                            "ids" : results[0]._id,
+                            "body":response
+                        };
+                        DreamFactory.api[CONFIG.SERVICERC].updateRecordsByIds(parametros).success(function (results){
+                            var mensajeExito = "Carnet de identidad reverso cargado en sistema.";
+                            sweet.show('', mensajeExito, 'success');
+                            $.unblockUI();
+                        });
+                    }
+            })
+            .error(function(data){
+                $.unblockUI();
+            })*/
+        }
+
+
+        $scope.guardar = function(data){
+            var tipo="";
+            if($scope.tipoDocumento == "png" || $scope.tipoDocumento == "jpg" || $scope.tipoDocumento == "jpeg" || $scope.tipoDocumento == "gif" || $scope.tipoDocumento == "doc" || $scope.tipoDocumento == "pdf"){
+            var file = $scope.myFile;
+            $scope.imagenDoc=uploadUrl + file.name + '?app_name=' + CONFIG.APP_NAME;
+            console.log("Archivo adjunto", data.direccion);
+            $scope.direccionvirtual= "/IF/" + $scope.sIdProcesoActual + "/" + $scope.sCasoNro + "/" + data.direccion;
+            console.log($scope.direccionvirtual);
+            var uploadUrl = CONFIG.APIURL+"/files"+$scope.direccionvirtual+"/";
+            var nombreFile = file.name;
+            tipo = nombreFile.split(".");
+            var cadenaURL = uploadUrl + file.name + '?app_name=' + CONFIG.APP_NAME;
+            var cadenaURI = $scope.direccionvirtual +"/" + file.name;
+            fileUpload.uploadFileToUrl(file, uploadUrl);
+            var datosUpload = {};
+            //alert($scope.sIdCaso);
+            if (data.tipificacion==1){
+                datosUpload['doc_sistema'] = 'IF';
+                datosUpload['doc_proceso'] = $scope.sIdProcesoActual;
+                datosUpload['doc_id'] = $scope.sIdCaso;
+                datosUpload['doc_ci_nodo'] = $scope.sCasoNombre;
+                datosUpload['doc_datos'] = data.descripcion;
+                datosUpload['doc_titulo'] = "";
+                datosUpload['doc_palabras'] = "";
+                datosUpload['doc_version'] ='1';
+                datosUpload['doc_tiempo'] = data.dias;
+                datosUpload['doc_firma_digital'] = 0;
+                datosUpload['doc_acceso'] = data.publicacion;
+                datosUpload['doc_tamanio_documento'] = "0";
+                datosUpload['doc_tps_doc_id'] = data.tipificacion;
+                datosUpload['doc_tipo_documentacion'] = 'U';
+                datosUpload['doc_tipo_ingreso'] = 'I';
+                datosUpload['doc_estado_de_envio'] = 'N';
+                datosUpload['doc_correlativo'] = '';
+                datosUpload['doc_tipo_documento_ext'] = '';
+                datosUpload['doc_nrotramite_nexo'] = '';
+                datosUpload['doc_id_carpeta'] = '0';
+                datosUpload['doc_registro'] = fechactual;
+                datosUpload['doc_modificacion'] = fechactual;
+                datosUpload['doc_usuario'] = sessionService.get('USUARIO');
+                datosUpload['doc_estado'] = 'A';
+                datosUpload['doc_url'] = cadenaURI;
+                datosUpload['doc_url_logica'] = cadenaURL;
+                datosUpload['doc_nombre'] = nombreFile;
+                datosUpload['doc_tipo_documento'] = tipo[1];
+            } else if (data.tipificacion==2){
+                datosUpload['doc_sistema'] = 'IF';
+                datosUpload['doc_proceso'] = $scope.sIdProcesoActual;
+                datosUpload['doc_id'] = $scope.sIdCaso;
+                datosUpload['doc_ci_nodo'] = $scope.sCasoNombre;
+                datosUpload['doc_datos'] = data.descripcion;
+                datosUpload['doc_titulo'] = data.titulo;
+                datosUpload['doc_palabras'] = data.palabras;
+                datosUpload['doc_version'] ='1';
+                datosUpload['doc_tiempo'] = data.dias;
+                datosUpload['doc_firma_digital'] = 0;
+                datosUpload['doc_acceso'] = data.publicacion;
+                datosUpload['doc_tamanio_documento'] = "0";
+                datosUpload['doc_tps_doc_id'] = data.tipificacion;
+                datosUpload['doc_tipo_documentacion'] = 'U';
+                datosUpload['doc_tipo_ingreso'] = 'I';
+                datosUpload['doc_estado_de_envio'] = 'N';
+                datosUpload['doc_correlativo'] = '';
+                datosUpload['doc_tipo_documento_ext'] = '';
+                datosUpload['doc_nrotramite_nexo'] = '';
+                datosUpload['doc_id_carpeta'] = '0';
+                datosUpload['doc_registro'] = fechactual;
+                datosUpload['doc_modificacion'] = fechactual;
+                datosUpload['doc_usuario'] = sessionService.get('USUARIO');
+                datosUpload['doc_estado'] = 'A';
+                datosUpload['doc_url'] = cadenaURI;
+                datosUpload['doc_url_logica'] = cadenaURL;
+                datosUpload['doc_nombre'] = nombreFile;
+                datosUpload['doc_tipo_documento'] = tipo[1];
+            } else {
+                datosUpload['doc_sistema'] = 'IF';
+                datosUpload['doc_proceso'] = $scope.sIdProcesoActual;
+                datosUpload['doc_id'] = $scope.sIdCaso;
+                datosUpload['doc_ci_nodo'] = $scope.sCasoNombre;
+                datosUpload['doc_datos'] = data.descripcion;
+                datosUpload['doc_titulo'] = data.tipo;
+                datosUpload['doc_palabras'] = data.CI;
+                datosUpload['doc_version'] ='1';
+                datosUpload['doc_tiempo'] = data.dias;
+                datosUpload['doc_firma_digital'] = 0;
+                datosUpload['doc_acceso'] = data.publicacion;
+                datosUpload['doc_tamanio_documento'] = "0";
+                datosUpload['doc_tps_doc_id'] = data.tipificacion;
+                datosUpload['doc_tipo_documentacion'] = 'U';
+                datosUpload['doc_tipo_ingreso'] = 'I';
+                datosUpload['doc_estado_de_envio'] = 'N';
+                datosUpload['doc_correlativo'] = '';
+                datosUpload['doc_tipo_documento_ext'] = '';
+                datosUpload['doc_nrotramite_nexo'] = '';
+                datosUpload['doc_id_carpeta'] = '0';
+                datosUpload['doc_registro'] = fechactual;
+                datosUpload['doc_modificacion'] = fechactual;
+                datosUpload['doc_usuario'] = sessionService.get('USUARIO');
+                datosUpload['doc_estado'] = 'A';
+                datosUpload['doc_url'] = cadenaURI;
+                datosUpload['doc_url_logica'] = cadenaURL;
+                datosUpload['doc_nombre'] = nombreFile;
+                datosUpload['doc_tipo_documento'] = tipo[1];
+            }
+		}
+		else{
+			sweet.show('', 'Documento no es valido', 'error');
+		}
+	    console.log('mi doc: ',$scope.myFile);
+            var ressubirU = {
+                table_name:"dms_gt_documentos",
+                body:datosUpload
+            };
+            var obj=DreamFactory.api[CONFIG.SERVICE].createRecords(ressubirU);
+            obj.success(function(data){
+                $.unblockUI();
+                $scope.datosArchi='';
+                $scope.myFile=''
+                $scope.imagenDoc='';
+                $scope.getArchivosAdjuntos();
+            })
+            .error(function(data){
+                $.unblockUI();
+            })
+        };
+
+        $scope.resultado1='';
+        $scope.pwd1='';
+
+        //***************************** INSTER DE ENVIOS ********************
+        $scope.registroEnvio = function(vid_doc){
+            $.blockUI();
+            var resenvios = {
+                "procedure_name":"dms_sp_adicionar_enviados",
+
+                 "body": {
+                  "params": [
+                    {
+                      "name": "senv_idd_documento",
+                      "value": vid_doc
+                    },
+                    {
+                      "name": "senv_id_usuario",
+                      "value": sessionService.get('IDUSUARIO')
+                    }
+                  ]
+                }
+            };
+            var obj=DreamFactory.api[CONFIG.SERVICE].callStoredProcWithParams(resenvios);
+            obj.success(function (response) {
+                $.unblockUI();
+                sweet.show('', 'Documento Enviado !!!', 'success');
+                $scope.getDocumento(sessionService.get('USUARIO'),'DMS',null,null);
+            })
+            obj.error(function(error) {
+                sweet.show('', 'Registro no Enviado', 'error');
+            });
+        };
+
+        // **************************** TODO ACERCA DE COMPARTIDO *********************
+        $scope.botonnewuser = null;
+        $scope.botonnewuser1 = null;
+        $scope.botonnewuser2 = null;
+        // *****************************************************************************
+        //*************************creacion de carpetas ******************************
+        $scope.nuevoCarpeta = function(parmetro){
+          $scope.tituloVentanaCa=parmetro;
+          $scope.tituloNivelqueencuentra=$scope.direccionvirtual;
+          $scope.boton="new";
+          $scope.datos="";
+        }
+        $scope.nuevoSubCarpeta = function(parmetro){
+          $scope.tituloVentanaCa=parmetro;
+          $scope.tituloNivelqueencuentra=$scope.direccionvirtual;
+          $scope.boton="news";
+          $scope.datos="";
+        }
+        $scope.reset = function(){
+          $scope.datos="";
+          //$scope.getArbol();
+          $scope.direccionvirtual ="";
+          $scope.Adjuntardoc=null;
+          $scope.opcnuevacapeta=null;
+          $scope.opcnuevasubcapeta=null;
+        }
+
+        //ver los documento ADJUNTOS
+      $scope.imprimirArchivo = function (fum) {
+          console.log(fum);
+          $scope.varSpin = true;
+          $scope.RegistroFUM={
+          registrado:'OK',
+          mensaje:''
+          };
+          var cadena= fum;
+          if (cadena.indexOf('?') != -1){
+               separador = '?';
+               arreglodecadena = cadena.split(separador);
+               cadena = arreglodecadena[0];
+               console.log('arreglo de la cadena',arreglodecadena[0]);
+           }
+           var tipoarch=cadena.substr(-4);
+            console.log('substring: ',cadena.substr(-4));
+            var imagen = cadena.indexOf('.jpeg');
+            console.log(imagen);
+
+            if(tipoarch == '.pdf'){
+                $scope.archotro = false;
+                $scope.archpdf = true;
+                $('#visorFum object').attr('data',fum);
+                $timeout(function(){$scope.varSpin=false}, 1000);
+            }
+            else {
+                var tipoimg = tipoarch.toUpperCase();
+                console.log(tipoimg);
+                if(tipoimg == '.JPG' || tipoimg == '.PNG' || tipoimg == '.BMP' || tipoimg == '.GIF') {
+                    $scope.archotro = true;
+                    $scope.archpdf = false;
+                    $scope.archivoP=fum;
+                    $('#imgSalida').attr("src",fum);
+                  }
+                else{ document.location = fum;}
+             }
+          };
+
+        // **************************** INICIO DE ENVIOS SERVICIOS ***************************************
+        var fechactualnuevoformasto=fecha.getDate() + "/" + (fecha.getMonth() + 1) + "/" + fecha.getFullYear() + " - " + fecha.getHours() + ":" + fecha.getMinutes() + ":" + fecha.getSeconds();
+
+        $scope.getArchivosAdjuntos = function(){
+            //alert($scope.sIdCaso);
+            $.blockUI
+            var filtro = "doc_proceso='" + $scope.sIdProcesoActual + "' and doc_id='" + $scope.sIdCaso + "' and doc_estado='A'";
+            var resOpcion = {
+                "table_name":"dms_gt_documentos",
+                "filter":filtro
+            };
+            var obj = DreamFactory.api[CONFIG.SERVICE].getRecordsByFilter(resOpcion)
+            .success(function (response){
+                $scope.obtArchivosAdjuntos=response.record;
+                $.unblockUI();
+
+            }).error(function(error) {
+                $scope.errors["error_rol"] = error;
+            });
+          };
+        $scope.$on('api:ready',function(){
+            $scope.getArchivosAdjuntos();
+        });
+        $scope.inicioDocumentos = function () {
+            if(DreamFactory.api[CONFIG.SERVICE]){
+                $scope.getArchivosAdjuntos();
+            }
+            //REDIRECCIONA A LA CABECERA DEL DOCUMENTO
+			scroll(0,0);
+        };
+        $scope.getprueba = function(accionSeleccionada){
+            if(accionSeleccionada ==1)
+            {   $scope.sincatalogar = true;}
+            else
+            {   $scope.sincatalogar = false;}
+            if(accionSeleccionada ==2)
+            {   $scope.catalogar = true;
+                $scope.tablaDocs = false;}
+            else
+            {   $scope.catalogar = false;
+            $scope.tablaDocs = false;}
+            if(accionSeleccionada ==3)
+            {   $scope.buscarCI = true;
+            $scope.tablaDocs = false;}
+            else
+            {   $scope.buscarCI = false;}
+        }
+        $scope.getCI = function(accionSeleccionada){
+            if(accionSeleccionada ==1)
+            {   $scope.archivoCI = true;}
+            else
+            {   $scope.archivoCI = false;}
+
+        }
+    }
+    $('.custom-upload input[type=file]').change(function(){
+        $(this).next().find('input').val($(this).val());
+        angular.element(this).scope().cambiarFile(this, $(this).val());
+    });
+
+    $(document).ready(function(){
+      $('#multiDocsButon').click(function(){
+        $("#multiDocsFile").click();
+      });
+    });
+
+</script>
+
+<div class="col-md-12" id="registro">
+    <form ng-controller="subirArchivoController" name="signupForm" class="form-horizontal" role="form" novalidate data-ng-init="inicioDocumentos()">
+        <div class="col-md-8">
+            <div class="tab-content">
+                <div id="tab-one" class="tab-pane active">
+                    <div class="col-sm-12" >
+                        <div class="col-sm-12">
+                            <form name="formulario11" readOnly="true" novalidate>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group" >
+                                            <label for="url" >Tipificacíon:</label>
+                                            <div class="controls">
+                                                <select id="vtps_doc_id" class="form-control" ng-model="datosArchi.tipificacion"  name="vtps_doc_id" ng-change="getprueba(datosArchi.tipificacion);" ng-disabled="protegido" required>
+                                                    <option value="0">--Seleccione--</option>
+                                                    <option value="3">Archivo desde App</option>
+                                                    <option value="1">Archivo Adjunto</option>
+                                                    <option value="2">Catalogar Archivo</option>
+                                                </select>
+                                                <span style="color:red" ng-show="formulario11.tipificacion.$invalid">
+                                                <span ng-show="formulario11.tipificacion.$error.required">Tipificación es requerido.
+                                                </span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div ng-show="buscarCI">
+                                        <div class="col-md-12">
+                                            <div class="form-group" >
+                                                <label class="col-sm-4 control-label no-padding-right" for="url" > Tipo : </label>
+                                                <div class="col-sm-8" align="left">
+                                                    <select id="vtps_doc_id2" class="form-control" ng-model="datosArchi.tipo"  name="vtps_doc_id2" ng-disabled="protegido" ng-change="getCI(datosArchi.tipo);" required>
+                                                        <option value="0">--Seleccione--</option>
+                                                        <option value="1">Carnet de Identidad</option>
+                                                        <option value="3">Certificado de Nacimiento</option>
+                                                        <option value="4">Pasaporte</option>
+                                                        <option value="5">DNI</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="form-group" >
+                                                <label class="col-sm-4 control-label no-padding-right" for="url" > Carnet : </label>
+                                                <div class="col-sm-4" align="left">
+                                                    <input ng-model="datosArchi.CI" id="vsuario" name="vsuario" class="form-control" type="text">
+                                                </div>
+                                                <div class="col-sm-4" align="left">
+                                                    <button data-dismiss="modal" ng-click="buscarDocs(datosArchi)" type="button" class="btn btn-primary">Buscar</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="ibox-content" ng-show="tablaDocs">
+                                        <div class="table-responsive">
+                                            <table ng-table="tablaDocumentos" show-filter="true" class="table table-striped responsive">
+                                            <thead>
+                                            </thead>
+                                            <tbody>
+                                                <tr class="column" ng-repeat="documento in obtdatosFile">
+                                                    <td data-title="'#'" class="text-center">&nbsp; {{$index+1}}</td>
+                                                    <td data-title="'Archivo'" class="text-left">&nbsp; {{documento.name}}</td>
+                                                    <td data-title="'Adjuntar'" class="text-center">&nbsp; {{documento.path}}</td>
+                                                    <td>
+                                                        <a href="{{direccionAdjuntosCel}}{{documento.path}}?app_name=todoangular" target="_blank" ng-click="verArchivo(documento)" tooltip="Ver Archivo" class="btn btn-info btn-circle">
+                                                            <i class="fa fa-eye"></i>
+                                                        </a>
+
+                                                    </td>
+                                                    <td>
+                                                        <a ng-click="guardarDocs(datosArchi, documento)" tooltip="Guardar" class="btn btn-info btn-circle">
+                                                            <i class="fa fa-save"></i>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div ng-show="catalogar">
+                                        <div class="col-md-12">
+                                            <div class="form-group" >
+                                                <div class="col-md-5">
+                                                    <label for="url" >Subir documentos</label>
+                                                         <div class="controls">
+                                                        <input name="file-input" id="file-input" type="file" file-model="myFile" value="Subir" "files[0]" nv-file-select="" uploader="uploader" accept="image/*, .csv, .pdf, .xlsx, .xls, .doc"/>
+                                                         </div>
+                                                </div>
+
+
+                                                <div class="col-md-7" ng-show='verimagen'>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-2 control-label">Imagen:</label>
+                                                        <div class="col-sm-4" >
+                                                          <img id="imgSalida" ng-src="{{imagenDoc}}" width="150px" height="150px">
+                                                      </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="form-group" >
+                                                <label class="col-sm-4 control-label no-padding-right" for="url" > Directorio : </label>
+                                                <div class="col-sm-8" align="left">
+                                                    <input ng-model="datosArchi.direccion" id="vsuario" name="vsuario" class="form-control" type="text">
+                                                    <p class="help-block"><b>Ejemplo:</b>directorio1/directorio2 </p>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12" align="right">
+                                            <div class="form-group" >
+                                                <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Título del documento : </label>
+                                                <div class="col-sm-8" align="left">
+                                                    <input  ng-model="datosArchi.titulo" id="titulo" name="titulo" class="form-control" type="text" class="form-control" required>
+                                                    <span style="color:red" ng-show="formulario11.titulo.$invalid">
+                                                        <span ng-show="formulario11.titulo.$error.required">Es requerido.
+                                                        </span>
+                                                    </span><br>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12" align="right">
+                                            <div class="form-group" >
+                                                <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Palabras claves del documento : </label>
+                                                <div class="col-sm-8" align="left">
+                                                    <input  ng-model="datosArchi.palabras" id="palabras" name="palabras" class="form-control" type="text" class="form-control" required>
+                                                    <span style="color:red" ng-show="formulario11.palabras.$invalid">
+                                                        <span ng-show="formulario11.palabras.$error.required">Es requerido.
+                                                        </span>
+                                                    </span><br>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12" align="right">
+                                            <div class="form-group" >
+                                                <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Descripción del documento : </label>
+                                                <div class="col-sm-8" align="left">
+                                                    <textarea id="descripcion" name="descripcion" ng-model="datosArchi.descripcion" class="form-control" required></textarea>
+                                                    <span style="color:red" ng-show="formulario11.descripcion.$invalid">
+                                                        <span ng-show="formulario11.descripcion.$error.required">Es requerido.
+                                                        </span>
+                                                    </span><br>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="form-group" >
+                                                <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Públicación : </label>
+                                                <div class="col-sm-8" align="left">
+                                                    <select id="publicacion" class="form-control" ng-model="datosArchi.publicacion" name="publicacion">  <option style="display:none" value="">-- Seleccione Publicación --</option>
+                                                        <option value="PUBLICO">PUBLICO</option>
+                                                        <option value="PRIVADO">PRIVADO</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="form-group" >
+                                                <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Tiempo de públicación en días  : </label>
+                                                <div class="col-sm-8" align="left">
+                                                    <input  ng-model="datosArchi.dias" id="dias" name="dias" class="form-control" type="number" placeholder="ingrese tiempo de publicación" required>
+                                                    <p class="help-block"><b>Ejemplo:</b>0 para infinito </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12" align="right">
+                                            <button data-dismiss="modal" ng-click="guardar(datosArchi)" type="button" class="btn btn-primary">Grabar</button>
+                                        </div>
+                                    </div>
+                                    <div ng-show="sincatalogar">
+                                        <div class="col-md-12">
+                                            <div class="form-group" >
+                                                <div class="col-md-5">
+                                                    <label for="url" >Subir documentos</label>
+                                                         <div class="controls">
+                                                        <input name="file-input" id="file-input" type="file" file-model="myFile" value="Subir" "files[0]" nv-file-select="" uploader="uploader" accept="image/*, .csv, .pdf, .xlsx, .xls, .doc"/>
+                                                         </div>
+                                                </div>
+
+
+                                                <div class="col-md-7" ng-show='verimagen'>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-2 control-label">Imagen:</label>
+                                                        <div class="col-sm-4" >
+                                                          <img id="imgSalida" ng-src="{{imagenDoc}}" width="150px" height="150px">
+                                                      </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="form-group" >
+                                                <label class="col-sm-4 control-label no-padding-right" for="url" > Directorio : </label>
+                                                <div class="col-sm-8" align="left">
+                                                    <input ng-model="datosArchi.direccion" id="vsuario" name="vsuario" class="form-control" type="text" placeholder="{{direccionvirtual}}">
+                                                    <p class="help-block"><b>Ejemplo:</b>directorio1/directorio2 </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12" align="right">
+                                            <div class="form-group" >
+                                                <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Descripción del documento : </label>
+                                                <div class="col-sm-8" align="left">
+                                                    <textarea id="descripcion" name="descripcion" ng-model="datosArchi.descripcion" class="form-control" required></textarea>
+                                                    <span style="color:red" ng-show="formulario11.descripcion.$invalid">
+                                                        <span ng-show="formulario11.descripcion.$error.required">Es requerido.
+                                                        </span>
+                                                    </span><br>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="form-group" >
+                                                <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Públicación : </label>
+                                                <div class="col-sm-8" align="left">
+                                                    <select id="publicacion" class="form-control" ng-model="datosArchi.publicacion" name="publicacion">  <option style="display:none" value="">-- Seleccione Publicación --</option>
+                                                        <option value="PUBLICO">PUBLICO</option>
+                                                        <option value="PRIVADO">PRIVADO</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="form-group" >
+                                                <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Tiempo de públicación en días  : </label>
+                                                <div class="col-sm-8" align="left">
+                                                    <input  ng-model="datosArchi.dias" id="dias" name="dias" class="form-control" type="number" placeholder="ingrese tiempo de publicación" required>
+                                                    <p class="help-block"><b>Ejemplo:</b>0 para infinito </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12" align="right">
+                                            <button data-dismiss="modal" ng-click="guardar(datosArchi)" type="button" class="btn btn-primary">Grabar</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-content">
+                    <div id="tab-one" class="tab-pane active">
+                        <div class="row">
+                          <div class="col-md-12">
+                                <br>
+                                <br>
+                                <table class="table table-striped table-bordered">
+                                    <thead>
+                                        <th>#&nbsp;</th>
+                                        <th>Opciones&nbsp;</th>
+                                        <th>Actividad&nbsp;</th>
+                                        <th>Título&nbsp;</th>
+                                        <th>Palabras&nbsp;</th>
+                                        <th>Descripción&nbsp;</th>
+                                        <th>Nombre&nbsp;</th>
+                                        <th>Url&nbsp;</th>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="column" ng-repeat="archivo in obtArchivosAdjuntos">
+                                            <td>{{$index+1}}</td>
+                                            <td>
+                                            <a tooltip = "Eliminar" ng-click="eliminarArchivo(archivo)" class="btn btn-default btn-circle"><i class="fa fa-trash-o " style="color:#249FE6"></i></a>
+                                          <a target="_blank" tooltip = "Ver" ng-click="imprimirArchivo(archivo.doc_url_logica)" class="btn btn-default btn-circle" data-toggle="modal" data-target="#divPopup4"><i class="fa fa-eye" style="color:#249FE6"></i></a>
+                                            </td>
+                                            <td>{{archivo.doc_ci_nodo}}</td>
+                                            <td>{{archivo.doc_titulo}}</td>
+                                            <td>{{archivo.doc_palabras}}</td>
+                                            <td>{{archivo.doc_datos}}</td>
+                                            <td>{{archivo.doc_nombre}}</td>
+                                            <td>{{archivo.doc_url}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                          </div>
+                      </div>
+                    </div>
+                </div>
+            </div>  <!-- fin de tab content  -->
+            <div class="modal fade" id="divPopup4" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                   <div class="modal-dialog" style="width:700px">
+                       <div class="modal-content">
+                           <div class="modal-header">
+                               <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Cerrar</span></button>
+                           </div>
+                           <div class="modal-body">
+                               <!--pdf-->
+                               <div id="visorFum" ng-show="archpdf">
+                                   <object data="" type="application/pdf" width="650" height="500"></object>
+                               </div>
+                               <!--imagen-->
+                               <div ng-show="archotro">
+                                    <img id="imgSalida" ng-src="{{archivoP}}" width="100%" height="100%">
+                               </div>
+                           </div>
+                           <div class="modal-footer">
+                               <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                           </div>
+                       </div>
+                   </div>
+               </div>
+        </div>
+    </form>
+</div>
+<div class="hr-line-dashed"></div>
+            <a class="btn btn-primary" ng-disabled="false" ng-click="volver()">
+                <i class="glyphicon fa fa-times"></i>
+                 Cancelar
+            </a>
+            <a class="btn btn-primary" ng-click="cargarDatos(datos);guardarData(datos);" ng-disabled="false">
+                <i class="glyphicon fa fa-save"></i>
+                 Guardar / Continuar
+            </a>
+</div>

@@ -1,0 +1,755 @@
+<script>
+    var fecha= new Date();
+  
+    function documentosDeSalidaController($scope,$rootScope, DreamFactory, CONFIG, FileUploader, fileUpload,sweet,$timeout,sessionService) {
+        var sDocumentoSalida        =   "";
+        $scope.tipoDocumento        =   "";
+        $scope.tamanioDocumento     =   "";
+        $scope.formatoDocumento     =   "";
+        $scope.docsFechaCreacion    =   $scope.fechactual;
+        var idActividad             =   $scope.casoActual.casoactid;
+        var sNodoActual             =   "";
+        
+        sNodoActual =   sessionService.get('NODO');
+
+        /*GENERANDO DOCUMENTOS PDF*/
+        $scope.generarDocumentoPhp = function (){
+                console.log("DATOS DEL CASO ACTUAL:", $scope.casoActual);
+                console.log("IMPRESION:", $scope.impFormulario);
+            switch ($scope.impFormulario.g_tipo) {
+                case 'UBI_ASA-':
+                $scope.generarAsignacion();
+                break;
+                case 'UBI_SEG-':
+                $scope.generarSeguro();
+                console.log('genera seguro');
+                break;
+                default:
+                var idCasoActual    =   $scope.casoActual.casoid;
+                var idActividadActual    =   $scope.casoActual.casoactid;
+                $.blockUI();
+                $.ajax({
+                    url:CONFIG.API_URL_DMS_2+'elaborar/elaborador/elaborar.php',
+                    type:"post",
+                    data:{
+                        "option":"ELABORAR",
+                        "idCaso":idCasoActual,
+                        "idActividad":idActividadActual,
+                        "sContenidoHtml":$scope.impFormulario
+                    },
+                    success:function(response){
+                        console.log(response);
+                        var urlData = JSON.parse(response);
+                        console.log("MI URL DE DATOS 111111111111111111111:", urlData);
+                        $scope.urlData = urlData;
+                        console.log("DATOS ARCHIVO DATA:", $scope.urlData, " -> ",  urlData.length);
+                         if(urlData.length > 0){
+                            try{
+                                //if(urlData[0].booSubirDoc == true){
+								if($scope.impFormulario.CI_BIGDATA){
+									$scope.almacenarDocumentosSalidaRc();
+								}
+                                //}
+                            }catch(e){}
+                        }
+                        $scope.$apply();
+                        $.unblockUI();
+                    }
+                });
+            }
+        };
+        $scope.generarSeguro= function(registro){
+            console.log($scope.datos.UBI_FEC_INI,$scope.datos.UBI_FEC_FIN);
+             var reslocal = {
+              "procedure_name":"ubi.sp_carga_tabla_seguro",
+              "body":{
+                "params": [
+                {
+                  "name":"fechini",
+                  "param_type":"IN","value":$scope.datos.UBI_FEC_INI
+                },
+                {
+                  "name":"fechfin",
+                  "param_type":"IN","value":$scope.datos.UBI_FEC_FIN
+                }
+                ] 
+              }
+            };
+            var obj=DreamFactory.api[CONFIG.SERVICE].callStoredProcWithParams(reslocal);
+            obj.success(function (response) {
+              $scope.grupos = response; 
+              $scope.generarSeguros();
+            })
+            obj.error(function(error) {
+            });
+        };
+        $scope.generarSeguros = function (){
+            var doc = new jsPDF('p', 'pt');
+            var colser = [
+            {title: "Codigo", dataKey: "uno"},
+            {title: "Nombre del Bien Inmueble", dataKey: "dos"},
+            {title: "Dirección", dataKey: "tres"},
+            {title: "Valor", dataKey: "cuatro"},
+            {title: "Gestión", dataKey: "cinco"}
+            ];
+            var dataser=[];
+            for (var i=0; i<$scope.grupos.length;i++){
+              var aporte = {"uno":$scope.grupos[i].codigo ,"dos":$scope.grupos[i].nombre,"tres":$scope.grupos[i].direccion ,"cuatro":$scope.grupos[i].valor,"cinco":$scope.grupos[i].gestion };          
+              dataser[i]=aporte;      
+            }
+            var header = function (data) {
+              doc.setFontSize(8);
+              doc.setTextColor(0);
+              doc.setFontStyle('normal');
+              doc.text('GOBIERNO AUTONÓMO MUNICIPAL DE LA PAZ', 40, 65);
+             };
+            var totalPagesExp = "{total_pages_count_string}";
+            var footer = function (data) {
+              var str = "Pagina " + data.pageCount;
+              if (typeof doc.putTotalPages === 'function') {
+                str = str + " de " + totalPagesExp;
+              }
+              doc.text(str, 40, doc.internal.pageSize.height - 30);
+              doc.text("Gobierno Autonomo Municipal de La Paz Tel. 2-2440709 ", 40, doc.internal.pageSize.height - 45);
+            };
+              doc.setFontSize(7);
+            doc.text("Fecha de Inicio: "+$scope.fechini,40,80);
+
+            doc.text("Fecha de Fin: "+$scope.fechfin,200,80);
+            doc.autoTable(colser, dataser, {startY: 110,theme: 'mary',bodyStyles: {rowHeight: 12, fontSize: 9, valign: 'middle'},beforePageContent: header,afterPageContent: footer,margin: {horizontal: 30, top: 140, bottom: 75},styles: {overflow: 'linebreak'}});
+            doc.setFontSize(9);
+            doc.setFontStyle('normal');
+            var text="Se encuentran "+$scope.grupos.length+" inmuebles para el seguro.";
+            doc.text(text,35, doc.autoTableEndPosY()+20);
+            if (typeof doc.putTotalPages === 'function') {
+              doc.putTotalPages(totalPagesExp);
+            }
+             var string = doc.output('datauristring'); 
+            $scope.archotro = false;
+            $scope.archpdf = true;
+            $('#visorFum object').attr('data',string);
+            $timeout(function(){$scope.varSpin=false}, 1000);
+  
+            console.log("hola seguro");
+            $scope.urlData = [{"nombre_archivo":"Seguro_Inmuebles","tam_archivo":" "}];
+        };
+        $scope.generarAsignacion = function () {
+            var reslocal = {
+                "procedure_name":"ejecutartojson",
+                "body":{
+                    "params": [
+                    {
+                        "name":"expression",
+
+                        "param_type":"IN","value":"select doc_datos, doc_url_logica,doc_correlativo from dms_gt_documentos where doc_proceso = 'UBI_AMBIENTES' and doc_estado = 'A' and doc_id ="+$scope.impFormulario.UBI_NOMBRE+" "
+                    }]
+                }
+            };
+            var obj=DreamFactory.api[CONFIG.SERVICE].callStoredProcWithParams(reslocal);
+            obj.success(function (respons) {
+                $scope.url = JSON.parse(respons[0].ejecutartojson);
+                console.log($scope.url);
+                var pic =[];
+                var j=0;
+                var k=0;
+                var n=2;
+                pic[0] ="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAFCAYAAACJmvbYAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAVSURBVAiZY/z///9/BhyACZcEDSUBO0oEBrFgibAAAAAASUVORK5CYII=";
+                pic[1] ="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAFCAYAAACJmvbYAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAVSURBVAiZY/z///9/BhyACZcEDSUBO0oEBrFgibAAAAAASUVORK5CYII=";
+                if($scope.url == null){
+                    $scope.generarAsignaciones(pic);            
+                }
+                else{
+                    for(var i=0;i<$scope.url.length ;i++){
+
+                        if($scope.url[i].doc_correlativo == "1"){
+                            k++;
+                            console.log('ingreso',k);
+                            var img = new Image();
+                            img.crossOrigin = 'Anonymous';
+                            img.src = $scope.url[i].doc_url_logica;
+                            img.onload = function(){
+                                var canvas = document.createElement('CANVAS');
+                                var ctx = canvas.getContext('2d');
+                                canvas.height = this.height;
+                                canvas.width = this.width;
+                                ctx.drawImage(this, 0, 0);
+                                pic[0] = canvas.toDataURL("image/jpg",0.2);
+                                j++;
+                                if(j == n ){
+                                    $scope.generarAsignaciones(pic);
+                                }
+                            }          
+                        }else if($scope.url[i].doc_correlativo == "2"){
+                            console.log('ingreso2');
+                            k++;
+                            var img = new Image();
+                            img.crossOrigin = 'Anonymous';
+                            img.src = $scope.url[i].doc_url_logica;
+                            img.onload = function(){
+                                var canvas = document.createElement('CANVAS');
+                                var ctx = canvas.getContext('2d');
+                                canvas.height = this.height;
+                                canvas.width = this.width;
+                                ctx.drawImage(this, 0, 0);
+                                pic[1] = canvas.toDataURL("image/jpg",0.2);
+                                j++;
+                                if(j == n ){
+                                    $scope.generarAsignaciones(pic);
+                                }
+                            }
+                        }
+                        if($scope.url.length == i+1 && k==0){
+                            $scope.generarAsignaciones(pic);
+                        }
+                        if($scope.url.length == i+1){
+                            n=k;
+                        }
+                    }
+                }
+            });
+            obj.error(function(error) {
+                console.log(error);
+            });
+        };
+
+        $scope.generarAsignaciones = function (pic) {
+            var doc = new jsPDF('p', 'pt');
+            var colser = [
+            {title: "DIA", dataKey: "uno"},
+            {title: "MES", dataKey: "dos"},
+            {title: "AÑO", dataKey: "tres"}
+            ];
+            var dataser=[
+            {"uno": fecha.getDate() ,"dos":fecha.getMonth()+1,"tres":fecha.getFullYear() }
+            ];
+            var colresp = [
+            {title: "DIA", dataKey: "uno"},
+            {title: "MES", dataKey: "dos"},
+            {title: "AÑO", dataKey: "tres"},
+            {title: "AÑO", dataKey: "cuatro"}
+            ];
+            var dataresp=[
+            {"uno": "APELLIDO PATERNO:","dos":$scope.impFormulario.UBI_AP_PAT,"tres":"CEDULA DE IDENTIDAD:","cuatro":$scope.impFormulario.UBI_CI },
+            {"uno": "APELLIDO MATERNO:","dos":$scope.impFormulario.UBI_AP_MAT,"tres":"NRO DE ITEM:","cuatro":$scope.impFormulario.UBI_NRO_ITEM },
+            {"uno": "NOMBRES:" ,"dos":$scope.impFormulario.UBI_NOM,"tres":"REPARTICIÓN:","cuatro":$scope.impFormulario.UBI_U_SOL_VALOR }
+            ];
+            var colnota = [
+            {title: "DIA", dataKey: "uno"}
+            ];
+            var datanota=[
+            {"uno": "Nota: el art. 166 (Asignación de Instalaciones y Ambientes ) del D.S.181-NBSABS, establece que:" },
+            {"uno": "I. Es función de la Unidad Administrativa, la asignación de instalaciones y ambientes a cada unidad de la entidad, así como su acondicionamiento para el cumplimiento de los objetivos de dichas unidades.  " },
+            {"uno": "II. La asignación estará en función de las demandas y características de la actividad que realiza cada unidad y de la disponibilidad de la entidad, evitando la sub utilización del espacio, el hacinamiento, los riesgos por deterioro y los riegos de accidentes." },
+            {"uno": "III. El Jefe de la Unidad quien se le asigno el ambiente es el responsable principal por el debido uso de las instalaciones y la preservación de su funcionalidad." },
+            {"uno": "Si Usted deja de pertenecer al G.A.M.L.P. o es transferido de unidad, deberá hacer la entrega de los ambientes quie le fueron asignados a su cargo. La omision a esta obligación dara lugar a una posible responsabilidad Administrativa, Civil y Penal, conforme a la Ley No. 1178 y sus reglamentos." }
+            ];
+            var coldesc = [
+            {title: "PISO", dataKey: "uno"},
+            {title: "NRO. AMB.", dataKey: "dos"},
+            {title: "OTROS", dataKey: "tres"},
+            {title: "MANTENIMIENTO", dataKey: "cuatro"},
+            {title: "FUNCION", dataKey: "cinco"},
+            {title: "TOTAL MTS", dataKey: "seis"}
+            ];
+
+            var datadesc=[
+            {"uno": $scope.impFormulario.UBI_PISO,"dos":$scope.impFormulario.UBI_NRO_AMB,"tres":$scope.impFormulario.UBI_OTRO,"cuatro":$scope.impFormulario.UBI_MANT,"cinco":$scope.impFormulario.UBI_FUN,"seis":$scope.impFormulario.UBI_METRO}
+            ];
+            var titulo = "";
+            var nombre_archivo = "";
+            var asg = "";
+            var dev = "";
+            var asigna = {};
+            if($scope.impFormulario.UBI_TIPO == "1"){                
+                titulo = "ASIGNACION DE AMBIENTES";
+                nombre_archivo = "Asignacion_Ambiente";
+                asg = "X";                
+            }else{
+                if ($scope.impFormulario.UBI_TIPO == "2"){
+                    titulo = "REASIGNACION DE AMBIENTES";
+                    nombre_archivo = "Reasignacion_Ambiente";
+                    asg = "X";
+                }else{
+                    titulo = "DEVOLUCION DE AMBIENTES";
+                    nombre_archivo = "Devolucion_Ambiente";
+                    dev = "X";
+                }
+            }
+            var colnro = [
+            {title: "primero", dataKey: "one"},
+            {title: "segundo", dataKey: "two"}
+            ];
+            var nro =  $scope.casoActual.casonombre.split('-');
+            var datanro = [
+            {"one":"NRO ACTA:","two": nro[1]},
+            {"one":"ASIGNACIÓN:","two":asg},
+            {"one":"DEVOLUCIÓN:","two":dev}
+            ];
+
+            var header = function (data) {
+                doc.setFontSize(11);
+                doc.setTextColor(0);
+                doc.setFontStyle('bold');
+                doc.addImage(lapaz,'JPEG', 70, 40, 60, 60);
+                doc.text('FORMULARIO III', 220, 80);
+                doc.text(titulo, 200, 100);
+                doc.setFontSize(8);
+                doc.setTextColor(0);
+                doc.setFontStyle('normal');
+                doc.text('Gobierno Autonomo Municipal de La Paz', 40, 110);
+                doc.text('Direccion de Administracion General', 50, 120);
+                doc.text('Unidad de Bienes Inmuebles', 60, 130);
+            };
+            var totalPagesExp = "{total_pages_count_string}";
+            var footer = function (data) {
+                var str = "Pagina " + data.pageCount;
+                if (typeof doc.putTotalPages === 'function') {
+                    str = str + " de " + totalPagesExp;
+                }
+                doc.text(str, 40, doc.internal.pageSize.height - 30);
+                doc.text("Para mayor informacion llamar al Tel. 2-2440709 ", 40, doc.internal.pageSize.height - 45);
+            };
+            doc.setFontSize(8);
+            doc.autoTable(colnro.splice(0,6), datanro, {drawHeaderRow: function() {return false;},startY: 60,pageBreak: 'auto',theme: 'mary',bodyStyles: {rowHeight: 12, fontSize: 8, valign: 'middle'},margin: {left: 420, top: 140, bottom: 80},styles: {overflow: 'linebreak'},columnStyles: {one: {columnWidth: 90,fontStyle: 'bold'}}});
+            doc.setFontSize(8);
+            doc.autoTable(colser, dataser, {startY: doc.autoTableEndPosY()+5,theme: 'mary',bodyStyles: {rowHeight: 12, fontSize: 8, valign: 'middle'},headerStyles: {rowHeight: 15, fontSize: 8, fontStyle:'bold'},beforePageContent: header,afterPageContent: footer,margin: {left: 420, top: 120, bottom: 75},styles: {overflow: 'linebreak'}});
+            doc.autoTable(colresp.splice(0,6), dataresp, {drawHeaderRow: function() {return false;},startY: doc.autoTableEndPosY()+20,pageBreak: 'auto',theme: 'mary',bodyStyles: {rowHeight: 12, fontSize: 8, valign: 'middle'},margin: { top: 140, bottom: 80},styles: {overflow: 'linebreak'},columnStyles: {uno: {fontStyle: 'bold',columnWidth: 110},tres: {fontStyle: 'bold',columnWidth: 110}}});
+            doc.setFontSize(9);
+            doc.setFontStyle('bold');
+            doc.text("NOMBRE DEL INMUEBLE:",40,doc.autoTableEndPosY()+15);
+            doc.text("DESCRIPCION DEL INMUEBLE:",40,doc.autoTableEndPosY()+30);
+            doc.setFontSize(9);
+            doc.setFontStyle('normal');
+            doc.text($scope.impFormulario.UBI_NOMB_VALOR,180,doc.autoTableEndPosY()+15);           
+            doc.autoTable(coldesc, datadesc, {startY: doc.autoTableEndPosY()+40,theme: 'mary',bodyStyles: {rowHeight: 12, fontSize: 8, valign: 'middle'},headerStyles: {rowHeight: 15, fontSize: 8, fontStyle:'bold'},margin: { top: 120, bottom: 75},styles: {overflow: 'linebreak'}});
+            doc.setFontSize(9);
+            doc.setFontStyle('bold');
+            doc.text("OBSERVACIONES:",40,doc.autoTableEndPosY()+15);
+            doc.text("PLANO DE UBICACION:",40,doc.autoTableEndPosY()+50);
+            doc.text("CROQUIS DE AREA ASIGNADA:",300,doc.autoTableEndPosY()+50);
+            doc.addImage(pic[0], 'JPEG',60, doc.autoTableEndPosY()+60, 200, 200);
+            doc.addImage(pic[1], 'JPEG',300, doc.autoTableEndPosY()+60, 200, 200);
+            doc.setFontSize(9);
+            doc.setFontStyle('normal');
+            doc.autoTable(colnota.splice(0,6), datanota, {drawHeaderRow: function() {return false;},startY: doc.autoTableEndPosY()+300,pageBreak: 'auto',theme: 'plain',bodyStyles: {rowHeight: 12, fontSize: 8, valign: 'middle'},margin: { top: 140, bottom: 80},styles: {overflow: 'linebreak'}});
+            doc.setFontSize(9);
+            doc.setFontStyle('bold');
+            doc.text("FUNCIONARIO RESPONSABLE:",40,doc.autoTableEndPosY()+30);
+            doc.text("INVENTARIADOR UBI:",240,doc.autoTableEndPosY()+30);
+            doc.text("VERIFICADOR UBI:",400,doc.autoTableEndPosY()+30);
+            if (typeof doc.putTotalPages === 'function') {
+                doc.putTotalPages(totalPagesExp);
+            }
+            var string = doc.output('datauristring'); 
+            $scope.archotro = false;
+            $scope.archpdf = true;
+            $('#visorFum object').attr('data',string);
+            $timeout(function(){$scope.varSpin=false}, 1000);
+            $scope.urlData = [{"nombre_archivo": nombre_archivo,"tam_archivo":" "}];
+             if($scope.impFormulario.UBI_TIPO == "1"){ 
+                var reslocal = {
+                    "procedure_name":"ejecutartojson",
+                    "body":{
+                      "params": [
+                      {
+                        "name":"expression",
+
+                        "param_type":"IN","value":"select asig_id from ubi._ubi_asignaciones where asig_tramite = '"+ $scope.casoActual.casonombre+"'"
+                      }]
+                    }
+                };
+                var obj=DreamFactory.api[CONFIG.SERVICE].callStoredProcWithParams(reslocal);
+                obj.success(function (respons) {
+                    $scope.url = JSON.parse(respons[0].ejecutartojson)
+                    if($scope.url == null)
+                    {asigna['asig_infr_id'] = parseInt($scope.impFormulario.UBI_NOMBRE);
+                asigna['asig_resp_pat'] = $scope.impFormulario.UBI_AP_PAT;
+                asigna['asig_resp_mat'] = $scope.impFormulario.UBI_AP_MAT;
+                asigna['asig_resp_nombre'] = $scope.impFormulario.UBI_NOM;
+                asigna['asig_resp_ci'] = $scope.impFormulario.UBI_CI;
+                asigna['asig_resp_nro_item'] = $scope.impFormulario.UBI_NRO_ITEM;
+                asigna['asig_resp_u_sol'] = $scope.impFormulario.UBI_U_SOL_VALOR;
+                asigna['asig_piso'] = parseInt($scope.impFormulario.UBI_PISO);
+                asigna['asig_nro_amb'] = parseInt($scope.impFormulario.UBI_NRO_AMB);
+                asigna['asig_mant'] = $scope.impFormulario.UBI_MANT;
+                asigna['asig_mts'] = $scope.impFormulario.UBI_METRO;
+                asigna['asig_registrado'] = $scope.fechactual;
+                asigna['asig_modificado'] = $scope.fechactual;
+                asigna['asig_usr_id'] = sessionService.get('IDUSUARIO');
+                asigna['asig_estado'] = 'A';
+                asigna['asig_tramite'] = $scope.casoActual.casonombre;
+                var resPersona = {
+                    table_name:"ubi._ubi_asignaciones",
+                    body:asigna
+                };
+                var obj=DreamFactory.api[CONFIG.SERVICE].createRecords(resPersona);
+                obj.success(function(data){
+                    console.log(data);
+                    $.unblockUI(); 
+                })
+                .error(function(data){
+                    console.log(data);
+                })}
+                 })
+                .error(function(data){
+                    console.log(data);
+                })
+            }
+                       
+        }
+        $scope.inicioDocumentosSalida = function () { 
+                if(DreamFactory.isReady()){
+                    $scope.generarDocumentoPhp();
+                }
+            scroll(0,0);
+        };
+
+        $scope.ImprimirProforma = function (fum) {
+               $scope.varSpin = true;
+                $scope.RegistroFUM={
+                    registrado:'OK',
+                    mensaje:''
+                };
+                var cadena= fum;
+                if (cadena.indexOf('?') != -1){
+                    separador = '?';
+                    arreglodecadena = cadena.split(separador);
+                    cadena = arreglodecadena[0];
+                    console.log('arreglo de la cadena',arreglodecadena[0]);
+                }
+                var tipoarch=cadena.substr(-4);
+                console.log('substring: ',cadena.substr(-4));
+                var imagen = cadena.indexOf('.jpeg');
+                if(tipoarch == '.pdf'){
+                    $scope.archotro = false;
+                    $scope.archpdf = true;
+                    $('#visorFum object').attr('data',fum);
+                    $timeout(function(){$scope.varSpin=false}, 1000);
+                }
+                else {
+                    var tipoimg = tipoarch.toUpperCase();
+                    console.log(tipoimg);
+                    if(tipoimg == '.JPG' || tipoimg == '.PNG' || tipoimg == '.BMP' || tipoimg == '.GIF') {
+                        $scope.archotro = true;
+                        $scope.archpdf = false;
+                        $scope.archivoP=fum;
+                        $('#imgSalida').attr("src",fum);
+                    }
+                    else { document.location = fum; }
+                }
+            
+        };
+
+        /*DOCUMENTOS DE SALIDA*/
+        $scope.almacenarDocumentosSalidaRc = function(){
+            
+            console.log("CASO NOMBRE 11:  ", $scope.sCasonombre);
+            console.log("CASO NOMBRE 22:  ", $scope.sCasoNombre);
+            
+            if($scope.urlData){
+                /*RECORRIENDO LOS ADJUNTOS*/
+                console.log($scope.impFormulario.CI_BIGDATA);
+                angular.forEach($scope.urlData, function(value, key) {
+                    console.log(key + ': ' + value.nombre_archivo);
+                    /*ALMACENAR ADJUNTOS CIUDADANO*/
+                    var sDocSistema     =   "IF_GENESIS";
+                    var sDocProceso     =   $scope.casoActual.procnombre;
+                    var sDocId          =   $scope.casoActual.casoid;
+                    var sDocCiNodo      =   sNodoActual;
+                    var sDocDatos       =   "";
+                    var sDocUrl         =   value.url_archivo;
+                    var sDocVersion     =   1;
+                    var sDocTiempo      =   1;
+                    var sDocFirmaDigital=   "0";
+                    var sDocUsuario     =   $scope.impFormulario.CI_BIGDATA;//"Ciudadano";
+                    var sDocTipoDoc     =   "pdf";
+                    var sDocTamDoc      =   "";
+                    var sDocNombre      =   value.nombre_archivo;
+
+                    var sDocTpsId       =   0;
+                    var sDocUrlLogica   =   value.url_archivo;
+                    var sDocAcceso      =   "";
+                    var sDocTipoExt     =   "";
+                    var sDocNroTramNexo =   "";
+                    var sCasoCodigo     =   $scope.sCasonombre;                    
+                    /*
+                    usando DSP
+                    var resOpcionRc = {
+                        "procedure_name":"dms_sp_adicionar_ext",
+                        "body":{
+                            "params": [
+
+                                {
+                                    "name": "sdoc_sistema",
+                                    "value": sDocSistema
+                                },{
+                                    "name": "sdoc_proceso",
+                                    "value": sDocProceso
+                                },{
+                                    "name": "sdoc_id",
+                                    "value": sDocId
+                                },{
+                                    "name": "sdoc_ci_nodo",
+                                    "value": sDocCiNodo
+                                },{
+                                    "name": "sdoc_datos",
+                                    "value": sDocDatos
+                                },{
+                                    "name": "sdoc_url",
+                                    "value": sDocUrl
+                                },{
+                                    "name": "sdoc_version",
+                                    "value": sDocVersion
+                                },{
+                                    "name": "sdoc_tiempo",
+                                    "value": sDocTiempo
+                                },{
+                                    "name": "sdoc_firma_digital",
+                                    "value": sDocFirmaDigital
+                                },{
+                                    "name": "sdoc_usuario",
+                                    "value": sDocUsuario
+                                },{
+                                    "name": "sdoc_tipo_documento",
+                                    "value": sDocTipoDoc
+                                },{
+                                    "name": "sdoc_tamanio_documento",
+                                    "value": sDocTamDoc
+                                },{
+                                    "name": "sdoc_nombre",
+                                    "value": sDocNombre
+                                },{
+                                    "name": "sdoc_tps_doc_id",
+                                    "value": sDocTpsId
+                                },{
+                                    "name": "sdoc_url_logica",
+                                    "value": sDocUrlLogica
+                                },{
+                                    "name": "sdoc_acceso",
+                                    "value": sDocAcceso
+                                },{
+                                    "name": "sdoc_tipo_documento_ext",
+                                    "value": sDocTipoExt
+                                },{
+                                    "name": "sdoc_nrotramite_nexo",
+                                    "value": sDocNroTramNexo
+                                },{
+                                    "name": "sdoc_id_codigo",
+                                    "value": sCasoCodigo
+                                }
+
+                            ]
+                        }
+                    };
+                    var obj2 = DreamFactory.api[CONFIG.SERVICERC_POSTGRES].callStoredProcWithParams(resOpcionRc).success(function (response){
+                        console.log("Archivos almacenados correctamente..");
+                    }).error(function(error) {
+                    });
+                    */
+
+                     var documento=new gDocumentos();
+                        documento.doc_sistema = sDocSistema;
+                        documento.doc_proceso = sDocProceso;
+                        documento.doc_id = sDocId;
+                        documento.doc_ci_nodo = sDocCiNodo;
+                        documento.doc_datos = sDocDatos;
+                        documento.doc_url = sDocUrl;
+                        documento.doc_version = sDocVersion;
+                        documento.doc_tiempo = sDocTiempo;
+                        documento.doc_firma_digital = sDocFirmaDigital;
+                        documento.doc_usuario = sDocUsuario;
+                        documento.doc_tipo_documento = sDocTipoDoc;
+                        documento.doc_tamanio_documento = sDocTamDoc;
+                        documento.doc_nombre = sDocNombre;
+                        documento.doc_tps_doc_id = sDocTpsId;
+                        documento.doc_url_logica = sDocUrlLogica;
+                        documento.doc_acceso = sDocAcceso;
+                        documento.doc_tipo_documento_ext = sDocTipoExt;
+                        documento.doc_nrotramite_nexo = sDocNroTramNexo;
+                        documento.doc_id_codigo = sCasoCodigo;
+
+                        documento.insertarDoc(function(resultado){
+                            resultadoApi = JSON.parse(resultado);							
+                            if (resultadoApi.success) {								
+                                console.log("REGISTRO CORRECTO");
+                            } else {
+                                $.unblockUI();
+                                sweet.show(resultadoApi.error.message);
+                            }
+                        });
+
+                });
+            }
+        };
+
+        /*DOCUMENTOS DE SALIDA*/
+        $scope.almacenarDocumentosSalidaLocal = function(){
+            if($scope.urlData){
+                /*RECORRIENDO LOS ADJUNTOS*/
+                //var log = [];
+                //console.log($scope.urlData);
+                console.log($scope.impFormulario.CI_BIGDATA);
+                angular.forEach($scope.urlData, function(value, key) {
+                    console.log(key + ': ' + value.nombre_archivo);
+                    /*ALMACENAR ADJUNTOS CIUDADANO*/
+                    var sDocSistema     =   "IF";
+                    var sDocProceso     =   $scope.casoActual.procnombre;
+                    var sDocId          =   $scope.casoActual.casoid;
+                    var sDocCiNodo      =   sNodoActual;
+                    var sDocDatos       =   "";
+                    var sDocUrl         =   value.url_archivo;
+                    var sDocVersion     =   1;
+                    var sDocTiempo      =   1;
+                    var sDocFirmaDigital=   "0";
+                    var sDocUsuario     =   $scope.impFormulario.CI_BIGDATA;//"Ciudadano";
+                    var sDocTipoDoc     =   "pdf";
+                    var sDocTamDoc      =   "";
+                    var sDocNombre      =   value.nombre_archivo;
+
+                    var sDocTpsId       =   0;
+                    var sDocUrlLogica   =   value.url_archivo;
+                    var sDocAcceso      =   "";
+                    var sDocTipoExt     =   "";
+                    var sDocNroTramNexo =   "";
+
+                    var resOpcionRc = {
+                        "procedure_name":"dms_sp_adicionar_ext",
+                        "body":{
+                            "params": [
+
+                                {
+                                    "name": "sdoc_sistema",
+                                    "value": sDocSistema
+                                },{
+                                    "name": "sdoc_proceso",
+                                    "value": sDocProceso
+                                },{
+                                    "name": "sdoc_id",
+                                    "value": sDocId
+                                },{
+                                    "name": "sdoc_ci_nodo",
+                                    "value": sDocCiNodo
+                                },{
+                                    "name": "sdoc_datos",
+                                    "value": sDocDatos
+                                },{
+                                    "name": "sdoc_url",
+                                    "value": sDocUrl
+                                },{
+                                    "name": "sdoc_version",
+                                    "value": sDocVersion
+                                },{
+                                    "name": "sdoc_tiempo",
+                                    "value": sDocTiempo
+                                },{
+                                    "name": "sdoc_firma_digital",
+                                    "value": sDocFirmaDigital
+                                },{
+                                    "name": "sdoc_usuario",
+                                    "value": sDocUsuario
+                                },{
+                                    "name": "sdoc_tipo_documento",
+                                    "value": sDocTipoDoc
+                                },{
+                                    "name": "sdoc_tamanio_documento",
+                                    "value": sDocTamDoc
+                                },{
+                                    "name": "sdoc_nombre",
+                                    "value": sDocNombre
+                                },{
+                                    "name": "sdoc_tps_doc_id",
+                                    "value": sDocTpsId
+                                },{
+                                    "name": "sdoc_url_logica",
+                                    "value": sDocUrlLogica
+                                },{
+                                    "name": "sdoc_acceso",
+                                    "value": sDocAcceso
+                                },{
+                                    "name": "sdoc_tipo_documento_ext",
+                                    "value": sDocTipoExt
+                                },{
+                                    "name": "sdoc_nrotramite_nexo",
+                                    "value": sDocNroTramNexo
+                                }
+
+                            ]
+                        }
+                    };
+                    var obj2 = DreamFactory.api[CONFIG.SERVICE].callStoredProcWithParams(resOpcionRc).success(function (response){
+                        console.log("Archivos almacenados correctamente..");
+                    }).error(function(error) {
+                    });
+                });
+            }
+        };
+}
+</script>
+<div class="wrap" ng-controller="documentosDeSalidaController"  data-ng-init="inicioDocumentosSalida();">
+    <div class="col-md-12">
+        <div   class="{{clase222}}">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading"><B> Documentos </B></div>
+                        <div class="panel-body"  >
+                            <div ng-show = "personaNatural1 == null">
+                               <form name="formularioBuscar" readOnly="true" novalidate>
+                                    <div class="row" ng-show = "frmPersonaNatural1 == null">
+                                        <div class="col-md-12">
+                                            <br>
+                                            <label for="url" >Fecha de creacion:</label>
+                                            {{docsFechaCreacion}}
+                                            <input type="hidden" name="AE_IMP_FEC_CREACION" id="AE_IMP_FEC_CREACION" ng-model="datos.AE_IMP_FEC_CREACION">
+                                        </div>
+                                        <div class="col-md-12">
+                                            <br>
+                                            <label for="url" >DOCUMENTOS DE SALIDA:</label>
+                                            <div ng-repeat="datop in urlData">
+                                                <a target="_blank" ng-click="ImprimirProforma(datop.url_archivo)" data-toggle="modal" data-target="#divPopup4">{{datop.nombre_archivo}}&nbsp;&nbsp;{{datop.tam_archivo}} </a>
+                                                <br>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div id="impresionid">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="hr-line-dashed"></div>
+    <a class="btn btn-primary" ng-disabled="false" ng-click="volver()">
+        <i class="glyphicon fa fa-times"></i>
+         Cancelar
+    </a>
+    <a class="btn btn-primary" ng-click="cargarDatos(datos);guardarData(datos);almacenarDocumentosSalidaLocal();" ng-disabled="false">
+        <i class="glyphicon fa fa-save"></i>
+         Guardar / Continuar
+    </a>
+    <div class="modal fade" id="divPopup4" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+             <div class="modal-dialog" style="width:700px">
+                 <div class="modal-content">
+                     <div class="modal-header">
+                         <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Cerrar</span></button>
+                     </div>
+                     <div class="modal-body">
+                         <!--pdf-->
+                         <div id="visorFum" ng-show="archpdf">
+                             <object data="" type="application/pdf" width="650" height="500"></object>
+                         </div>
+                         <!--imagen-->
+                         <div ng-show="archotro">
+                              <img id="imgSalida" ng-src="{{archivoP}}" width="100%" height="100%">
+                         </div>
+                     </div>
+                     <div class="modal-footer">
+                         <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                     </div>
+                 </div>
+             </div>
+         </div>
+</div>

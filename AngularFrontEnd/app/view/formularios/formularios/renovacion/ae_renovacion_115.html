@@ -1,0 +1,1147 @@
+<script>
+function cocheController($scope,  $rootScope, DreamFactory, CONFIG, sessionService) {
+    var fecha= new Date();
+    $scope.fechactual=fecha.getFullYear() + "-" + fecha.getMonth() + "-" + fecha.getDate() + " " + fecha.getHours() + ":" + fecha.getMinutes() + ":" + fecha.getSeconds();
+    var misDatos = {
+        "procedure_name":"usuarioslst",
+        "body":{
+        }
+    };
+
+    DreamFactory.api[CONFIG.SERVICE].callStoredProcWithParams(misDatos).success(function (results){
+        if(results.length > 0){
+            //console.log(results);
+            $scope.usuarios = results[0];
+        }else{                        
+        }
+    }).error(function(results){
+    });
+    $scope.coche = {
+        marca: "Audi",
+        modelo: "A3",
+        nombreCompleto: function() {
+            var x;
+            x = $scope.coche;
+            return x.marca + " " + x.modelo;
+        }
+    };
+    
+    $scope.tituloForm1 = "FORMULARIO DE RENOVACION DE LICENCIA DE FUNCIONAMIENTO";
+    $scope.titulo2Form1 = "VERIFICACIÓN DE REQUISITOS Y ORDEN DE DEMOLICIÓN - PERSONA NATURAL";
+
+    var requisitos = $scope.getSPCombos('sp_lst_datos_parametricas_renovacion','{"params": [{"name":"valoparametro1","value":"2"},{"name":"valoparametro2","value":"INTA_INT_JUE"}]}');
+    requisitos.then(function(respuesta) {
+        //console.log(respuesta);
+        $rootScope.datosRequisitosCheckBox = respuesta;
+        console.log("DATOS REUISITOS", $rootScope.datosRequisitosCheckBox);
+    }, function(reason) {
+        alert('Failed: ' + reason);
+    });
+
+
+}
+</script>
+<div class="wrap" ng-controller="cocheController">
+    <legend> Datos Generales</legend>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >PMC:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.num_pmc}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Tipo de Persona: </label>
+                <div class="col-sm-8" align="left">
+                    <select id="tipo_per" name="tipo_per" class="form-control"  ng-model="datos.tipo_per" >                        
+                        <option value="N">NATURAL</option>
+                        <option value="J">JURÍDICA</option>
+                    </select>
+                    <span style="color:red" ng-show="formulario.tipo_per.$invalid">
+                        <span ng-show="formulario.tipo_per.$error.required">Es requerido.
+                        </span>
+                    </span><br>
+                    <!--<label for="url" >{{datos.INT_TIPO_CONTRIBUYENTE}}</label>-->
+                </div>
+            </div>
+        </div>
+        
+    <legend> Datos del Contribuyente</legend>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >NIT:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.nit_prop}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Tipo de Documento:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.tip_doc_prop}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Número de Documento:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.num_dos_prop}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Expedido en:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.expedido_prop}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Primer Nombre:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.pri_nom_prop}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Segundo Nombre:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.seg_nom_prop}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Tercer Nombre:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.ter_nom_prop}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Apellido Paterno:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.ape_pat_prop}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Apellido Materno:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.ape_mat_prop}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Apellido de Casada:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.ape_cas_prop}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Número de Teléfono Celular:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.telef_prop}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Número de Teléfono:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.cel_prop}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Correo Electrónico:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.email_prop}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Casilla:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.casilla}}</label>
+                </div>
+            </div>
+        </div>
+
+
+    <legend>Dirección del Contribuyente</legend> 
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Zona:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.zon_prop}}</label>
+                </div>
+            </div>
+        </div>        
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Tipo de Vía:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.tip_via_prop}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Nombre de Vía:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.nom_via_prop}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Número:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.num_prop}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Nombre del Edificio:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.nom_edi_prop}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Bloque:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.bloq_prop}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Piso:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.piso_prop}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Departemento:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.depa_prop}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Direccion Detallada: </label>
+                <div class="col-sm-8" align="left">
+                    <textarea id="dir_det_prop" name="dir_det_prop" ng-model="datos.dir_det_prop" class="form-control" required></textarea><br>
+                </div>
+            </div>
+        </div>
+
+
+
+    <legend>Identificación de la Empresa</legend>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >NIT:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.num_doc_per_jur}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Razón Social:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.raz_soc_per_jur}}</label>
+                </div>
+            </div>
+        </div>
+
+
+
+    <legend>Datos del Representante Legal</legend>
+
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Tipo de Documento:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.tip_doc_rep}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Número de Documento:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.num_doc_rep}}</label>
+                </div>
+            </div>
+        </div>
+         <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Expedido en:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.expedido_rep}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Primer Nombre:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.pri_nom_rep}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Segundo Nombre:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.seg_nom_rep}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Tercer Nombre:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.ter_nom_rep}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Apellido Paterno:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.ape_pat_rep}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Apellido Materno:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.ape_mat_rep}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Apellido de Casada:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.ape_cas_rep}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Número de Teléfono Celular:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.cel_rep}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Número de Teléfono:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.telef_rep}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Correo Electrónico:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.email_rep}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Número de Poder Notarial:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.num_pod_leg}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Gestión de Vigencia del Poder Notarial:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.ges_vig_pod}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Número de Notaria:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.num_not}}</label>
+                </div>
+            </div>
+        </div>
+
+
+    <legend> Datos Técnicos de la Activida Económica</legend>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >NIT:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.nit}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Denominación:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.raz_soc}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Sucursal:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.nu_actividad_MatrSuc}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Superficie M2:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.sup}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Capacidad Aproximada:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.cap_aprox}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >El Establecimietno es:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.estab_es}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Horario de Inicio de Atención:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.de_hor}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Horario de Fin de Atención:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.a_hor}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Productos Elaborados:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.productosElaborados}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Actividades Secundarias:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.actividadesSecundarias}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Fecha de Inicio de la Actividad:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.fecha_ini_act}}</label>
+                </div>
+            </div>
+        </div>
+
+
+    <legend> Ubicación de la Actividad Económica</legend>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Macrodistrito:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.macro_act_descrip}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Distrito:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.dict_act}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Zona:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.zona_act}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Tipo de Vía:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.tip_via_act}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Nombre de Vía:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.nom_via_act}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Número:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.num_act}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Edificio:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.edificio_act}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Bloque:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.bloque_act}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Piso:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.piso_act}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Dpto. Of./Local.:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.dpto_of_loc}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Teléfono:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.tel_act}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Cuenta Energía Eléctrica:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.cod_luz}}</label>
+                </div>
+            </div>
+        </div>
+
+
+    <legend> Clasificación de la Actividad Económica</legend>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Tipo de Actividad:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.tip_act_eco}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Tipo de Licencia:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.tipo_lic_descrip}}</label>
+                </div>
+                <div class="col-sm-8" align="left">
+                    <select id="tipo_lic" name="tipo_lic" class="form-control"  ng-model="datos.tipo_lic" >                        
+                        <!--<option value="N">NATURAL</option>
+                        <option value="J">JURÍDICA</option>
+                    </select><br>-->
+                    <!--<label for="url" >{{datos.INT_TIPO_CONTRIBUYENTE}}</label>-->
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Actividad Desarrollada:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.categoria_descrip}}</label>
+                </div>
+            </div>
+        </div>
+
+
+    <legend> Revisión de Ancedentes</legend>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>La Solicitud: </label>
+                <div class="col-sm-8" align="left">
+                    <select id="ant" name="ant" class="form-control"  ng-model="datos.ant" >                        
+                        
+                    </select>
+                    <span style="color:red" ng-show="formulario.ant.$invalid">
+                        <span ng-show="formulario.ant.$error.required">Es requerido.
+                        </span>
+                    </span><br>
+                    <!--<label for="url" >{{datos.INT_TIPO_CONTRIBUYENTE}}</label>-->
+                </div>
+            </div>
+        </div>
+
+
+    <legend> Informe de Antecedentes</legend>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <div class="col-sm-8" align="left">
+                    <textarea id="inf_apr" name="inf_obs" ng-model="datos.inf_obs" class="form-control" required></textarea><br>
+                </div>
+            </div>
+        </div>
+
+
+    <legend> Foliado y Descripción - Antecedentes</legend>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Número de Hojas Recibidas de Trámite:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.num_de_hoj}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Descripción: </label>
+                <div class="col-sm-8" align="left">
+                    <textarea id="des" name="des" ng-model="datos.des" class="form-control"></textarea>
+                </div>
+            </div>
+        </div> 
+
+
+    <legend> Elaboración de Informe Técnico UDE</legend>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>La Solicitud es:</label>
+                <div class="col-sm-8" align="left"> 
+                    <select id="res_solicitud_upaee" name="res_solicitud_upaee" class="form-control"  ng-model="datos.res_solicitud_upaee" >
+                        <!--<option value="APROBADO">APROBADO</option>
+                        <option value="RECHAZADO">RECHAZADO</option>
+                        <option value="EN PROCESO">EN PROCESO</option>-->
+                    </select>
+                    <span style="color:red" ng-show="formulario.res_solicitud_upaee.$invalid">
+                        <span ng-show="formulario.res_solicitud_upaee.$error.required">Es requerido.
+                        </span>
+                    </span><br>
+                </div>
+            </div>
+        </div>
+
+
+    <legend> Solicitud Aprobada</legend>
+         <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Número de Orden Form 402:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.nro_orden}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Fecha de Impresión:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.fecha_imp}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Fecha de Vencimiento:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.fecha_fin_act}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Id Área Recaudadora:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.id_area_recaudadora}}</label>
+                </div>
+            </div>
+        </div>
+
+
+    <legend> Informe de Observación o Rechazo</legend>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <div class="col-sm-8" align="left">
+                    <textarea id="inf_rechazo" name="inf_rechazo" ng-model="datos.inf_rechazo" class="form-control"></textarea>
+                </div>
+            </div>
+        </div>
+        
+
+
+    <legend> Foliado y Descripción - Renovación de Licencia</legend>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Número de Hojas Adjuntas al Trámite:</label>
+                <div class="col-sm-8" align="left">
+                    <input  ng-model="datos.hojas_recibidas" id="hojas_recibidas" name="hojas_recibidas" class="form-control" type="text" placeholder="ingrese numero de hojas" ng-disabled="true">
+                    <br>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Descripción:</label>
+                <div class="col-sm-8" align="left">
+                    <textarea id="observaciones_i" name="observaciones_i" ng-model="datos.observaciones_i" class="form-control" required ng-disabled="desabilitado"></textarea>
+                    <br>
+                </div>
+            </div>
+        </div>
+
+
+    <legend> Remisión para Corrección</legend>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Envío a la UDE para Corrección de Licencia:</label>
+                <div class="col-sm-2" align="right"></div>
+                <div class="col-sm-10" align="left">
+                    <label ng-repeat="role in datosRequisitosCheckBox">
+                      <input type="checkbox" checklist-model="datos.correccion_impresion" checklist-value="role.correccion_impresion" ng-disabled="true"> {{role.correccion_impresion}}<br>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+
+    <legend> Falta de Seguimiento del Ciudadano</legend>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" ><font color="#FF0000" size="5px"> * </font>Remitir el Trámite a Archivo por falta de Seguimiento del Ciudadano:</label>
+                <div class="col-sm-2" align="right"></div>
+                <div class="col-sm-10" align="left">
+                    <label ng-repeat="role in datosRequisitosCheckBox">
+                      <input type="checkbox" checklist-model="datos.falta_seg" checklist-value="role.falta_seg" ng-disabled="true"> {{role.falta_seg}}<br>
+                    </label>
+                    <span style="color:red" ng-show="formulario.falta_seg.$invalid">
+                        <span ng-show="formulario.falta_seg.$error.required">Es requerido.
+                        </span>
+                    </span><br>
+                </div>
+            </div>
+        </div>
+
+
+    <legend> Documentos Enviados a Archivo</legend>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Licencia de Funcionamiento Original:</label>
+                <div class="col-sm-2" align="right"></div>
+                <div class="col-sm-10" align="left">
+                    <label ng-repeat="role in datosRequisitosCheckBox">
+                      <input type="checkbox" checklist-model="datos.lic_orig" checklist-value="role.lic_orig" ng-disabled="true"> {{role.lic_orig}}<br>
+                    </label><br>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Formulario 401/402 Original:</label>
+                <div class="col-sm-2" align="right"></div>
+                <div class="col-sm-10" align="left">
+                    <label ng-repeat="role in datosRequisitosCheckBox">
+                      <input type="checkbox" checklist-model="datos.form_arch" checklist-value="role.form_arch" ng-disabled="true"> {{role.form_arch}}<br>
+                    </label><br>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Carpeta Completa:</label>
+                <div class="col-sm-2" align="right"></div>
+                <div class="col-sm-10" align="left">
+                    <label ng-repeat="role in datosRequisitosCheckBox">
+                      <input type="checkbox" checklist-model="datos.carp_comp" checklist-value="role.carp_comp" ng-disabled="true"> {{role.carp_comp}}<br>
+                    </label><br>
+                </div>
+            </div>
+        </div>
+
+
+
+    <legend> Requisitos Entregados al Solicitante</legend>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Licencia de Funcionamiento Renovada:</label>
+                <div class="col-sm-2" align="right"></div>
+                <div class="col-sm-10" align="left">
+                    <label ng-repeat="role in datosRequisitosCheckBox">
+                      <input type="checkbox" checklist-model="datos.lic_de_fun_ren" checklist-value="role.lic_de_fun_ren" ng-disabled="true"> {{role.lic_de_fun_ren}}<br>
+                    </label><br>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Formulario 402:</label>
+                <div class="col-sm-2" align="right"></div>
+                <div class="col-sm-10" align="left">
+                    <label ng-repeat="role in datosRequisitosCheckBox">
+                      <input type="checkbox" checklist-model="datos.form_401_402" checklist-value="role.form_401_402" ng-disabled="true"> {{role.form_401_402}}<br>
+                    </label><br>
+                </div>
+            </div>
+        </div>
+
+
+    <legend> Requisitos Entregados al Solicitante</legend>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Resolución Administrativa:</label>
+                <div class="col-sm-2" align="right"></div>
+                <div class="col-sm-10" align="left">
+                    <label ng-repeat="role in datosRequisitosCheckBox">
+                      <input type="checkbox" checklist-model="datos.adm_adm" checklist-value="role.adm_adm" ng-disabled="true"> {{role.adm_adm}}<br>
+                    </label><br>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Informe de Rechazo:</label>
+                <div class="col-sm-2" align="right"></div>
+                <div class="col-sm-10" align="left">
+                    <label ng-repeat="role in datosRequisitosCheckBox">
+                      <input type="checkbox" checklist-model="datos.dev_sol_np" checklist-value="role.dev_sol_np" ng-disabled="true"> {{role.dev_sol_np}}<br>
+                    </label><br>
+                </div>
+            </div>
+        </div>
+
+
+    <legend> Requisitos Entregados al Solicitante</legend>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Detalle de Observaciones a la Solicitud:</label>
+                <div class="col-sm-2" align="right"></div>
+                <div class="col-sm-10" align="left">
+                    <label ng-repeat="role in datosRequisitosCheckBox">
+                      <input type="checkbox" checklist-model="datos.dev_sol_np_obs" checklist-value="role.dev_sol_np_obs" ng-disabled="true"> {{role.dev_sol_np_obs}}<br>
+                    </label><br>
+                </div>
+            </div>
+        </div>
+
+
+    <legend> Requisitos Entregados al Solicitante</legend>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Formulario de Inspección con Observaciones/Detalle de Observaciones a la Solicitud:</label>
+                <div class="col-sm-2" align="right"></div>
+                <div class="col-sm-10" align="left">
+                    <label ng-repeat="role in datosRequisitosCheckBox">
+                      <input type="checkbox" checklist-model="datos.dev_sol_obs" checklist-value="role.dev_sol_obs" ng-disabled="true"> {{role.dev_sol_obs}}<br>
+                    </label><br>
+                </div>
+            </div>
+        </div>
+
+
+    <legend> Requisitos Entregados al Solicitante</legend>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <div class="col-sm-2" align="right"></div>
+                <div class="col-sm-10" align="left">
+                    <label ng-repeat="role in datosRequisitosCheckBox">
+                      <input type="checkbox" checklist-model="datos.com_serv_n" checklist-value="role.com_serv_n" ng-disabled="true"> {{role.com_serv_n}}<br>
+                    </label><br>
+                </div>
+            </div>
+        </div>
+
+    <legend> Requisitos Entregados al Solicitante</legend>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <div class="col-sm-2" align="right"></div>
+                <div class="col-sm-10" align="left">
+                    <label ng-repeat="role in datosRequisitosCheckBox">
+                      <input type="checkbox" checklist-model="datos.com_serv_i" checklist-value="role.com_serv_i" ng-disabled="true"> {{role.com_serv_i}}<br>
+                    </label><br>
+                </div>
+            </div>
+        </div>
+
+        
+    <legend> Requisitos Entregados al Solicitante</legend>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <div class="col-sm-2" align="right"></div>
+                <div class="col-sm-10" align="left">
+                    <label ng-repeat="role in datosRequisitosCheckBox">
+                      <input type="checkbox" checklist-model="datos.alim_beb_nat" checklist-value="role.alim_beb_nat" ng-disabled="true"> {{role.alim_beb_nat}}<br>
+                    </label><br>
+                </div>
+            </div>
+        </div>
+
+    <legend> Requisitos Entregados al Solicitante</legend>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <div class="col-sm-2" align="right"></div>
+                <div class="col-sm-10" align="left">
+                    <label ng-repeat="role in datosRequisitosCheckBox">
+                      <input type="checkbox" checklist-model="datos.alim_beb_jur" checklist-value="role.alim_beb_jur" ng-disabled="true"> {{role.alim_beb_jur}}<br>
+                    </label><br>
+                </div>
+            </div>
+        </div>
+
+    <legend> Requisitos Entregados al Solicitante</legend>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <div class="col-sm-2" align="right"></div>
+                <div class="col-sm-10" align="left">
+                    <label ng-repeat="role in datosRequisitosCheckBox">
+                      <input type="checkbox" checklist-model="datos.jue_cent_n" checklist-value="role.jue_cent_n" ng-disabled="true"> {{role.jue_cent_n}}<br>
+                    </label><br>
+                </div>
+            </div>
+        </div>
+
+      <legend> Requisitos Entregados al Solicitante</legend>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <div class="col-sm-2" align="right"></div>
+                <div class="col-sm-10" align="left">
+                    <label ng-repeat="role in datosRequisitosCheckBox">
+                      <input type="checkbox" checklist-model="datos.jue_cent_i" checklist-value="role.jue_cent_i" ng-disabled="true"> {{role.jue_cent_i}}<br>
+                    </label><br>
+                </div>
+            </div>
+        </div>
+        
+    <legend> Requisitos Entregados al Solicitante</legend>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <div class="col-sm-2" align="right"></div>
+                <div class="col-sm-10" align="left">
+                    <label ng-repeat="role in datosRequisitosCheckBox">
+                      <input type="checkbox" checklist-model="datos.act_ind_n" checklist-value="role.act_ind_n" ng-disabled="true"> {{role.act_ind_n}}<br>
+                    </label><br>
+                </div>
+            </div>
+        </div>
+
+
+    <legend> Requisitos Entregados al Solicitante</legend>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <div class="col-sm-2" align="right"></div>
+                <div class="col-sm-10" align="left">
+                    <label ng-repeat="role in datosRequisitosCheckBox">
+                      <input type="checkbox" checklist-model="datos.act_ind_i" checklist-value="role.act_ind_i" ng-disabled="true"> {{role.act_ind_i}}<br>
+                    </label><br>
+                </div>
+            </div>
+        </div>
+
+
+    <legend> Requisitos Enviados a Archivo</legend>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Copia de Licencia de Funcionamiento Renovada con Firma de Constancia:</label>
+                <div class="col-sm-2" align="right"></div>
+                <div class="col-sm-10" align="left">
+                    <label ng-repeat="role in datosRequisitosCheckBox">
+                      <input type="checkbox" checklist-model="datos.cop_de_lic_de" checklist-value="role.cop_de_lic_de" ng-disabled="true"> {{role.cop_de_lic_de}}<br>
+                    </label><br>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Copia del Formulario 402 Firmado:</label>
+                <div class="col-sm-2" align="right"></div>
+                <div class="col-sm-10" align="left">
+                    <label ng-repeat="role in datosRequisitosCheckBox">
+                      <input type="checkbox" checklist-model="datos.form_401_402_arch" checklist-value="role.form_401_402_arch" ng-disabled="true"> {{role.form_401_402_arch}}<br>
+                    </label><br>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Carpeta Completa:</label>
+                <div class="col-sm-2" align="right"></div>
+                <div class="col-sm-10" align="left">
+                    <label ng-repeat="role in datosRequisitosCheckBox">
+                      <input type="checkbox" checklist-model="datos.carp_comp_arch" checklist-value="role.carp_comp_arch" ng-disabled="true"> {{role.carp_comp_arch}}<br>
+                    </label><br>
+                </div>
+            </div>
+        </div>
+
+
+
+    <legend> Requisitos Enviados a Archivo</legend>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Copia de la Resolución Administrativa con Firma de Constancia:</label>
+                <div class="col-sm-2" align="right"></div>
+                <div class="col-sm-10" align="left">
+                    <label ng-repeat="role in datosRequisitosCheckBox">
+                      <input type="checkbox" checklist-model="datos.cop_de_la_res" checklist-value="role.cop_de_la_res" ng-disabled="true"> {{role.cop_de_la_res}}<br>
+                    </label><br>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Copia Informe de Rechazo Firmada:</label>
+                <div class="col-sm-2" align="right"></div>
+                <div class="col-sm-10" align="left">
+                    <label ng-repeat="role in datosRequisitosCheckBox">
+                      <input type="checkbox" checklist-model="datos.arch_dev_np" checklist-value="role.arch_dev_np" ng-disabled="true"> {{role.arch_dev_np}}<br>
+                    </label><br>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Carpeta Completa:</label>
+                <div class="col-sm-2" align="right"></div>
+                <div class="col-sm-10" align="left">
+                    <label ng-repeat="role in datosRequisitosCheckBox">
+                      <input type="checkbox" checklist-model="datos.carp_comp_arch_rech" checklist-value="role.carp_comp_arch_rech" ng-disabled="true"> {{role.carp_comp_arch_rech}}<br>
+                    </label><br>
+                </div>
+            </div>
+        </div>
+
+
+    <legend> Documento Enviado a Archivo</legend>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Copia Formulario de Inspección con Observaciones Firmada/Copia del Detalle de Observaciones a la Solicitud:</label>
+                <div class="col-sm-2" align="right"></div>
+                <div class="col-sm-10" align="left">
+                    <label ng-repeat="role in datosRequisitosCheckBox">
+                      <input type="checkbox" checklist-model="datos.arch_dev_obs" checklist-value="role.arch_dev_obs" ng-disabled="true"> {{role.arch_dev_obs}}<br>
+                    </label><br>
+                </div>
+            </div>
+        </div>
+
+
+    <legend> Fecha de Entrega y Remisión de Documentos</legend>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Fecha de Entrega y Remisión:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.fech_desg}}</label>
+                </div>
+            </div>
+        </div>
+
+    <legend> Foliado y Descripción Desglose</legend>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Número de Hojas del Tramite:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.hojas_recibidas}}</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Descripción: </label>
+                <div class="col-sm-8" align="left">
+                    <textarea id="des" name="des" ng-model="datos.observaciones_i" class="form-control"></textarea>
+                </div>
+            </div>
+        </div> 
+
+
+    <legend> Escaneado Licencia de Funcionamiento/Resolución Administrativa</legend>
+         <div class="col-md-12">
+            <div class="form-group" >
+                <label for="url" >Adjuntar Archivo</label>
+                <div class="controls">
+                    <input type="file" file-model="escaneo"/>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Observaciones: </label>
+                <div class="col-sm-8" align="left">
+                    <textarea id="des" name="des" ng-model="datos.observaciones" class="form-control"></textarea>
+                </div>
+            </div>
+        </div> 
+
+
+        <button data-dismiss="modal" type="button" class="btn btn-danger fa fa-save" ng-disabled="false" ng-click="volver()"><span span class="textoAux"> CANCELAR </span></button>
+            <button ng-click="cargarDatos(datos);guardarData(datos);evalReglasFormulario()" data-dismiss="modal" type="button" class="btn btn-success fa fa-save" ng-disabled="false"><span span class="textoAux"> GUARDAR / CONTINUAR </span></button>
+    
+</div>

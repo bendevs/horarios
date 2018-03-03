@@ -1,0 +1,1228 @@
+
+<script type="text/javascript">
+    
+
+function cocheController($scope,  $rootScope, DreamFactory, CONFIG, sessionService) {
+
+    //$('.clockpicker').clockpicker();
+     $scope.getprueba = function(accionSeleccionada){
+        console.log(accionSeleccionada);
+        console.log("panchito");
+    }
+
+    var fecha= new Date();
+    $scope.fechactual=fecha.getFullYear() + "-" + fecha.getMonth() + "-" + fecha.getDate() + " " + fecha.getHours() + ":" + fecha.getMinutes() + ":" + fecha.getSeconds();
+
+    
+    $scope.tituloForm1 = "TRÁMITE: EMISIÓN DE LICENCIA / AUTORIZACIÓN PARA EL FUNCIONAMIENTO DE SERVICIO DE INTERNET";
+    $scope.titulo2Form1 = "VERIFICACIÓN DE REQUISITOS Y ORDEN DE DEMOLICIÓN - PERSONA NATURAL";
+
+    var requisitos = $scope.getSPCombos('sp_lst_datos_parametricas','{"params": [{"name":"accion","value":"C1"},{"name":"valoparametro1","value":"1"},{"name":"valoparametro2","value":"INTA_INT_JUE"}]}');    
+    requisitos.then(function(respuesta) {
+        $rootScope.datosRequisitosCheckBox = respuesta;
+        //console.log("DATOS REUISITOS", $rootScope.datosRequisitosCheckBox);
+    }, function(reason) {
+        alert('Failed: ' + reason);
+    });
+
+
+    var requisitosCondiciones = $scope.getSPCombos('sp_lst_datos_parametricas','{"params": [{"name":"accion","value":"C3"},{"name":"valoparametro1","value":"INTA_INT_JUE"},{"name":"valoparametro2","value":"1"}]}');
+    //dataT = sessionService.get('DATOSTRAMITE');
+    //console.log("asdas",dataT);
+    requisitosCondiciones.then(function(respuesta) {
+        $rootScope.datosRequisitosCondiciones = respuesta;
+        //console.log($rootScope.datosRequisitosCondiciones);
+    }, function(reason) {
+        alert('Failed: ' + reason);
+    });
+
+    $scope.control1='200';
+    
+
+    $scope.getAccesoInspeccion = function(valor){
+        if (valor=="SI") {
+            $scope.control1='100';
+
+        }else{
+            $scope.control1='200';
+        }
+        console.log(valor);
+        console.log("zarigueyas");
+    }
+
+    var requisitos = $scope.getSPCombos('sp_lst_datos_parametricas','{"params": [{"name":"accion","value":"C1"},{"name":"valoparametro1","value":"1"},{"name":"valoparametro2","value":"INTA_INT_JUE"}]}');
+    //dataT = sessionService.get('DATOSTRAMITE');
+    //console.log("asdas",dataT);
+    
+    requisitos.then(function(respuesta) {
+        $rootScope.datosRequisitosCheckBox = respuesta;
+        console.log("DATOS REUISITOS", $rootScope.datosRequisitosCheckBox);
+    }, function(reason) {
+        alert('Failed: ' + reason);
+    });
+    
+
+    //resid
+    $scope.checkAll = function() {
+        $scope.datos.INT_CON_TEC = $scope.INT_CON_TEC.map(function(item) { return item.resid; });
+        //console.log($scope.datos.INT_CON_TEC);
+      };
+    
+}
+</script>
+
+<div class="wrap" ng-controller="cocheController">
+<form name="frmGenesis" class="form-horizontal" role="form" novalidate>     
+    <legend> Datos Generales de la Actividad</legend>        
+
+       
+
+  
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Formulario De Empadronamiento Y Solicitud De Licencia De Funcionamiento:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.sub_for_emp_sol_lic}}</label>
+                </div>
+            </div>
+        </div>
+
+
+
+ 
+
+
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Datos Generales:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.sub_emi_lic_fun}}</label>
+                </div>
+            </div>
+        </div>
+
+
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Pmc:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.num_pmc}}</label>
+                </div>
+            </div>
+        </div>
+
+
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Tipo De Persona:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.tipo_per}}</label>
+                </div>
+            </div>
+        </div>
+
+
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Datos Del Contribuyente:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.sub_dat_per_nat}}</label>
+                </div>
+            </div>
+        </div>
+
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Nit:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.nit_prop}}</label>
+                </div>
+            </div>
+        </div>
+
+
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Tipo De Documento:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.tip_doc_prop}}</label>
+                </div>
+            </div>
+        </div>
+
+
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Numero De Documento:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.num_dos_prop}}</label>
+                </div>
+            </div>
+        </div>
+
+
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Expedido:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.expedido_prop}}</label>
+                </div>
+            </div>
+        </div>
+
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Primer Nombre:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.pri_nom_prop}}</label>
+                </div>
+            </div>
+        </div>
+
+
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Segundo Nombre:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.segnom_prop}}</label>
+                </div>
+            </div>
+        </div>
+
+
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Tercer Nombre:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.ter_nom_prop}}</label>
+                </div>
+            </div>
+        </div>
+
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Apellido Paterno:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.ape_pat_prop}}</label>
+                </div>
+            </div>
+        </div>
+
+
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Apellido Materno:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.ape_mat_prop}}</label>
+                </div>
+            </div>
+        </div>
+
+
+
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Apellido Casada:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.ape_cas_prop}}</label>
+                </div>
+            </div>
+        </div>
+
+
+
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Telefono</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.telef_prop}}</label>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+
+
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Celular:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.cel_prop}}</label>
+                </div>
+            </div>
+        </div>
+
+
+
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Correo Electronico:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.email_prop}}</label>
+                </div>
+            </div>
+        </div>
+
+
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Identificacion De La Empresa:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.sub_dat_per_jur}}</label>
+                </div>
+            </div>
+        </div>
+
+
+
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Nit</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.num_doc_per_jur}}</label>
+                </div>
+            </div>
+        </div>
+
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Razon Social</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.raz_soc_per_jur}}</label>
+                </div>
+            </div>
+        </div>
+
+
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Datos Del Representante Legal</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.sub_dat_rep_leg}}</label>
+                </div>
+            </div>
+        </div>
+
+
+
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Tipo De Documento</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.tip_doc_rep}}</label>
+                </div>
+            </div>
+        </div>
+
+
+
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Numero De Documento</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.num_doc_rep}}</label>
+                </div>
+            </div>
+        </div>
+
+
+
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Expedido</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.expedido_rep}}</label>
+                </div>
+            </div>
+        </div>
+
+
+  <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Primer Nombre</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.pri_nom_rep}}</label>
+                </div>
+            </div>
+        </div>
+
+
+  <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Segundo Nombre</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.seg_nom_rep}}</label>
+                </div>
+            </div>
+        </div>
+
+  <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Tercer Nombre</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.ter_nom_rep}}</label>
+                </div>
+            </div>
+        </div>
+
+  <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Apellido Paterno</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.ape_pat_rep}}</label>
+                </div>
+            </div>
+        </div>
+
+  <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Apellido Materno</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.ape_mat_rep}}</label>
+                </div>
+            </div>
+        </div>
+
+  <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Apellido Casada</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.ape_cas_rep}}</label>
+                </div>
+            </div>
+        </div>
+
+  <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Telefono Oficina</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.telef_rep}}</label>
+                </div>
+            </div>
+        </div>
+
+  <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Celular</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.cel_rep}}</label>
+                </div>
+            </div>
+        </div>
+
+  <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Correo Electronico</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.email_rep}}</label>
+                </div>
+            </div>
+        </div>
+
+  <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Datos Tecnicos De La Actividad Economica</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.sub_dat_act_eco_nuev}}</label>
+                </div>
+            </div>
+        </div>
+
+  <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Nit</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.nit}}</label>
+                </div>
+            </div>
+        </div>
+
+  <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Denominacion</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.raz_soc}}</label>
+                </div>
+            </div>
+        </div>
+
+
+
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Superficie M2</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.sup}}</label>
+                </div>
+            </div>
+        </div>
+
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Capacidad Aprox:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.cap_aprox}}</label>
+                </div>
+            </div>
+        </div>
+
+
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Horario Inicio De Atencion:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.de_hor}}</label>
+                </div>
+            </div>
+        </div>
+
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Horario Fin De Atencion:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.a_hor}}</label>
+                </div>
+            </div>
+        </div>
+
+
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Fecha De Inicio De La Actividad:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.fecha_ini_act}}</label>
+                </div>
+            </div>
+        </div>
+
+
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >El Establecimiento Es::</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.estab_es}}</label>
+                </div>
+            </div>
+        </div>
+
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Productos Elaborados:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.productoselaborados}}</label>
+                </div>
+            </div>
+        </div>
+
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Actividades Secundarias:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.actividadessecundarias}}</label>
+                </div>
+            </div>
+        </div>
+
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Ubicacion De La Actividad Economica:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.sub_dir_act}}</label>
+                </div>
+            </div>
+        </div>
+
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Macrodistrito:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.macro_act_descrip}}</label>
+                </div>
+            </div>
+        </div>
+
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Distrito</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.dist_act}}</label>
+                </div>
+            </div>
+        </div>
+
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Zona</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.zona_act_descrip}}</label>
+                </div>
+            </div>
+        </div>
+
+
+
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Tipo De Via</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.tip_via_act}}</label>
+                </div>
+            </div>
+        </div>
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Nombre De Via:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.num_act}}</label>
+                </div>
+            </div>
+        </div>
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Factor:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.factor}}</label>
+                </div>
+            </div>
+        </div>
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Numero</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.num_act1}}</label>
+                </div>
+            </div>
+        </div>
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Edificio</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.edificio_act}}</label>
+                </div>
+            </div>
+        </div>
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Bloque</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.bloque_act}}</label>
+                </div>
+            </div>
+        </div>
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Piso:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.piso_act}}</label>
+                </div>
+            </div>
+        </div>
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Dpto/Of/Loc::</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.dpto_of_loc}}</label>
+                </div>
+            </div>
+        </div>
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Telefono:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.tel_act1}}</label>
+                </div>
+            </div>
+        </div>
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Casilla:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.casilla}}</label>
+                </div>
+            </div>
+        </div>
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Cuenta Energia Electrica:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.cod_luz}}</label>
+                </div>
+            </div>
+        </div>
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.sub_req_sol}}</label>
+                </div>
+            </div>
+        </div>
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Tipo De Actividad:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.tip_act}}</label>
+                </div>
+            </div>
+        </div>
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Tipo De Licencia:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.tipo_lic_descrip}}</label>
+                </div>
+            </div>
+        </div>
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Tipo De Categoria:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.categoria_agrupada_descripcion}}</label>
+                </div>
+            </div>
+        </div>
+
+   
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Actividad Desarrollada:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.categoria_descrip}}</label>
+                </div>
+            </div>
+        </div>
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Requisitos Generales:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.sub_req_gen_nat}}</label>
+                </div>
+            </div>
+        </div>
+
+
+
+
+        <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.requisitos_actividad_economica}}</label>
+                </div>
+            </div>
+        </div>
+   <div class="col-sm-12" align="right">
+
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Informe De Antecedentes:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.sub_info_antec}}</label>
+                </div>
+            </div>
+        </div>
+           <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.info }}</label>
+                </div>
+            </div>
+        </div>
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Asignacion De Inspector Y Programacion De Inspección:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.sub_insp}}</label>
+                </div>
+            </div>
+        </div>
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Nombre Del Inpector Integral:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.nom_ins}}</label>
+                </div>
+            </div>
+        </div>
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Fecha De Inspeccion:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.fech_insp}}</label>
+                </div>
+            </div>
+        </div>
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Condiciones Generales:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.tip_act_insp}}</label>
+                </div>
+            </div>
+        </div>
+
+           <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.requisitos_tecnicos}}</label>
+                </div>
+            </div>
+        </div>
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Inspeccion Y Elaboracion De Recomendacion Inspector Integral:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.sub_res_insp}}</label>
+                </div>
+            </div>
+        </div>
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Resultado De La Inspeccion:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.resultado_inspeccion}}</label>
+                </div>
+            </div>
+        </div>
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Elaboracion De Informe De Recomendacion:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.sub_inf_aprobado}}</label>
+                </div>
+            </div>
+        </div>
+
+
+
+           <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.inf_aprobado}}</label>
+                </div>
+            </div>
+        </div>
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Elaboracion De Informe De Recomendacion:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.sub_inf_rechazo}}</label>
+                </div>
+            </div>
+        </div>
+
+           <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.inf_rechazo }}</label>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Elaboracion De Informe De Recomendacion:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.obs_insp}}</label>
+                </div>
+            </div>
+        </div>
+
+
+           <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Nombre Inspector:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.dat_insp_patr}}</label>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+   
+
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Foliado Y Descripcion - Inspeccion:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.sub_foliado}}</label>
+                </div>
+            </div>
+        </div>
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Numero De Hojas Adjuntadas Al Tramite:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.hojas_recibidas}}</label>
+                </div>
+            </div>
+        </div>
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Descripcion:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.observaciones_i}}</label>
+                </div>
+            </div>
+        </div>
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Elaboracion De Informe De Recomendacion:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.sub_rec_zoo}}</label>
+                </div>
+            </div>
+        </div>
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Resultado De La Inspeccion Uaia:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.res_insp}}</label>
+                </div>
+            </div>
+        </div>
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Resultado De La Inspeccion:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.res_insp}}</label>
+                </div>
+            </div>
+        </div>
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Resultado De La Inspeccion:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.sub_rec_rech}}</label>
+                </div>
+            </div>
+        </div>
+           <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.inf_obs }}</label>
+                </div>
+            </div>
+        </div>
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Resultado De La Inspeccion:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.sub_rec_rech}}</label>
+                </div>
+            </div>
+        </div>
+           <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Elaboracion De Informe De Recomendacion:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.sub_rec_lab}}</label>
+                </div>
+            </div>
+        </div>
+           <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Resultado De La Inspeccion:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.res_insp }}</label>
+                </div>
+            </div>
+        </div>
+           <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Resultado De La Inspeccion:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.sub_rec_apr }}</label>
+                </div>
+            </div>
+        </div>
+           <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.inf_obs }}</label>
+                </div>
+            </div>
+        </div>
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Elaboracion De Informe De Recomendacion:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.sub_rec_lab}}</label>
+                </div>
+            </div>
+        </div>
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Resultado De La Inspeccion Lab:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.res_insp}}</label>
+                </div>
+            </div>
+        </div>
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Resultado De La Inspeccion:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.sub_rec_apr}}</label>
+                </div>
+            </div>
+        </div>
+
+           <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.inf_apr }}</label>
+                </div>
+            </div>
+        </div>
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Resultado De La Inspeccion:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.sub_rec_rech}}</label>
+                </div>
+            </div>
+        </div>
+
+
+           <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.inf_rech }}</label>
+                </div>
+            </div>
+        </div>
+ <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Resultado De La Inspeccion:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.sub_rec_obs}}</label>
+                </div>
+            </div>
+        </div>
+
+
+           <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.inf_obs }}</label>
+                </div>
+            </div>
+        </div>
+
+           <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Elaboracion De Informe:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.sub_inf}}</label>
+                </div>
+            </div>
+        </div>
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Fecha Inspeccion:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.fech_insp_patr}}</label>
+                </div>
+            </div>
+        </div>
+           <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.sub_aux_pat }}</label>
+                </div>
+            </div>
+        </div>
+           <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.ela_de_inf_apb}}</label>
+                </div>
+            </div>
+        </div>
+
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Archivo Fotografico:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.sub_fotos}}</label>
+                </div>
+            </div>
+        </div>
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Fotografias:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.fotos}}</label>
+                </div>
+            </div>
+        </div>
+
+
+
+
+         <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.fotos2}}</label>
+                </div>
+            </div>
+        </div>
+
+
+         <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.fotos3}}</label>
+                </div>
+            </div>
+        </div>
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Tecnico Ude:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.link}}</label>
+                </div>
+            </div>
+        </div>
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Foliado Y Descripcion - Uptm:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.sub_foliado}}</label>
+                </div>
+            </div>
+        </div>
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Numero De Hojas Adjuntas Al Tramite:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.hojas_recibidas}}</label>
+                </div>
+            </div>
+        </div>
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Descripcion:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.observaciones_i}}</label>
+                </div>
+            </div>
+        </div>
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Validacion Informe Bien Patrimonial:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.sub_validacion}}</label>
+                </div>
+            </div>
+        </div>
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Resultado Revision:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.firma}}</label>
+                </div>
+            </div>
+        </div>
+   <div class="col-sm-12" align="right">
+            <div class="form-group" >
+                <label class="col-sm-4 control-label no-padding-right" for="url" >Observaciones:</label>
+                <div class="col-sm-8" align="left">
+                    <label for="url" >{{datos.observaciones}}</label>
+                </div>
+            </div>
+        </div>
+  
+        <div class="modal-footer">
+            <!-- <button id = "INT_CANCELAR" data-dismiss="modal" type="button" class="btn btn-danger fa fa-save" ng-disabled="false" ng-click="volver()"><span span class="textoAux"> CANCELAR </span></button>
+            <button id = "INT_ACEPTAR" ng-show="siguiente!=null && casoActual.actsigid!=0" ng-click="cargarDatos(datos);guardarData(datos);cargarFormulario(siguiente,posicion);" data-dismiss="modal" type="button" class="btn btn-success fa fa-save" ng-disabled="false"><span span class="textoAux"> GUARDAR / CONTINUAR </span></button> -->
+            <!-- <button data-dismiss="modal" type="button" class="btn btn-danger fa fa-save" ng-disabled="false" ng-click="volver()"><span span class="textoAux"> CANCELAR </span></button>
+            <button ng-click="cargarDatos(datos);guardarData(datos);" data-dismiss="modal" type="button" class="btn btn-success fa fa-save" ng-disabled="false"><span span class="textoAux"> GUARDAR / CONTINUAR </span></button>
+            <button id = "btnGuardar" ng-show="siguiente==null && casoActual.actsigid!=0" ng-click="cargarDatos(datos);guardarData(datos);derivar();" data-dismiss="modal" type="button" class="btn btn-success fa fa-save" ng-disabled="false"><span span class="textoAux"> DERIVAR </span></button>
+            <button id = "btnGuardar" ng-show="casoActual.actsigid==0" data-dismiss="modal" type="button" class="btn btn-success fa fa-save" ng-disabled="false" ng-click="cerrarCaso()"><span span class="textoAux"> CERRAR CASO </span></button> -->
+            <button data-dismiss="modal" type="button" class="btn btn-danger fa fa-save" ng-disabled="false" ng-click="volver()"><span span class="textoAux"> CANCELAR </span></button>
+            <button ng-click="cargarDatos(datos);guardarData(datos);" data-dismiss="modal" type="button" class="btn btn-success fa fa-save" ng-disabled="false"><span span class="textoAux"> GUARDAR / CONTINUAR </span></button>
+
+        </div>
+</form>
+</div>

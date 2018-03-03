@@ -1,0 +1,149 @@
+<div class="col-md-12" class="row" ng-controller="servicio_limpiezaController" data-ng-init="inicioCrear()">
+    <table  width="100%">
+        <td><h3>SERVICIO DE LIMPIEZA</h3></td> 
+    </table>
+    <br/>
+ 
+
+
+
+   <div class="modal-body" >
+     <div class="col-md-3">
+            <div class="form-group">
+                <label class="col-sm-3 control-label no-padding-right" for="url">FECHA INGRESO:</label>
+                <div class="controls">
+                    <p class="input-group">
+                    <input name="FECHA1" id="registro1[]" type="text" class="form-control" datepicker-popup="" ng-model="registro.FECHA1" is-open="startDateOpened1" ng-required="true" close-text="Close" ng-disabled="desabilitado"/>
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-default" ng-click="startDateOpen1($event)"><i class="glyphicon glyphicon-calendar"></i>
+                        </button>
+                    </span>
+                </p>
+                </div>
+            </div>
+        </div> 
+        <div class="col-md-3">
+            <div class="form-group">
+                <label class="col-sm-3 control-label no-padding-right" for="url">FECHA SALIDA:</label>
+                    <div class="controls">    
+                        <p class="input-group"><input name="FECHA2" id="registro2[]" type="text" class="form-control" datepicker-popup="" ng-model="registro.FECHA2" is-open="startDateOpened" ng-required="true" close-text="Close" ng-disabled="desabilitado"/>
+                        <span class="input-group-btn">
+                            <button type="button" class="btn btn-default" ng-click="startDateOpen($event)"><i class="glyphicon glyphicon-calendar"></i>
+                            </button>
+                        </span></p>
+                    </div>
+                </div>
+            </div> 
+
+    <div class="col-md-6">
+                <button ng-click="getMostrarTabla('USG_SER_LIMP',registro);" data-dismiss="modal" type="button" class="btn btn-primary" >Buscar</button>
+            </div>
+                  <!-- carga los procesos de la base de datos segun el espacio de trabajo -->                     
+               
+<!-- carga de casos segun el caso que se haya presentado  -->
+           <!-- <div class="col-md-12"   >-->
+              <div class="col-md-7">
+                <div class="form-group">
+                    <label for="category" >Busqueda por:</label>
+                    <div class="controls">
+
+                        <select ng-model="datosCargar.campo" id="campo" name="campo" class="form-control"  ng-required="true" ng-change="cargarDatos(datosCargar.campo,33)" >
+                            <option style="display:none" value="">-- Elegir--</option>
+                       
+                       <option value = '7'>UNIDAD SOLICITANTE</option>
+                       <option value = '6'>NOMBRE DE LA EMPRESA</option>
+                                                                             
+                        </select>
+                        
+                    </div>
+                </div>
+            </div>
+
+
+
+               
+
+               <div class="col-md-7 col-sm-11 col-xs-12"ng-if="datosCargar.campo==='7' ">
+                    <div class="form-group">
+                        <label >Opciones </label>   
+                        <input  ng-value="&nbsp;" ng-model="datosCargar.id" name="wsnombre" id="wsnombre" class="form-control" type="text" placeholder="Ingrese Unidad Solicitante" ng-disabled="only" ng-required="true" onkeyUp="return conMayusculas(this)" ng-change="getTabla('USG_SER_LIMP',datosCargar.id,'USG_UO_SOL_VALOR')">
+
+                     
+                    </div>
+                </div>
+            
+          <div class="col-md-7 col-sm-11 col-xs-12"ng-if="datosCargar.campo==='6' ">
+                    <div class="form-group">
+                        <label >Opciones </label>   
+                        <input  ng-value="&nbsp;" ng-model="datosCargar.id" name="wsnombre" id="wsnombre" class="form-control" type="text" placeholder="Ingrese Nombre de la Empresa" ng-disabled="only" ng-required="true" onkeyUp="return conMayusculas(this)" ng-change="getTabla('USG_SER_LIMP',datosCargar.id,'USG_NOM_EMP_VALOR')">
+
+                     
+                    </div>
+                </div>
+               <div class="col-md-7 col-sm-11 col-xs-12"ng-if="datosCargar.campo==='3' ">
+                    <div class="form-group">
+                        <label >Opciones </label>   
+                        <input  ng-value="&nbsp;" ng-model="datosCargar.id" name="wsnombre" id="wsnombre" class="form-control" type="text" placeholder="Ingrese nombre el tipo de vehiculo" ng-disabled="only" ng-required="true" onkeyUp="return conMayusculas(this)" ng-change="getTabla('USG_SDMV',datosCargar.id,'USG_VEHI')">
+
+                     
+                    </div>
+                </div>
+       
+            <br>
+            <br>
+                  
+   <!-- carga de casos segun el caso que se haya presentado  -->                 
+       
+   
+        <div class="col-md-12" >
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                       <h5>Datos </h5> 
+                       <div ibox-tools></div>
+                       <div align="right">
+                            <a class="btn btn-primary" ng-click="getreportemant(datosCargar.campo)" >
+                                <i class="glyphicon fa fa-eye"></i>
+                                 Imprimir Listado
+                            </a>
+                        </div>
+                    </div>  
+                <div class="ibox-content" >
+                    <div class="table-responsive"> 
+                         <table  class="table table-striped"  >
+                            <thead>      
+                                <th>#&nbsp;</th>
+                                <th>Codigo &nbsp;</th>
+                                <th>Unidad Solicitante&nbsp;</th>
+                                <th>Nombre de la empresa&nbsp;</th>
+                                <th>Nro de Contrato&nbsp;</th>
+                              
+                               
+                            </thead>
+                    <tbody> 
+                  <tr ng-repeat="grupo in grupos" >
+                    <td>{{grupo.casid}}</td>
+                    <td>{{grupo.codigo}}</td>
+                    <td>{{grupo.uni_solicitante}}</td>
+                    <td>{{grupo.nom_empresa }}</td> 
+                    <td>{{grupo.nro_contrato}}</td>
+                  
+
+                 <td data-title="'VER'"><a  tooltip = "Imprimir" ng-click="ejemplo3(grupo.casid,33)" class="btn-floating"><i class="fa fa-print" ></i></a></td>
+                  
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
+          </div>
+        </div>
+         </div>
+        </div>
+
+
+
+
+
+ </div>
+
+</div>

@@ -1,0 +1,1132 @@
+<script>
+function cocheController($scope,  $rootScope, DreamFactory, CONFIG, sessionService ) {
+    var fecha= new Date();
+    $scope.fechactual=fecha.getFullYear() + "-" + fecha.getMonth() + "-" + fecha.getDate() + " " + fecha.getHours() + ":" + fecha.getMinutes() + ":" + fecha.getSeconds();
+    var misDatos = {
+        "procedure_name":"usuarioslst",
+        "body":{
+        }
+    };
+
+    DreamFactory.api[CONFIG.SERVICE].callStoredProcWithParams(misDatos).success(function (results){
+        if(results.length > 0){
+            //console.log(results);
+            $scope.usuarios = results[0];
+        }else{                        
+        }
+    }).error(function(results){
+    });
+    
+    $scope.coche = {
+        marca: "Audi",
+        modelo: "A3",
+        nombreCompleto: function() {
+            var x;
+            x = $scope.coche;
+            return x.marca + " " + x.modelo;
+        }
+    };    
+    $scope.tituloForm1 = "TRÁMITE: EMISIÓN DE LICENCIA / AUTORIZACIÓN PARA EL FUNCIONAMIENTO DE SERVICIO DE INTERNET";
+    $scope.titulo2Form1 = "VERIFICACIÓN DE REQUISITOS Y ORDEN DE DEMOLICIÓN - PERSONA NATURAL";
+
+
+    //   datos de requisitos de para obtener Licencia / Autorizacion 
+
+    $scope.checkAll = function() {
+        $scope.datos.AE_REQ = $scope.AE_REQ.map(function(item) { return item.resid; });
+        console.log($scope.datos.AE_REQ);
+      };
+
+    $scope.control1='200';
+    
+
+    $scope.getAccesoInspeccion = function(valor){
+        if (valor=="OBSERVADO") {
+            $scope.control1='100';
+
+        }else{
+            $scope.control1='200';
+        }
+        console.log(valor);
+        console.log("zarigueyas");
+    }
+
+    $scope.getListache = function(dato){
+        console.log("Check -> "+dato);
+        var ddd= '{"params": [{"name":"accion","value":"C1"},{"name":"valoparametro1","value":"1"},{"name":"valoparametro2","value":"'+dato+'"}]}';
+        var requisitos = $scope.getSPCombos('sp_lst_datos_parametricas',ddd);
+        requisitos.then(function(respuesta) {
+            $rootScope.datosRequisitosCheckBox = respuesta;
+            console.log("DATOS REUISITOS", $rootScope.datosRequisitosCheckBox);
+        }, function(reason) {
+            alert('Failed: ' + reason);
+        });
+    }
+
+
+}
+</script>
+<div class="wrap" ng-controller="cocheController">	
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Formulario de empadronamiento y solicitud de licencia de funcionamiento:</label>
+			<div class='col-sm-8' align='left'>
+          	<title>{{datos.f01_sub_for_emp_sol_lic}}</title>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Datos generales:</label>
+			<div class='col-sm-8' align='left'>
+          	<legend for='url' >{{datos.f01_sub_emi_lic_fun}}</legend>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Pmc:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_num_pmc' name='f01_num_pmc' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Id actividad econ&oacute;mica:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_id_actividad_economica' name='f01_id_actividad_economica' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Tipo de persona:</label>
+			<div class='col-sm-8' align='left'>
+          	<select id='f01_tipo_per' name='f01_tipo_per'></select>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Datos del contribuyente:</label>
+			<div class='col-sm-8' align='left'>
+          	<legend for='url' >{{datos.f01_sub_dat_per_nat}}</legend>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Nit:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_nit_prop' name='f01_nit_prop' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Tipo de documento:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_tip_doc_prop' name='f01_tip_doc_prop' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >N&uacute;mero de documento:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_num_dos_prop' name='f01_num_dos_prop' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Expedido:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_expedido_prop' name='f01_expedido_prop' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Primer nombre:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_pri_nom_prop' name='f01_pri_nom_prop' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Segundo nombre:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_seg_nom_prop' name='f01_seg_nom_prop' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Tercer nombre:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_ter_nom_prop' name='f01_ter_nom_prop' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Apellido paterno:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_ape_pat_prop' name='f01_ape_pat_prop' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Apellido materno:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_ape_mat_prop' name='f01_ape_mat_prop' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Apellido de casada:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_ape_cas_prop' name='f01_ape_cas_prop' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Tel&eacute;fono:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_telef_prop' name='f01_telef_prop' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Celular:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_cel_prop' name='f01_cel_prop' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Correo electr&oacute;nico:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_email_prop' name='f01_email_prop' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Identificaci&oacute;n de la empresa:</label>
+			<div class='col-sm-8' align='left'>
+          	<legend for='url' >{{datos.f01_sub_dat_per_jur}}</legend>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Nit:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_num_doc_per_jur' name='f01_num_doc_per_jur' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Raz&oacute;n social:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_raz_soc_per_jur' name='f01_raz_soc_per_jur' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Datos del representante legal:</label>
+			<div class='col-sm-8' align='left'>
+          	<legend for='url' >{{datos.f01_sub_dat_rep_leg}}</legend>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Tipo de documento:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_tip_doc_rep' name='f01_tip_doc_rep' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >N&uacute;mero de documento:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_num_doc_rep' name='f01_num_doc_rep' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Expedido:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_expedido_rep' name='f01_expedido_rep' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Primer nombre:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_pri_nom_rep' name='f01_pri_nom_rep' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Segundo nombre:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_seg_nom_rep' name='f01_seg_nom_rep' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Tercer nombre:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_ter_nom_rep' name='f01_ter_nom_rep' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Apellido paterno:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_ape_pat_rep' name='f01_ape_pat_rep' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Apellido materno:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_ape_mat_rep' name='f01_ape_mat_rep' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Apellido casada:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_ape_cas_rep' name='f01_ape_cas_rep' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Telefono oficina:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_telef_rep' name='f01_telef_rep' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Celular:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_cel_rep' name='f01_cel_rep' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Correo electronico:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_email_rep' name='f01_email_rep' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Datos tecnicos de la actividad economica:</label>
+			<div class='col-sm-8' align='left'>
+          	<legend for='url' >{{datos.f01_sub_dat_act_eco_nuev}}</legend>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Nit:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_nit' name='f01_nit' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Denominacion:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_raz_soc' name='f01_raz_soc' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Sucursal:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_num_actividad_MatrSuc' name='f01_num_actividad_MatrSuc' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Superficie m2:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_sup' name='f01_sup' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Horario inicio de atencion:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_de_hor' name='f01_de_hor' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Horario fin de atencion:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_a_hor' name='f01_a_hor' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Fecha de inicio de la actividad:</label>
+			<div class='col-sm-8' align='left'>
+				<input id='f01_fecha_ini_act' name='f01_fecha_ini_act' class='form-control' type='Date' ng-disabled='desabilitado' ><br>
+       	</div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >El establecimiento es::</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_estab_es' name='f01_estab_es' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Productos elaborados:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_productosElaborados' name='f01_productosElaborados' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Actividades secundarias:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_actividadesSecundarias' name='f01_actividadesSecundarias' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Ubicacion de la actividad economica:</label>
+			<div class='col-sm-8' align='left'>
+          	<legend for='url' >{{datos.f01_sub_dir_act}}</legend>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Macrodistrito:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_macro_act_descrip' name='f01_macro_act_descrip' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Distrito:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_dist_act' name='f01_dist_act' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Zona:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_zona_act_descrip' name='f01_zona_act_descrip' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Tipo de via:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_tip_via_act' name='f01_tip_via_act' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Nombre de via:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_num_act' name='f01_num_act' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >N&uacute;mero:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_num_act1' name='f01_num_act1' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Edificio:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_edificio_act' name='f01_edificio_act' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Bloque:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_bloque_act' name='f01_bloque_act' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Piso:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_piso_act' name='f01_piso_act' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Dpto/of/loc::</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_dpto_of_loc' name='f01_dpto_of_loc' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Tel&eacute;fono:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_tel_act1' name='f01_tel_act1' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+			<div class='col-sm-8' align='left'>
+          	<legend for='url' >{{datos.f01_sub_req_sol}}</legend>
+          	</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Tipo de actividad:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_tip_act' name='f01_tip_act' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Tipo de licencia:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_tipo_lic_descrip' name='f01_tipo_lic_descrip' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Tipo de categoria:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_categoria_agrupada_descripcion' name='f01_categoria_agrupada_descripcion' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Actividad desarrollada:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_categoria_descrip' name='f01_categoria_descrip' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Verificacion de antecedentes:</label>
+			<div class='col-sm-8' align='left'>
+          	<legend for='url' >{{datos.f02_sub_la_solic_proc}}</legend>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >La solicitud::</label>
+			<div class='col-sm-8' align='left'>
+          	<select id='f02_la_sol_proced' name='f02_la_sol_proced'></select>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Informe de antecedentes:</label>
+			<div class='col-sm-8' align='left'>
+          	<legend for='url' >{{datos.f02_sub_info_antec_2}}</legend>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+			<div class='col-sm-8' align='left'>
+				<textarea id='f02_info2' name='f02_info2' class='form-control' required ng-disabled='desabilitado'></textarea>
+			</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Foliado y descripci&oacute;n - antecedentes:</label>
+			<div class='col-sm-8' align='left'>
+          	<legend for='url' >{{datos.f02_sub_foliado}}</legend>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Numero de hojas adjuntas al tramite:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f02_hojas_recibidas' name='f02_hojas_recibidas' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Descripci&oacute;n:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f02_observaciones_i' name='f02_observaciones_i' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Resultado t&eacute;cnico ude:</label>
+			<div class='col-sm-8' align='left'>
+          	<legend for='url' >{{datos.f04_sub_inf}}</legend>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >La solicitud es ::</label>
+			<div class='col-sm-8' align='left'>
+          	<select id='f04_res_solicitud_upaee' name='f04_res_solicitud_upaee'></select>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Solicitud aprobada:</label>
+			<div class='col-sm-8' align='left'>
+          	<legend for='url' >{{datos.f04_sub_aprob}}</legend>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Nro orden form 401/402:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_nro_orden' name='f01_nro_orden' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Fecha emisi&oacute;n:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_fecha_imp' name='f01_fecha_imp' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Fecha vencimiento:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f01_fecha_fin_act' name='f01_fecha_fin_act' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Foliado y descripci&oacute;n - emisi&oacute;n de licencia:</label>
+			<div class='col-sm-8' align='left'>
+          	<legend for='url' >{{datos.f08_sub_foliado}}</legend>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Numero de hojas adjuntas al tramite:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f08_hojas_recibidas' name='f08_hojas_recibidas' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Descripci&oacute;n:</label>
+			<div class='col-sm-8' align='left'>
+				<textarea id='f08_observaciones_i' name='f08_observaciones_i' class='form-control' required ng-disabled='desabilitado'></textarea>
+			</div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Foliado y descripci&oacute;n - resoluci&oacute;n:</label>
+			<div class='col-sm-8' align='left'>
+          	<legend for='url' >{{datos.f09_sub_foliado}}</legend>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >N&uacute;mero de hojas adjuntas al tramite:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f09_hojas_recibidas' name='f09_hojas_recibidas' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Descripci&oacute;n:</label>
+			<div class='col-sm-8' align='left'>
+				<textarea id='f09_observaciones_i' name='f09_observaciones_i' class='form-control' required ng-disabled='desabilitado'></textarea>
+			</div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Foliado y descripci&oacute;n - gesti&oacute;n:</label>
+			<div class='col-sm-8' align='left'>
+          	<legend for='url' >{{datos.f10_sub_foliado}}</legend>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >N&uacute;mero de hojas adjuntas al tramite:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f10_hojas_recibidas' name='f10_hojas_recibidas' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Descripci&oacute;n:</label>
+			<div class='col-sm-8' align='left'>
+				<textarea id='f10_observaciones_i' name='f10_observaciones_i' class='form-control' required ng-disabled='desabilitado'></textarea>
+			</div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Remisi&oacute;n para correcci&oacute;n:</label>
+			<div class='col-sm-8' align='left'>
+          	<legend for='url' >{{datos.f11_sub_correccion_impresion}}</legend>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Envio a la upe para correcci&oacute;n de licencia:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f11_correccion_impresion' name='f11_correccion_impresion' class='form-control' type='checkbox'><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Falta de seguimiento del ciudadano:</label>
+			<div class='col-sm-8' align='left'>
+          	<legend for='url' >{{datos.f11_sub_falta_seg}}</legend>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Remitir el tramite a archivo por falta de seguimiento del ciudadano:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f11_falta_seg' name='f11_falta_seg' class='form-control' type='checkbox'><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Documentos enviados a archivo:</label>
+			<div class='col-sm-8' align='left'>
+          	<legend for='url' >{{datos.f11_sub_req_arch}}</legend>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Licencia de funcionamiento original/r.a. de rechazo/detalle observaciones al tramite:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f11_lic_orig' name='f11_lic_orig' class='form-control' type='checkbox'><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Formulario 401/402 original:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f11_form_arch' name='f11_form_arch' class='form-control' type='checkbox'><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Carpeta completa:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f11_carp_comp' name='f11_carp_comp' class='form-control' type='checkbox'><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Requisitos entregados al solicitante:</label>
+			<div class='col-sm-8' align='left'>
+          	<legend for='url' >{{datos.f06_sub_req_sol_ap}}</legend>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Licencia de funcionamiento:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f06_lic_fun' name='f06_lic_fun' class='form-control' type='checkbox'><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Formulario 401/402:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f110_form_401_402' name='f110_form_401_402' class='form-control' type='checkbox'><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Requisitos entregados al solicitante:</label>
+			<div class='col-sm-8' align='left'>
+          	<legend for='url' >{{datos.f11_sub_dev_sol_rech}}</legend>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Resoluci&oacute;n administrativa macrodistrital de rechazo:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f11_dev_sol_rech' name='f11_dev_sol_rech' class='form-control' type='checkbox'><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Requisitos entregados al solicitante:</label>
+			<div class='col-sm-8' align='left'>
+          	<legend for='url' >{{datos.f11_sub_dev_sol_np}}</legend>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Detalle de observaciones a la solicitud:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f11_dev_sol_np_obs' name='f11_dev_sol_np_obs' class='form-control' type='checkbox'><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Requisitos entregados al solicitante:</label>
+			<div class='col-sm-8' align='left'>
+          	<legend for='url' >{{datos.f11_sub_dev_sol_obs}}</legend>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Formulario de inspecci&oacute;n con observaciones/detalle de observaciones a la solicitud:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f11_dev_sol_obs' name='f11_dev_sol_obs' class='form-control' type='checkbox'><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Documentos entregados al solicitante:</label>
+			<div class='col-sm-8' align='left'>
+          	<legend for='url' >{{datos.f11_sub_obs_com_serv_n}}</legend>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+			<div class='col-sm-8' align='left'>
+          	<input id='f11_com_serv_n' name='f11_com_serv_n' class='form-control' type='checkbox'><br>
+          </div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Documentos entregados al solicitante:</label>
+			<div class='col-sm-8' align='left'>
+          	<legend for='url' >{{datos.f11_sub_obs_com_serv_j}}</legend>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+			<div class='col-sm-8' align='left'>
+          	<input id='f11_com_serv_j' name='f11_com_serv_j' class='form-control' type='checkbox'><br>
+          </div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Documentos entregados al solicitante:</label>
+			<div class='col-sm-8' align='left'>
+          	<legend for='url' >{{datos.f11_sub_obs_alim_beb_n}}</legend>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+			<div class='col-sm-8' align='left'>
+          	<input id='f11_alim_beb_nat' name='f11_alim_beb_nat' class='form-control' type='checkbox'><br>
+          </div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Documentos entregados al solicitante:</label>
+			<div class='col-sm-8' align='left'>
+          	<legend for='url' >{{datos.f11_sub_obs_alim_beb_j}}</legend>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+			<div class='col-sm-8' align='left'>
+          	<input id='f11_alim_beb_jur' name='f11_alim_beb_jur' class='form-control' type='checkbox'><br>
+          </div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Documentos entregados al solicitante:</label>
+			<div class='col-sm-8' align='left'>
+          	<legend for='url' >{{datos.f11_sub_obs_jue_cent_n}}</legend>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+			<div class='col-sm-8' align='left'>
+          	<input id='f11_jue_cent_n' name='f11_jue_cent_n' class='form-control' type='checkbox'><br>
+          </div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Documentos entregados al solicitante:</label>
+			<div class='col-sm-8' align='left'>
+          	<legend for='url' >{{datos.f11_sub_obs_jue_cent_j}}</legend>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+			<div class='col-sm-8' align='left'>
+          	<input id='f11_jue_cent_j' name='f11_jue_cent_j' class='form-control' type='checkbox'><br>
+          </div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Documentos entregados al solicitante:</label>
+			<div class='col-sm-8' align='left'>
+          	<legend for='url' >{{datos.f11_sub_obs_act_ind_n}}</legend>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+			<div class='col-sm-8' align='left'>
+          	<input id='f11_act_ind_n' name='f11_act_ind_n' class='form-control' type='checkbox'><br>
+          </div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Documentos entregados al solicitante:</label>
+			<div class='col-sm-8' align='left'>
+          	<legend for='url' >{{datos.f11_sub_obs_act_ind_j}}</legend>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+			<div class='col-sm-8' align='left'>
+          	<input id='f11_act_ind_j' name='f11_act_ind_j' class='form-control' type='checkbox'><br>
+          </div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Documento enviado a archivo:</label>
+			<div class='col-sm-8' align='left'>
+          	<legend for='url' >{{datos.f11_dev_arc1_np}}</legend>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Copia licencia de funcionamiento firmada:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f11_dev_arc2_np' name='f11_dev_arc2_np' class='form-control' type='checkbox'><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Copia del formulario 401/402 firmado:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f11_form_401_402_arch' name='f11_form_401_402_arch' class='form-control' type='checkbox'><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Carpeta completa:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f11_carp_comp_arch' name='f11_carp_comp_arch' class='form-control' type='checkbox'><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Documento enviado a archivo:</label>
+			<div class='col-sm-8' align='left'>
+          	<legend for='url' >{{datos.f11_sub_arch_dev_rech}}</legend>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Copia de la resolucion administrativa macrodistrital de rechazo firmada:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f11_arch_dev_rech' name='f11_arch_dev_rech' class='form-control' type='checkbox'><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Carpeta completa:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f11_carp_comp_arch_rech' name='f11_carp_comp_arch_rech' class='form-control' type='checkbox'><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Documento enviado a archivo:</label>
+			<div class='col-sm-8' align='left'>
+          	<legend for='url' >{{datos.f11_sub_arch_dev_np}}</legend>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Copia del detalle de observaciones a la solicitud:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f11_arch_dev_np_obs' name='f11_arch_dev_np_obs' class='form-control' type='checkbox'><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Carpeta completa:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f11_carp_comp_rech' name='f11_carp_comp_rech' class='form-control' type='checkbox'><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Documento enviado a archivo:</label>
+			<div class='col-sm-8' align='left'>
+          	<legend for='url' >{{datos.f11_sub_arch_dev_obs}}</legend>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Copia formulario de inspecci&oacute;n con observaciones firmada/copia del detalle de observaciones a la solicitud:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f11_arch_dev_obs' name='f11_arch_dev_obs' class='form-control' type='checkbox'><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Foliado y descripci&oacute;n - desglose:</label>
+			<div class='col-sm-8' align='left'>
+          	<legend for='url' >{{datos.f11_sub_foliado}}</legend>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Numero de hojas para archivo:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f11_hojas_recibidas' name='f11_hojas_recibidas' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Descripci&oacute;n:</label>
+			<div class='col-sm-8' align='left'>
+				<textarea id='f11_observaciones_i' name='f11_observaciones_i' class='form-control' required ng-disabled='desabilitado'></textarea>
+			</div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Escaneado licencia de funcionamiento/resolucion administrativa:</label>
+			<div class='col-sm-8' align='left'>
+          	<legend for='url' >{{datos.f11_sub_escaneo}}</legend>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Adjuntar archivo:</label>
+			<div class='col-sm-8' align='left'>
+          	<input id='f11_escaneo' name='f11_escaneo' class='form-control' type='text' ng-disabled='desabilitado' ><br>
+          </div>
+		</div>
+	</div>
+	<div class='col-sm-12' align='right'>
+		<div class='form-group' >
+      	<label class='col-sm-4 control-label no-padding-right' for='url' >Observaciones:</label>
+			<div class='col-sm-8' align='left'>
+				<textarea id='f11_observaciones' name='f11_observaciones' class='form-control' required ng-disabled='desabilitado'></textarea>
+			</div>
+		</div>
+	</div>
+	<div class="modal-footer">
+        <button data-dismiss="modal" type="button" class="btn btn-danger fa fa-save" ng-disabled="false" ng-click="volver()"><span span class="textoAux"> CANCELAR </span></button>
+        <button ng-click="cargarDatos(datos);guardarData(datos);" data-dismiss="modal" type="button" class="btn btn-success fa fa-save" ng-disabled="false"><span span class="textoAux"> GUARDAR / CONTINUAR </span></button>
+    </div>
+</div>

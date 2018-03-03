@@ -1,0 +1,21 @@
+<html>
+<head>
+	<title> ..:: Acceso Restringido ::.. </title>
+	<!--meta http-equiv="Refresh" content="3;url=http://localhost:3001/24-7beta-master/AngularFrontEnd/index.html"-->
+	<script language="JavaScript">
+		function redireccionar() {
+			var partes = document.location.href.split("/");
+			url = "http://" + partes[2] + "/" + partes[3] + "/" + partes[4] + "/index.html";
+			setTimeout("location.href='" + url + "'", 3000);
+		}
+	</script>
+</head>
+<body bgcolor="#000000" onLoad="redireccionar()">
+	<center>
+		<font color="#FFFFFF"><h1>24/7</h1>
+			<br>
+			<h2>Estructura Basica ..... !!!</h2>
+		</font>
+	</center>
+</body>
+</html>

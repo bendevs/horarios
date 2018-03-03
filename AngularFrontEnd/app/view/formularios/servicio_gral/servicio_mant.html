@@ -1,0 +1,294 @@
+<div class="col-md-12" class="row" ng-controller="servicioController" data-ng-init="inicioCrear()">
+    <table  width="100%">
+        <td><h3>SERVICIO DE MANTENIMIENTO VEHICULAR</h3></td> 
+    </table>
+    <br/>
+ 
+
+    <div class="modal-body" >
+        
+                  <!-- carga los procesos de la base de datos segun el espacio de trabajo -->                     
+               
+<!-- carga de casos segun el caso que se haya presentado  -->
+            <div class="col-md-7"   >
+                <div class="form-group">
+                    <label for="category" >Busqueda por:</label>
+                    <div class="controls">
+
+                        <select ng-model="datosCargar.campo" id="campo" name="campo" class="form-control"  ng-required="true" ng-change="cargarDatos(datosCargar.campo,141)" >
+                            <option style="display:none" value="">-- Elegir--</option>
+                            <option value = '0'>SOLICITUD DE SERVICIO</option>
+                                                             
+                        </select>
+                        
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-7">
+                    <div class="form-group">
+                        <label for="clasevehiculo">Opciones </label>                        
+                        <select id="id" name="id" ng-model="datosCargar.id" class="form-control" ng-options="carga.valor as carga.dato for carga in cargas" ng-change="getTabla('USG_SDMV',datosCargar.id)">
+                            <option style="display:none" value="">-- Opciones--</option>
+                        </select>
+                    </div>
+                </div>
+            
+
+       
+            <br>
+            <br>
+                  
+   <!-- carga de casos segun el caso que se haya presentado  -->                 
+       
+   
+        <div class="col-md-12" >
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                       <h5>Datos </h5> 
+                       <div ibox-tools></div>
+                       <div align="right">
+                         <a class="btn btn-primary" ng-click="getReportesGrafica()" >
+                      <i class="glyphicon fa fa-eye"></i>
+                       Generar Grafica
+                  </a>
+                            <a class="btn btn-primary" ng-click="ejemplo()" >
+                                <i class="glyphicon fa fa-print"></i>
+                                 Imprimir Listado
+                            </a>
+                        </div>
+                    </div>  
+                <div class="ibox-content" >
+                    <div class="table-responsive"> 
+                         <table  class="table table-striped"  >
+                            <thead>      
+                                <th>#&nbsp;</th>
+                                <th>CODIGO&nbsp;</th>
+                                <th>MOTOR</th>
+                                <th>SIS. DE FRENOS&nbsp;</th>
+                                <th>SIS. SUSPENSION DELANTERA&nbsp;</th>
+                                <th>SIS. SUSPENSION&nbsp;</th>
+                                <th>SIS. DE DIRECCION TRANSMISION&nbsp;</th>
+                                <th>SIS. DE LUBRICACION&nbsp;</th>
+                                <th>SIS. DE TRANSMISION DIFERENCIAL&nbsp;</th>
+                                <th>SIS. ELECTRICO&nbsp;</th>
+                                <th>SIS. DE ENFRIAMIENTO&nbsp;</th>
+                            </thead>
+                            <thead>      
+                                <th></th>
+                                <th></th>
+                                <th>
+                                  <table>
+                                    <tr>
+                                        <td>M1&nbsp;&nbsp;&nbsp;</td>
+                                        <td>M2&nbsp;&nbsp;&nbsp;</td>
+                                        <td>M3&nbsp;&nbsp;&nbsp;</td>
+                                        <td>M4&nbsp;&nbsp;&nbsp;</td>
+                                        <td>M5&nbsp;&nbsp;&nbsp;</td>
+                                        <td>M6&nbsp;&nbsp;&nbsp;</td>
+                                        <td>M7&nbsp;&nbsp;&nbsp;</td>
+                                        <td>M8&nbsp;&nbsp;&nbsp;</td>
+                                        <td>M9&nbsp;&nbsp;&nbsp;</td>
+                                    </tr>
+                                  </table>
+                                </th>
+                               
+                                <th>
+                                  <table>
+                                    <tr>
+                                        <td>F1&nbsp;&nbsp;&nbsp;</td>
+                                        <td>F2&nbsp;&nbsp;&nbsp;</td>
+                                        <td>F3&nbsp;&nbsp;&nbsp;</td>
+                                        <td>F4&nbsp;&nbsp;&nbsp;</td>
+                                    </tr>
+                                  </table>
+                                </th>
+
+                                 <th>
+                                  <table>
+                                    <tr>
+                                        <td>SD1&nbsp;&nbsp;&nbsp;</td>
+                                        <td>SD2&nbsp;&nbsp;&nbsp;</td>
+                                        <td>SD3&nbsp;&nbsp;&nbsp;</td>
+                                        <td>SD4&nbsp;&nbsp;&nbsp;</td>
+                                        <td>SD5&nbsp;&nbsp;&nbsp;</td>
+                                        <td>SD6&nbsp;&nbsp;&nbsp;</td>
+                                        <td>SD7&nbsp;&nbsp;&nbsp;</td>
+                                        <td>SD8&nbsp;&nbsp;&nbsp;</td>
+                                        <td>SD9&nbsp;&nbsp;&nbsp;</td>
+                                    </tr>
+                                  </table>
+                                </th>
+                                <th>
+                                  <table>
+                                    <tr>
+                                        <td>S1&nbsp;&nbsp;&nbsp;</td>
+                                        <td>S2&nbsp;&nbsp;&nbsp;</td>
+                                        <td>S3&nbsp;&nbsp;&nbsp;</td>
+                                        <td>S4&nbsp;&nbsp;&nbsp;</td>
+                                        <td>S5&nbsp;&nbsp;&nbsp;</td>
+                                        <td>S6&nbsp;&nbsp;&nbsp;</td>
+                                    </tr>
+                                  </table>
+                                </th>
+                                <th>
+                                  <table>
+                                    <tr>
+                                        <td>DT1&nbsp;&nbsp;&nbsp;</td>
+                                        <td>DT2&nbsp;&nbsp;&nbsp;</td>
+                                        <td>DT3&nbsp;&nbsp;&nbsp;</td>
+                                        <td>DT4&nbsp;&nbsp;&nbsp;</td>
+                                    </tr>
+                                  </table>
+                                </th>
+                                <th>
+                                  <table>
+                                    <tr>
+                                        <td>L1&nbsp;&nbsp;&nbsp;</td>
+                                        <td>L2&nbsp;&nbsp;&nbsp;</td>
+                                        <td>L3&nbsp;&nbsp;&nbsp;</td>
+                                        <td>L4&nbsp;&nbsp;&nbsp;</td>
+                                    </tr>
+                                  </table>
+                                </th>
+                                <th>
+                                  <table>
+                                    <tr>
+                                        <td>TD1&nbsp;&nbsp;&nbsp;</td>
+                                        <td>TD2&nbsp;&nbsp;&nbsp;</td>
+                                        <td>TD3&nbsp;&nbsp;&nbsp;</td>
+                                        <td>TD4&nbsp;&nbsp;&nbsp;</td>
+                                        <td>TD5&nbsp;&nbsp;&nbsp;</td>                                      
+                                    </tr>
+                                  </table>
+                                </th>
+                                <th>
+                                  <table>
+                                    <tr>
+                                        <td>E1&nbsp;&nbsp;&nbsp;</td>
+                                        <td>E2&nbsp;&nbsp;&nbsp;</td>
+                                        <td>E3&nbsp;&nbsp;&nbsp;</td>
+                                        <td>E4&nbsp;&nbsp;&nbsp;</td>                                                           
+                                    </tr>
+                                  </table>
+                                </th>
+                                 <th>
+                                  <table>
+                                    <tr>
+                                        <td>EF1&nbsp;&nbsp;&nbsp;</td>
+                                    </tr>
+                                  </table>
+                                </th>
+                            </thead>
+                    <tbody> 
+                  <tr ng-repeat="grupo in grupos" >
+                    <td>{{grupo.cas_id}}</td>
+                    <td>{{grupo.cas_nombre_caso}}</td>
+                    <td>
+                      <table  class="table table-striped"  >
+                      <tr>
+                          <td ng-repeat="motor in grupo.cas_datos.USG_MOTOR" >
+                              <div ng-show="motor.estado==true">1</div>
+                              <div ng-show="motor.estado==false">0</div>
+                          </td>
+                      </tr>
+                    </table>
+                    </td> 
+                    <td>
+                      <table  class="table table-striped"  >
+                      <tr>
+                          <td ng-repeat="motor in grupo.cas_datos.USG_FRENO" >
+                              <div ng-show="motor.estado==true">1</div>
+                              <div ng-show="motor.estado==false">0</div>
+                          </td>
+                      </tr>
+                    </table>
+                    </td> 
+                    <td>
+                      <table  class="table table-striped"  >
+                      <tr>
+                          <td ng-repeat="motor in grupo.cas_datos.USG_SUS_D" >
+                              <div ng-show="motor.estado==true">1</div>
+                              <div ng-show="motor.estado==false">0</div>
+                          </td>
+                      </tr>
+                    </table>
+                    </td>
+                    <td>
+                      <table  class="table table-striped"  >
+                      <tr>
+                          <td ng-repeat="motor in grupo.cas_datos.USG_SUS" >
+                              <div ng-show="motor.estado==true">1</div>
+                              <div ng-show="motor.estado==false">0</div>
+                          </td>
+                      </tr>
+                    </table>
+                    </td>
+                   <td>
+                      <table  class="table table-striped"  >
+                      <tr>
+                          <td ng-repeat="motor in grupo.cas_datos.USG_DIR_TRA" >
+                              <div ng-show="motor.estado==true">1</div>
+                              <div ng-show="motor.estado==false">0</div>
+                          </td>
+                      </tr>
+                    </table>
+                    </td>
+                    <td>
+                      <table  class="table table-striped"  >
+                      <tr>
+                          <td ng-repeat="motor in grupo.cas_datos.USG_LUBR" >
+                              <div ng-show="motor.estado==true">1</div>
+                              <div ng-show="motor.estado==false">0</div>
+                          </td>
+                      </tr>
+                    </table>
+                    </td>
+                    <td>
+                      <table  class="table table-striped"  >
+                      <tr>
+                          <td ng-repeat="motor in grupo.cas_datos.USG_TRA_DIF" >
+                              <div ng-show="motor.estado==true">1</div>
+                              <div ng-show="motor.estado==false">0</div>
+                          </td>
+                      </tr>
+                    </table>
+                    </td>
+                    <td>
+                      <table  class="table table-striped"  >
+                      <tr>
+                          <td ng-repeat="motor in grupo.cas_datos.USG_SIS_ELEC" >
+                              <div ng-show="motor.estado==true">1</div>
+                              <div ng-show="motor.estado==false">0</div>
+                          </td>
+                      </tr>
+                    </table>
+                    </td>
+                    <td>
+                      <table  class="table table-striped"  >
+                      <tr>
+                          <td ng-repeat="motor in grupo.cas_datos.USG_ENFR" >
+                              <div ng-show="motor.estado==true">1</div>
+                              <div ng-show="motor.estado==false">0</div>
+                          </td>
+                      </tr>
+                    </table>
+                    </td>
+                                      
+                  <td ><a   ng-click="ejemplo3(grupo.casid,72)" ></a></td>
+                  
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
+                  
+          </div>
+        </div>
+         </div>
+        </div>
+
+ </div>
+<div class="col-md-8">
+                <div id="containerdato" style="width: 1200px; height:600px; margin: 0 auto"></div>
+                </div>
+</div>

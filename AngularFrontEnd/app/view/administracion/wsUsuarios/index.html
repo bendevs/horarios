@@ -1,0 +1,101 @@
+
+<div  ng-controller="trabajoControler"   data-ng-init="inicioAccesos()">
+  <div class="ibox float-e-margins" style="margin-bottom: 10px;">
+                <div class="ibox-title" style="padding: 5px 20px 5px 20px !important; height: 75px !important;    border-color: #1AB394 !important;">
+                    <form role="form" class="form-inline">
+                        <div class="form-group">
+                           <label><h3>Usuarios:</h3> </label>
+                            <input type="text" name="product" ng-change="getAccesos(usrid)" ng-model="usrid"  list="Usuarios"  />
+                            <datalist id="Usuarios">
+                                 <option ng-repeat="usuario in obtUsuarios" value="{{usuario.usrusuario}}">{{usuario.usrusuario}}</option>
+                            </datalist>
+                        </div>
+                    </form>
+                    <H3> <label for="title">Administracion de Espacios de Trabajo</label> </H3>
+              </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-5">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>Espacios disponibles</h5>
+                <div ibox-tools></div>
+                    <div class="botones_inspinia_lmc">
+                      <div class="col-md-6">
+
+                        <div class="row">
+                          <div class="col-md-6">
+                          <label>Buscar:</label>
+                          </div>
+                          <div class="col-md-6">
+                          <input ng-model = "query" id ="busca1" class="form-control" placeholder="" >
+                          </div>
+                        </div>                      
+                        
+                      </div> 
+                    </div> 
+            </div>
+            <div class="ibox-content">
+              <table ng-table="tablaOpcion "   class="table table-hover table-striped todolist" >
+                <tr ng-repeat="opcion in Opciones  | filter:query   "  ng-class="{'colorInactivo': grupo.grpEstado == 'INACTIVO', 'colorBloqueado': grupo.grpEstado == 'BLOQUEADO'}"  >
+                  <td><input  type="checkbox" ng-model="checkboxes.items[opcion.wsid]" /> </td> 
+                  <td data-title="'Espacio de Trabajo'" >{{opcion.ws_nom}}</td>
+                  <td data-title="'Registrado'">{{opcion.ws_reg}}</td>
+                  <td data-title="'Modificado'">{{opcion.ws_mod}}</td>          
+                </tr>
+              </table>
+              <input ng-model="usuarioRol.usuarios_usr_id" ng-init="usuarioRol.usuarios_usr_id='1'" hidden id="GRUPO" name="GRUPO" type="text" value="1"> 
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="col-md-2">
+        <button ng-click="adicionar(usrid)" type="button" class="btn btn-primary" style="margin: 2px">AGREGAR <span class="glyphicon glyphicon-chevron-right"></button>
+        <button ng-click="retirar(usrid)"  type="button" class="btn btn-primary" style="margin: 2px">RETIRAR<span class="glyphicon glyphicon-chevron-left">&nbsp;</button>
+    </div>
+
+
+
+  <div class="col-md-5">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>Espacios de Trabajo Asignados al Usuario</h5>
+
+                <div ibox-tools></div>
+                    <div class="botones_inspinia_lmc">
+                         <div class="col-md-6">
+
+                        <div class="row">
+                          <div class="col-md-6">
+                          <label>Buscar:</label>
+                          </div>
+                          <div class="col-md-6">
+                          <input ng-model = "query1" id ="busca2" class="form-control" placeholder="" >
+                          </div>
+                        </div>                      
+                        
+                      </div> 
+                    </div>
+            </div>
+            <div class="ibox-content">
+              <table ng-table="tablaAccesos" class="table table-hover table-striped todolist" >
+                <tr ng-repeat="accesosRol in obtAccesosRoles  | filter: query1 " ng-class="{'colorInactivo': grupo.grpEstado == 'INACTIVO', 'colorBloqueado': grupo.grpEstado == 'BLOQUEADO'}" >
+                  <td><input  type="checkbox" ng-model="checkboxes2.items[accesosRol.uwid]" /> </td>
+                  <td data-title="'Usuario'">{{accesosRol.usuario }}</td>
+                  <td data-title="'Espacio de Trabajo'">{{accesosRol.wsnom}}</td>
+                  <td data-title="'Registrado'">{{accesosRol.registrado}}</td>
+                  <td data-title="'Modificado'">{{accesosRol.modificado}}</td>
+                </tr>
+              </table>
+            </div>
+        </div>
+    </div>
+
+
+
+
+  </div>
+</div>
